@@ -1,11 +1,7 @@
 #Imports
 
 import random
-
-#Clear Screen
-
-def clear_screen():
-    print("\n" * 50)
+from Extras import yes_or_no, clear_screen
 
 #Input Words
 
@@ -25,15 +21,15 @@ def input_words():
 
 #Get Word
 
-def get_word():
-    random_word = random.choice(WORDS)
+def get_word(words = []):
+    random_word = random.choice(words)
 
     return random_word 
 
 #Try Again
 
-def try_again():
-    print(f"Congrats! You guessed it in {GUESSES} guesses. Try again? (Y/N)\n")
+def try_again(guesses = 0, words = []):
+    print(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n")
     
     response = yes_or_no()
     if response == "y":
@@ -43,7 +39,7 @@ def try_again():
         clear_screen()
 
         if same_words == "y":
-            game()
+            game(words)
 
         elif same_words == "n":
             main()
@@ -51,28 +47,17 @@ def try_again():
     elif response == "n":
         exit()
 
-#Yes or No
-
-def yes_or_no():
-    while True:
-        response = input().lower()
-
-        if response == "y":
-            return response
-        elif response == "n":
-            return response
-        else:
-            print('\nPlease enter "Y" or "N".\n')
-
 #Game Loop
 
-def game():
-    global GUESSES
+GUESSES = []
 
-    game_word = get_word()
+def game(words = []):
+    clear_screen()
+
+    game_word = get_word(words)
     game_letters = list(game_word)
     guessed_letters = ['_' for _ in game_letters]
-    GUESSES = 0
+    guesses = 0
 
     while True:
         for i, game_letter in enumerate(game_letters):
@@ -91,20 +76,20 @@ def game():
                 continue
 
         if "_" not in guessed_letters:
-            GUESSES += 1
-            try_again()
+            guesses += 1
+            try_again(guesses, words)
 
         else:
-            GUESSES += 1
+            guesses += 1
             continue
 
 #main loop
 
 def main():
-    global WORDS
+    clear_screen()
 
-    WORDS = input_words()
-    game()
+    words = input_words()
+    game(words)
 
 if __name__ == "__main__":
     main()

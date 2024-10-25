@@ -1,36 +1,32 @@
+#Imports
+
+from Extras import yes_or_no, clear_screen
+
 #Players
 
 NUM_PLAYERS = 2
 players = [f"Player{i+1}" for i in range(NUM_PLAYERS)]
 
-#Clear screen
-
-def clear_screen():
-    print("\n" * 50)
-
 #Handling ValueError
 
 def handle_value_error():
-    while True:
-        try:
-            return int(input())
-        except ValueError:
-            print("\nPlease enter a valid integer.\n")
+    try:
+        return int(input())
+    except ValueError:
+        print("\nPlease enter a valid integer.\n")
+        handle_value_error()
 
 #Try again?
 
 def try_again():
     print(f"{CURRENT_PLAYER} lost. Try again? (Y/N)\n")
-    while True:
-        response = input().lower()
+    response = yes_or_no()
 
-        if response == "y":
-            clear_screen()
-            nim()
-        elif response == "n":
-            exit()
-        else:
-            print('\nPlease enter "Y" or "N".\n')
+    if response == "y":
+        clear_screen()
+        nim()
+    elif response == "n":
+        exit()
 
 
 

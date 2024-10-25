@@ -1,8 +1,6 @@
 import random
 import keyboard
-
-def clear_screen():
-    print("\n" * 50)
+from Extras import yes_or_no, clear_screen
 
 def menu():
     menu = ["Play", "Highscores", "Settings", "Exit"]
@@ -53,7 +51,9 @@ def bounds():
     settings()
 
 def highscore():
-    choice = input("Are you sure you want to reset your current highscores?")
+    print("Are you sure you want to reset your current highscores?")
+
+    choice = yes_or_no()
 
     if choice == "y":
         reset_highscores()
@@ -61,10 +61,6 @@ def highscore():
 
     elif choice == "n":
         settings()
-
-    else:
-        print("Invalid choice.")
-        highscore()
 
 def try_again():
     '''
