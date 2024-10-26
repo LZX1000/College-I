@@ -1,6 +1,6 @@
-from Nim import nim
+from Nim import main as nim
 from Word_Guess import main as word_guess
-import Number_Guess
+from Number_Guess import main as number_guess
 
 def main():
     word_guess()

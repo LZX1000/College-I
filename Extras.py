@@ -16,7 +16,7 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def main():
-    yes_or_no()
+    print("I am but a humble module file.")
 
 def handle_value_error():
     try:
