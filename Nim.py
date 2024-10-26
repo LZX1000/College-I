@@ -1,39 +1,34 @@
 #Imports
 
-from Extras import yes_or_no, clear_screen
+from Extras import yes_or_no, clear_screen, handle_value_error
 
 #Players
 
-NUM_PLAYERS = 2
-players = [f"Player{i+1}" for i in range(NUM_PLAYERS)]
+def identify_players():
+    print("How many players are playing?\n")
+    num_players = handle_value_error()
+    players = [f"Player{i+1}" for i in range(num_players)]
 
-#Handling ValueError
-
-def handle_value_error():
-    try:
-        return int(input())
-    except ValueError:
-        print("\nPlease enter a valid integer.\n")
-        handle_value_error()
+    return players, num_players
 
 #Try again?
 
-def try_again():
-    print(f"{CURRENT_PLAYER} lost. Try again? (Y/N)\n")
+def try_again(current_player, players, num_players):
+    print(f"{current_player} lost. Try again? (Y/N)\n")
     response = yes_or_no()
 
     if response == "y":
         clear_screen()
-        nim()
+        play_again(players, num_players)
     elif response == "n":
         exit()
 
-
-
 #Choosing a starting number by averaging the two numbers chosen by the players
 
-def choose_starting_number():
+def choose_starting_number(players = []):
     start_nums = []
+
+    clear_screen()
 
     for player in players:
         print(f"{player}, choose a starting number: ")
@@ -46,33 +41,50 @@ def choose_starting_number():
     
     return starting_number
 
+#Check if it's a valid number (Between 1 and 3)
+
+def number_check(player_choice):
+    if player_choice <= 3:
+        return player_choice
+    else:
+        print("\nPlease choose a number between 1 and 3.\n")
+        player_choice = handle_value_error()
+        number_check(player_choice)
+
 #Game loop
 
-def nim():
-    global CURRENT_PLAYER
-
-    game_number = choose_starting_number()
-    current_player_index = 0
+def game(players, num_players, game_number, current_player_index):
     player_choice = 0
-
-    while True:
-        CURRENT_PLAYER = players[current_player_index]
-        print(f"\n\nThere are currently {game_number} left.\n{CURRENT_PLAYER}, how many do you want to take?\n")
-        player_choice = handle_value_error()
-
-        while True:
-            if player_choice <= 3:
-                if player_choice >= game_number:
-                    try_again()
-                    break
-                else:
-                    game_number -= player_choice
-                    break
-            else:
-                print("\nPlease choose a number between 1 and 3.\n")
-                player_choice = handle_value_error()
     
-        current_player_index = (current_player_index + 1) % NUM_PLAYERS
+    clear_screen()
 
+    current_player = players[current_player_index]
+    print(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n")
+    player_choice = handle_value_error()
+    player_choice = number_check(player_choice)
+
+    if player_choice >= game_number:
+        try_again(current_player, players, num_players)
+    else:
+        game_number -= player_choice
+        current_player_index = (current_player_index + 1) % num_players
+        game(players, num_players, game_number, current_player_index)
+
+#Play again with the same players
+
+def play_again(players, num_players):
+    game_number = choose_starting_number(players)
+    current_player_index = 0
+
+    game(players, num_players, game_number, current_player_index)
+
+#Main loop
+
+def main():
+    clear_screen()
+
+    players, num_players = identify_players()
+
+    play_again(players, num_players)
 if __name__ == "__main__":
-    nim()
+    main()

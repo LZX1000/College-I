@@ -18,5 +18,12 @@ def clear_screen():
 def main():
     yes_or_no()
 
+def handle_value_error():
+    try:
+        return int(input())
+    except ValueError:
+        print("\nPlease enter a valid integer.\n")
+        handle_value_error()
+
 if __name__ == "__main__":
     main()
