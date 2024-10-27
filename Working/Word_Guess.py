@@ -63,7 +63,11 @@ def check_guess():
     guess = input("Guess a letter: ").lower()
     
     if len(guess) == 1:
-        return guess
+        if any(char.isdigit() for char in guess):
+            return check_guess()
+
+        else:
+            return guess
     
     else:
         print("Please enter a single letter.\n")
@@ -71,7 +75,7 @@ def check_guess():
         
 #Guessing
 
-def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, words=None):
+def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, words=None, missed_letters=None):
     clear_screen()
 
     if words is None:
@@ -82,13 +86,17 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
         game_letters = list(game_word)
     if guessed_letters is None:
         guessed_letters = ['_' for _ in game_letters]
+    if missed_letters is None:
+        missed_letters = []
+
+    clear_screen()
 
     for i, game_letter in enumerate(game_letters):
         if guessed_letters[i] != "_":
             print(game_letter, end="")
         elif game_letter.islower():
             print("_", end="")
-    print("\n")
+    print("\n"*3)
 
     guess = check_guess()
 
@@ -96,7 +104,8 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
         if guess == game_letter:
             guessed_letters[i] = game_letter
         else:
-            continue
+            missed_letters.append(guess)
+            return missed_letters
 
     if "_" not in guessed_letters:
         guesses += 1

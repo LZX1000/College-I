@@ -3,9 +3,9 @@ import os
 def yes_or_no():
         response = input().strip().lower()
 
-        if response == "y" or "yes" or "1":
+        if response in ["y", "yes", "1"]:
             return "y"
-        elif response == "n" or "no" or "0":
+        elif response in ["n" or "no" or "0"]:
             return "n"
         else:
             print('\nPlease enter "Y" or "N".\n')
