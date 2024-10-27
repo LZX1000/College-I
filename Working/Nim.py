@@ -6,7 +6,12 @@ from Extras import yes_or_no, clear_screen, handle_value_error
 
 def identify_players():
     print("How many players are playing?\n")
-    num_players = handle_value_error()
+    while True:
+        num_players = handle_value_error()
+        if num_players < 2:
+            print("\nSorry but this game currently needs at least two players.\n")
+        else:
+            break
     players = [f"Player{i+1}" for i in range(num_players)]
 
     return players, num_players

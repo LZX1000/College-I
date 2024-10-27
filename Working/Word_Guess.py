@@ -57,10 +57,15 @@ def try_again(guesses=0, words=None):
             main(words=None)
     #If the player doesn't want to play again
     elif response == "n":
-        exit()
+        return response
 
 #Check Guess
-def check_guess():
+def check_guess(guessed_letters=None, missed_letters=None):
+    if guessed_letters is None:
+        guessed_letters = []
+    if missed_letters is None:
+        missed_letters = []
+
     guess = input("Guess a letter: ").lower()
     
     if len(guess) == 1:
@@ -68,6 +73,10 @@ def check_guess():
             print("Numbers are not allowed. Please enter a single letter.\n")
             return check_guess()
 
+        elif guess in guessed_letters or guess in missed_letters:
+            print("You already guessed that letter. Try again.\n")
+            return check_guess(guessed_letters=guessed_letters, missed_letters=missed_letters)
+        
         else:
             return guess
     
@@ -94,25 +103,24 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
     print(f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n")
 
     if "_" in guessed_letters: 
-        guess = check_guess()
-
-        if guess not in guessed_letters and guess not in missed_letters:
-            if guess in game_letters:
-                for i, letter in enumerate(game_letters):
-                    if guess == letter:
-                        guessed_letters[i] = letter
-                guesses += 1
-            else:
-                if guess not in missed_letters:
-                    missed_letters.append(guess)
-                    guesses += 1
+        guess = check_guess(guessed_letters=guessed_letters, missed_letters=missed_letters)
+        if guess in game_letters:
+            for i, letter in enumerate(game_letters):
+                if guess == letter:
+                    guessed_letters[i] = letter
+            guesses += 1
         else:
-            print("You already guessed that letter. Try again.\n")
+            if guess not in missed_letters:
+                missed_letters.append(guess)
+            guesses += 1
         return main(game_word, guesses, game_letters, guessed_letters, words, missed_letters)        
     else:
         clear_screen()
         print(f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n")
-        try_again(guesses, words)
+        response = try_again(guesses, words)
+        
+        if response == "n":
+            return
 
 if __name__ == "__main__":
-    main()
+    response = main()
