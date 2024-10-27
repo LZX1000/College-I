@@ -39,7 +39,7 @@ def try_again(guesses = 0, words = []):
         clear_screen()
 
         if same_words == "y":
-            game(words)
+            main(words)
 
         elif same_words == "n":
             main()
@@ -47,48 +47,59 @@ def try_again(guesses = 0, words = []):
     elif response == "n":
         exit()
 
-#Game Loop
+#Check Guess
 
-def game(words):
+def check_guess():
+    guess = input("Guess a letter: ").lower()
+    
+    if len(guess) == 1:
+        return guess
+    
+    else:
+        print("Please enter a single letter.\n")
+        return check_guess()
+        
+#Guessing
+
+def guessing(guesses, game_letters, guessed_letters, words):
+    for i, game_letter in enumerate(game_letters):
+        if guessed_letters[i] != "_":
+            print(game_letter, end="")
+        elif game_letter.islower():
+            print("_", end="")
+    print("\n")
+
+    guess = check_guess()
+
+    for i, game_letter in enumerate(game_letters):
+        if guess == game_letter:
+            guessed_letters[i] = game_letter
+        else:
+            continue
+
+    if "_" not in guessed_letters:
+        guesses += 1
+        print()
+        try_again(guesses, words)
+
+    else:
+        guesses += 1
+        return guessing(guesses, game_letters, guessed_letters, words)
+
+#Game
+
+def main(words=None):
     clear_screen()
+
+    if words is None:
+        words = input_words()
 
     game_word = get_word(words)
     game_letters = list(game_word)
     guessed_letters = ['_' for _ in game_letters]
     guesses = 0
 
-    while True:
-        for i, game_letter in enumerate(game_letters):
-            if guessed_letters[i] != "_":
-                print(game_letter, end="")
-            elif game_letter.islower():
-                print("_", end="")
-        print("\n")
-
-        guess = input("Guess a letter: ").lower()
-
-        for i, game_letter in enumerate(game_letters):
-            if guess == game_letter:
-                guessed_letters[i] = game_letter
-            else:
-                continue
-
-        if "_" not in guessed_letters:
-            guesses += 1
-            print()
-            try_again(guesses, words)
-
-        else:
-            guesses += 1
-            continue
-
-#main loop
-
-def main():
-    clear_screen()
-
-    words = input_words()
-    game(words)
+    guessing(guesses, game_letters, guessed_letters, words)
 
 if __name__ == "__main__":
     main()

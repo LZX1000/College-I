@@ -7,7 +7,6 @@ def yes_or_no():
             return response
         elif response == "n":
             return response
-        
         else:
             print('\nPlease enter "Y" or "N".\n')
             return yes_or_no()

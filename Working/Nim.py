@@ -49,7 +49,7 @@ def number_check(player_number):
     else:
         print("\nPlease choose an integer between 1 and 3.\n")
         player_number = handle_value_error()
-        number_check(player_number)
+        return number_check(player_number)
 
 #Game loop
 
@@ -67,7 +67,7 @@ def game(players, num_players, game_number, current_player_index):
     else:
         game_number -= player_choice
         current_player_index = (current_player_index + 1) % num_players
-        game(players, num_players, game_number, current_player_index)
+        return game(players, num_players, game_number, current_player_index)
 
 #Play again with the same players
 
