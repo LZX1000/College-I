@@ -5,7 +5,7 @@ def yes_or_no():
 
         if response in ["y", "yes", "1"]:
             return "y"
-        elif response in ["n" or "no" or "0"]:
+        elif response in ["n", "no", "0"]:
             return "n"
         else:
             print('\nPlease enter "Y" or "N".\n')
