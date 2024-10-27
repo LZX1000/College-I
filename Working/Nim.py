@@ -43,13 +43,13 @@ def choose_starting_number(players = []):
 
 #Check if it's a valid number (Between 1 and 3)
 
-def number_check(player_choice):
-    if player_choice <= 3:
-        return player_choice
+def number_check(player_number):
+    if player_number <= 3:
+        return player_number
     else:
-        print("\nPlease choose a number between 1 and 3.\n")
-        player_choice = handle_value_error()
-        number_check(player_choice)
+        print("\nPlease choose an integer between 1 and 3.\n")
+        player_number = handle_value_error()
+        number_check(player_number)
 
 #Game loop
 
@@ -60,8 +60,7 @@ def game(players, num_players, game_number, current_player_index):
 
     current_player = players[current_player_index]
     print(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n")
-    player_choice = handle_value_error()
-    player_choice = number_check(player_choice)
+    player_choice = number_check(player_number=handle_value_error())
 
     if player_choice >= game_number:
         try_again(current_player, players, num_players)

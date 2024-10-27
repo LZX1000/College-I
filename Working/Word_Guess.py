@@ -49,9 +49,7 @@ def try_again(guesses = 0, words = []):
 
 #Game Loop
 
-GUESSES = []
-
-def game(words = []):
+def game(words):
     clear_screen()
 
     game_word = get_word(words)
@@ -77,6 +75,7 @@ def game(words = []):
 
         if "_" not in guessed_letters:
             guesses += 1
+            print()
             try_again(guesses, words)
 
         else:

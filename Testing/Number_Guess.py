@@ -83,7 +83,7 @@ def highscore():
         settings()
 
 def get_highscore(highscores):
-    highscores.sort(key=lambda x: x[1], reverse=True)
+    highscores = highscores.sort(key=lambda x: x[1], reverse=True)
 
     return highscores[0][1]
 

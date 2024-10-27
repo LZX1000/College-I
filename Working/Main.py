@@ -1,6 +1,5 @@
 from Nim import main as nim
 from Word_Guess import main as word_guess
-from Number_Guess import main as number_guess
 from Extras import handle_value_error, clear_screen
 
 def menu_choice(menu):
@@ -17,7 +16,7 @@ def run_choice():
     print()
 
 def main():
-    menu = ["Quit", "Nim", "Word Guess", "Number Guess"]
+    menu = ["Quit", "Nim", "Word Guess"]
 
     clear_screen()
 

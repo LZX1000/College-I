@@ -10,7 +10,7 @@ def yes_or_no():
         
         else:
             print('\nPlease enter "Y" or "N".\n')
-            yes_or_no()
+            return yes_or_no()
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')

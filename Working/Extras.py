@@ -10,20 +10,20 @@ def yes_or_no():
         
         else:
             print('\nPlease enter "Y" or "N".\n')
-            yes_or_no()
+            return yes_or_no()
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
-
-def main():
-    print("I am but a humble module file.")
 
 def handle_value_error():
     try:
         return int(input())
     except ValueError:
         print("\nPlease enter a valid integer.\n")
-        handle_value_error()
+        return handle_value_error()
+
+def main():
+    print("I am but a humble module file.")
 
 if __name__ == "__main__":
     main()
