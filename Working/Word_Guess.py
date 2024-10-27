@@ -15,6 +15,10 @@ def input_words():
             print("Numbers are not allowed. Please enter a valid word.")
             continue
         words.append(word)
+    #Check if words[] is empty
+    if len(words) == 0:
+        print("You must enter at least one word.")
+        return input_words()
     #Return words
     return words
 

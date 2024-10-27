@@ -27,7 +27,7 @@ def main():
     clear_screen()
     #Asks the user to choose a game, printing the games in the menu
     print("Which game would you like to play?\n")
-    print("\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]))
+    print("\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n")
     #Checks the choice for the corresponding name or index in menu[]
     choice_name = check_menu_choice(menu).strip().lower().replace(" ", "_")
     #Evaluates the choice to call the corresponding game function
