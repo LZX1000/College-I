@@ -21,28 +21,38 @@ def input_words():
 
 #Get Word
 
-def get_word(words = []):
+def get_word(words=None):
+    if words == None:
+        words = input_words()
+
     random_word = random.choice(words)
 
     return random_word 
 
 #Try Again
 
-def try_again(guesses = 0, words = []):
+def try_again(guesses=0, words=None):
+    if words is None:
+        words = input_words()
+    if guesses == 0:
+        main(words=words)
+
     print(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n")
     
     response = yes_or_no()
     if response == "y":
+        clear_screen()
+
         print("Would you like to use the same words? (Y/N)\n")
         
         same_words = yes_or_no()
         clear_screen()
 
         if same_words == "y":
-            main(words)
+            main(words=words)
 
         elif same_words == "n":
-            main()
+            main(words=None)
 
     elif response == "n":
         exit()
@@ -61,7 +71,18 @@ def check_guess():
         
 #Guessing
 
-def guessing(guesses, game_letters, guessed_letters, words):
+def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, words=None):
+    clear_screen()
+
+    if words is None:
+        words = input_words()
+    if game_word is None:
+        game_word = get_word(words)
+    if game_letters is None:
+        game_letters = list(game_word)
+    if guessed_letters is None:
+        guessed_letters = ['_' for _ in game_letters]
+
     for i, game_letter in enumerate(game_letters):
         if guessed_letters[i] != "_":
             print(game_letter, end="")
@@ -79,27 +100,13 @@ def guessing(guesses, game_letters, guessed_letters, words):
 
     if "_" not in guessed_letters:
         guesses += 1
-        print()
+        clear_screen()
+        print(f"\n{game_word}" + "\n." * 3)
         try_again(guesses, words)
 
     else:
         guesses += 1
-        return guessing(guesses, game_letters, guessed_letters, words)
-
-#Game
-
-def main(words=None):
-    clear_screen()
-
-    if words is None:
-        words = input_words()
-
-    game_word = get_word(words)
-    game_letters = list(game_word)
-    guessed_letters = ['_' for _ in game_letters]
-    guesses = 0
-
-    guessing(guesses, game_letters, guessed_letters, words)
+        return main(game_word, guesses, game_letters, guessed_letters, words)
 
 if __name__ == "__main__":
     main()

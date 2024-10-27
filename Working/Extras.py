@@ -1,12 +1,12 @@
 import os
 
 def yes_or_no():
-        response = input().lower()
+        response = input().strip().lower()
 
-        if response == "y":
-            return response
-        elif response == "n":
-            return response
+        if response == "y" or "yes" or "1":
+            return "y"
+        elif response == "n" or "no" or "0":
+            return "n"
         else:
             print('\nPlease enter "Y" or "N".\n')
             return yes_or_no()
