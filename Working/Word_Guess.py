@@ -1,46 +1,48 @@
-#Imports
 import random
 from Extras import yes_or_no, clear_screen
 
 #Input Words
 def input_words():
-    print("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.")
+    #Initialize words list
     words = []
+    print("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.\n")
+    #Entering words loop
     while True:
-        word = input("Enter a word: ").lower()
+        word = input("Enter a word: ").lower().strip()
         if word == "done":
             break
-        elif any(char.isdigit() for char in words):
+        elif any(char.isdigit() for char in word):
             print("Numbers are not allowed. Please enter a valid word.")
             continue
         words.append(word)
-
+    #Return words
     return words
 
-#Get Word
+#Get Random Word
 def get_word(words=None):
+    #Checks there is a proper words[] list
     if words == None:
         words = input_words()
-
+    #Chooses a random word from words[] list
     random_word = random.choice(words)
-
+    #Returns a random word
     return random_word 
 
 #Try Again
 def try_again(guesses=0, words=None):
+    #Check parameters
     if words is None:
         words = input_words()
     if guesses == 0:
         main(words=words)
-
+    #Ask if the player wants to play again
     print(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n")
-    
     response = yes_or_no()
+    #If the player wants to play again
     if response == "y":
         clear_screen()
-
+        #Checks if the player wants new words
         print("Would you like to use the same words? (Y/N)\n")
-        
         same_words = yes_or_no()
         clear_screen()
 
@@ -49,7 +51,7 @@ def try_again(guesses=0, words=None):
 
         elif same_words == "n":
             main(words=None)
-
+    #If the player doesn't want to play again
     elif response == "n":
         exit()
 
@@ -89,7 +91,7 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
 
     if "_" in guessed_letters: 
         guess = check_guess()
-        
+
         if guess not in guessed_letters and guess not in missed_letters:
             if guess in game_letters:
                 for i, letter in enumerate(game_letters):
