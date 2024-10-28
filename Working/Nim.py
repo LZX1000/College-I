@@ -17,8 +17,7 @@ def try_again(current_player=None):
     if current_player == None:
         return main()
     #Get response
-    print(f"{current_player} lost. Try again? (Y/N)\n")
-    response = yes_or_no()
+    response = yes_or_no(f"{current_player} lost. Try again? (Y/N)\n")
     #Play again or quit
     if response == "y":
         clear_screen()
@@ -81,8 +80,7 @@ def get_player_choice(game_number=None, current_player=None):
     if game_number == None or current_player == None:
         return main()
     #Get player number
-    prompt = f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n"
-    player_choice = number_check(handle_value_error(prompt), game_number=game_number, current_player=current_player)
+    player_choice = number_check(handle_value_error(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n"), game_number=game_number, current_player=current_player)
     return player_choice
 
 #Generate random number from robot
@@ -96,33 +94,40 @@ def get_robot_choice():
 
 #Main loop
 def main(players=None, num_players=0, game_number=0, current_player_index=0, current_player=None):
-    #Starting functions
-    clear_screen()
-    players, num_players, game_number = start()
-    #Game loop
-    while True:
-        #Ready turn
-        player_choice = 0
+    game = True
+    while game == True:
+        #Starting functions
         clear_screen()
-        #Prompts and recieves integer choice from player
-        current_player = players[current_player_index]
-        if current_player == "Robot":
-            player_choice = get_robot_choice()
-        else:
-            player_choice = get_player_choice(game_number=game_number, current_player=current_player)
-        #Check for game over
-        if player_choice >= game_number:
-            response = try_again(current_player=current_player)
-            #Play again or quit
-            if response == "y":
-                players, num_players, game_number = start(players=players, num_players=num_players)
-            elif response == "n":
-                playing = False
-                break
-        #Game continues
-        else:
-            game_number -= player_choice
-            current_player_index = (current_player_index + 1) % num_players
+        current_player_index = 0
+        players, num_players, game_number = start(players=players, num_players=num_players)
+        if game_number == 0:
+            game_number = choose_starting_number(players=players)
+        #Game loop
+        playing = True
+        while playing == True:
+            #Ready turn
+            player_choice = 0
+            clear_screen()
+            #Prompts and recieves integer choice from player
+            current_player = players[current_player_index]
+            if current_player == "Robot":
+                player_choice = get_robot_choice()
+            else:
+                player_choice = get_player_choice(game_number=game_number, current_player=current_player)
+            #Check for game over
+            if player_choice >= game_number:
+                response = try_again(current_player=current_player)
+                #Play again or quit
+                if response == "y":
+                    playing = False
+                    break
+                elif response == "n":
+                    playing = game = False
+                    break
+            #Game continues
+            else:
+                game_number -= player_choice
+                current_player_index = (current_player_index + 1) % num_players
     #End of game
     return
     
