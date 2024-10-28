@@ -1,25 +1,26 @@
 import os
 
-def yes_or_no():
-        response = input().strip().lower()
-
+def yes_or_no(prompt=""):
+    while True:
+        response = input(prompt).strip().lower()
         if response in ["y", "yes", "1"]:
             return "y"
         elif response in ["n", "no", "0"]:
             return "n"
         else:
+            clear_screen()
             print('\nPlease enter "Y" or "N".\n')
-            return yes_or_no()
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def handle_value_error(prompt=""):
-    try:
-        return int(input(prompt))
-    except ValueError:
-        print("\nPlease enter a valid integer.\n")
-        return handle_value_error(prompt="")
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            clear_screen()
+            print("\nPlease enter a valid integer.\n")
 
 def main():
     print("I am but a humble module file.")
