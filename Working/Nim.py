@@ -3,16 +3,12 @@ from Extras import yes_or_no, clear_screen, handle_value_error
 #Prompts for and recieves the number of players, returning them as a list
 def identify_players():
     #Initial print statement
-    print("How many players are playing?\n")
-    #Check for at least two players
-    while True:
-        num_players = handle_value_error()
-        if num_players < 2:
-            print("\nSorry but this game currently needs at least two players.\n")
-        else:
-            break
+    num_players = handle_value_error("How many players are playing?\n")
     #Initialize players []
     players = [f"Player{i+1}" for i in range(num_players)]
+    if len(players) == 1:
+        players.append("Robot")
+        num_players += 1
     #Return players and number of players
     return players, num_players
 
@@ -39,10 +35,16 @@ def choose_starting_number(players=None):
     clear_screen()
     #All players choose a starting number
     for player in players:
-        start_nums.append(handle_value_error(f"{player}, choose a starting number: "))
+        if player == "Robot":
+            continue
+        else:
+            start_nums.append(handle_value_error(f"{player}, choose a starting number: "))
     #Average starting numbers
     num_sums = sum(start_nums)
-    starting_number = num_sums // len(players)
+    if "Robot" not in [players for players in players]:
+        starting_number = num_sums // len(players)
+    else:
+        starting_number = num_sums
     print(f"\nThe starting number is {starting_number}.\n")
     #Return values
     return starting_number
@@ -55,7 +57,7 @@ def number_check(player_number=None, game_number=None, current_player=None):
     condition = False
     #Get proper number loop
     while True:
-        if player_number <= 3:
+        if player_number <= 3 and player_number >= 1:
             return player_number
         elif condition == True:
             clear_screen()
@@ -68,25 +70,46 @@ def number_check(player_number=None, game_number=None, current_player=None):
 def start(players=None, num_players=None):
     #Check variables
     if players == None or num_players == None:
-        return main()
+        players, num_players = identify_players()
     game_number = choose_starting_number(players=players)
     #Return values
     return players, num_players, game_number
 
+#Prompt for and recieve the player's number
+def get_player_choice(game_number=None, current_player=None):
+    #Check/initialize variables
+    if game_number == None or current_player == None:
+        return main()
+    #Get player number
+    prompt = f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n"
+    player_choice = number_check(handle_value_error(prompt), game_number=game_number, current_player=current_player)
+    return player_choice
+
+#Generate random number from robot
+def get_robot_choice():
+    while True:
+        try:
+            return randint(1,3)
+        except NameError:
+            from random import randint as randint
+            continue
+
 #Main loop
-def main(players=None, num_players=0, game_number=0, current_player_index=0):
+def main(players=None, num_players=0, game_number=0, current_player_index=0, current_player=None):
     #Starting functions
     clear_screen()
-    players, num_players = identify_players()
-    players, num_players, game_number = start(players=players, num_players=num_players)
-    #Playing loop
+    players, num_players, game_number = start()
+    #Game loop
     while True:
         #Ready turn
         player_choice = 0
         clear_screen()
         #Prompts and recieves integer choice from player
         current_player = players[current_player_index]
-        player_choice = number_check(player_number=handle_value_error(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n"), game_number=game_number, current_player=current_player)
+        if current_player == "Robot":
+            player_choice = get_robot_choice()
+        else:
+            player_choice = get_player_choice(game_number=game_number, current_player=current_player)
         #Check for game over
         if player_choice >= game_number:
             response = try_again(current_player=current_player)
@@ -94,6 +117,7 @@ def main(players=None, num_players=0, game_number=0, current_player_index=0):
             if response == "y":
                 players, num_players, game_number = start(players=players, num_players=num_players)
             elif response == "n":
+                playing = False
                 break
         #Game continues
         else:
