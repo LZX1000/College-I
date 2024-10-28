@@ -94,7 +94,7 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
     if game_letters is None:
         game_letters = list(game_word)
     if guessed_letters is None:
-        guessed_letters = ['_' for _ in game_letters]
+        guessed_letters = ['_' if letter.isalpha() else letter for letter in game_letters]
     if missed_letters is None:
         missed_letters = []
     #Print the game screen
