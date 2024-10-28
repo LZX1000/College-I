@@ -14,12 +14,12 @@ def yes_or_no():
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def handle_value_error():
+def handle_value_error(prompt=""):
     try:
-        return int(input())
+        return int(input(prompt))
     except ValueError:
         print("\nPlease enter a valid integer.\n")
-        return handle_value_error()
+        return handle_value_error(prompt="")
 
 def main():
     print("I am but a humble module file.")
