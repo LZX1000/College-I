@@ -41,14 +41,12 @@ def try_again(guessed_letters=None, guesses=0, words=None):
     #Check parameters
     if words is None:
         words = input_words()
-    if guesses == 0:
-        main(words=words)
     if guessed_letters is None:
         guessed_letters = []
     #Ask if the player wants to play again
-    print(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n")
     if guesses == len(guessed_letters):
         print("*Perfect!*\n")
+    print(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n")
     response = yes_or_no()
     #If the player wants to play again
     if response == "y":
@@ -66,7 +64,7 @@ def try_again(guessed_letters=None, guesses=0, words=None):
         return response
 
 #Check Guess
-def check_guess(guessed_letters=None, missed_letters=None, guesses=0):
+def check_guess(display_game="",guessed_letters=None, missed_letters=None, guesses=0):
     #Check parameters
     if guessed_letters is None:
         guessed_letters = []
@@ -75,25 +73,25 @@ def check_guess(guessed_letters=None, missed_letters=None, guesses=0):
     while True:
         guess = input("Guess a letter: ").lower()
         #Check if the guess is a single letter
-        if len(guess) == 1:
+        if len(guess) == 1 and guess.isalpha():
             #Check if the guess is a letter
             if any(char.isdigit() for char in guess):
-                clear_screen()
-                print(f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n")
-                print("Numbers are not allowed. Please enter a single letter.\n")
+                clear_screen(display_game + "\nNumbers are not allowed. Please enter a single letter.\n")
             #Check if the guess has already been guessed
             elif guess in guessed_letters or guess in missed_letters:
-                clear_screen()
-                print(f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n")
-                print("You already guessed that letter. Try again.\n")
+                clear_screen(display_game + "\nYou already guessed that letter. Try again.\n")
             #Return the proper guess
             else:
                 return guess
         #Ask for a new, single-letter guess
+        elif len(guess) > 1:
+            clear_screen(display_game + "\nPlease enter a single letter.\n")
+        #Ask for a new, letter guess
+        elif not guess.isalpha():
+            clear_screen(display_game + "\nPlease enter a letter.\n")
+        #Ask for a new guess because the guess was just weird
         else:
-            clear_screen()
-            print(f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n")
-            print("Please enter a single letter.\n")
+            clear_screen(display_game + "\nPlease enter a valid letter.\n")
         
 #Guessing
 def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, words=None, missed_letters=None):
@@ -109,13 +107,14 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
         guessed_letters = ['_' if letter.isalpha() else letter for letter in game_letters]
     if missed_letters is None:
         missed_letters = []
+    display_game = f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
     #Print the game screen
     clear_screen()
     print(f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n")
     #Check if there are characters left to guess
     if "_" in guessed_letters:
         #Get a proper guess 
-        guess = check_guess(guessed_letters=guessed_letters, missed_letters=missed_letters, guesses=guesses)
+        guess = check_guess(display_game=display_game, guessed_letters=guessed_letters, missed_letters=missed_letters, guesses=guesses)
         #Check if the guess is in the word
         if guess in game_letters:
             for i, letter in enumerate(game_letters):
