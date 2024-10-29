@@ -19,18 +19,16 @@ def input_words():
         elif not any(char.isalpha() for char in word):
             clear_screen("You need at least one letter. Please enter a valid word.\n")
         elif any(char == '_' for char in word):
-            clear_screen("Underscores are not currently supported. Please enter a valid word.\n")
+            clear_screen("Underscores are not currently supported. Please enter another word.\n")
         elif word in words:
             clear_screen("You already entered that word. Please enter a new word.\n")
+        elif len(words) == 0:
+            clear_screen("You must enter at least one word.\n")
         else:
             words.append(word)
             clear_screen()
         #Sort words alphabetically
         words.sort()
-    #Check if words[] is empty
-    if len(words) == 0:
-        clear_screen("You must enter at least one word.\n")
-        return input_words()
     #Return words
     return words
 
