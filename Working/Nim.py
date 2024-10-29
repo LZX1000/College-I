@@ -3,9 +3,12 @@ from Extras import yes_or_no, clear_screen, handle_value_error
 #Prompts for and recieves the number of players, returning them as a list
 def identify_players():
     #Initial print statement
-    num_players = handle_value_error("How many players are playing?\n")
-    if num_players < 1:
-        num_players = 1
+    while True:
+        num_players = handle_value_error("How many players are playing?\n")
+        if num_players < 1:
+            clear_screen("This game requires at least 1 player.\n")
+        else:
+            break
     #Initialize players []
     players = [f"Player{i+1}" for i in range(num_players)]
     if len(players) == 1:
