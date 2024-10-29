@@ -11,8 +11,10 @@ def yes_or_no(prompt=""):
             clear_screen()
             print('\nPlease enter "Y" or "N".\n')
 
-def clear_screen():
+def clear_screen(prompt=""):
     os.system('cls' if os.name == 'nt' else 'clear')
+    if prompt != "":
+        print(prompt)
 
 def handle_value_error(prompt=""):
     while True:
