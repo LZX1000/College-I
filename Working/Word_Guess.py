@@ -14,6 +14,10 @@ def input_words():
         elif any(char.isdigit() for char in word):
             print("Numbers are not allowed. Please enter a valid word.")
             continue
+        elif not any(char.isalpha() for char in word):
+            print("You need at least one letter. Please enter a valid word.")
+        elif any(char == '_' for char in word):
+            print("Underscores are not currently supported. Please enter a valid word.")
         words.append(word)
     #Check if words[] is empty
     if len(words) == 0:
