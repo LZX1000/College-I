@@ -8,25 +8,28 @@ def input_words():
     #Entering words loop
     while True:
         if len(words) > 0:
-            clear_screen("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.\n" + f"{words}")
+            print("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.\n" + f"{words}")
         else:
-            clear_screen("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.")
+            print("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.")
         word = input("\nEnter a word: ").lower().strip()
         if word == "done":
             break
         elif any(char.isdigit() for char in word):
-            print("Numbers are not allowed. Please enter a valid word.")
-            continue
+            clear_screen("Numbers are not allowed. Please enter a valid word.\n")
         elif not any(char.isalpha() for char in word):
-            print("You need at least one letter. Please enter a valid word.")
+            clear_screen("You need at least one letter. Please enter a valid word.\n")
         elif any(char == '_' for char in word):
-            print("Underscores are not currently supported. Please enter a valid word.")
-        words.append(word)
+            clear_screen("Underscores are not currently supported. Please enter a valid word.\n")
+        elif word in words:
+            clear_screen("You already entered that word. Please enter a new word.\n")
+        else:
+            words.append(word)
+            clear_screen()
         #Sort words alphabetically
         words.sort()
     #Check if words[] is empty
     if len(words) == 0:
-        print("You must enter at least one word.")
+        clear_screen("You must enter at least one word.\n")
         return input_words()
     #Return words
     return words
