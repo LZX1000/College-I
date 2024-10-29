@@ -44,7 +44,7 @@ def try_again(guesses=0, words=None, perfect_word=None):
     #Ask if the player wants to play again
     if guesses == len(perfect_word):
         print("*Perfect!*\n")
-    response = yes_or_no(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n")
+    response = yes_or_no(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n\n")
     #If the player wants to play again
     if response == "y":
         #Checks if the player wants new words
