@@ -8,8 +8,7 @@ def yes_or_no(prompt=""):
         elif response in ["n", "no", "0"]:
             return "n"
         else:
-            clear_screen()
-            print('\nPlease enter "Y" or "N".\n')
+            clear_screen('\nPlease enter "Y" or "N".\n')
 
 def clear_screen(prompt=""):
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -21,8 +20,7 @@ def handle_value_error(prompt=""):
         try:
             return int(input(prompt))
         except ValueError:
-            clear_screen()
-            print("\nPlease enter a valid integer.\n")
+            clear_screen("\nPlease enter a valid integer.\n")
 
 def main():
     print("I am but a humble module file.")
