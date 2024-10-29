@@ -5,10 +5,13 @@ from Extras import yes_or_no, clear_screen
 def input_words():
     #Initialize words list
     words = []
-    print("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.\n")
     #Entering words loop
     while True:
-        word = input("Enter a word: ").lower().strip()
+        if len(words) > 0:
+            clear_screen("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.\n" + f"{words}")
+        else:
+            clear_screen("Enter the words you want to guess one at a time.\nWhen you are done, type 'done'.")
+        word = input("\nEnter a word: ").lower().strip()
         if word == "done":
             break
         elif any(char.isdigit() for char in word):
@@ -19,6 +22,8 @@ def input_words():
         elif any(char == '_' for char in word):
             print("Underscores are not currently supported. Please enter a valid word.")
         words.append(word)
+        #Sort words alphabetically
+        words.sort()
     #Check if words[] is empty
     if len(words) == 0:
         print("You must enter at least one word.")
@@ -44,7 +49,7 @@ def try_again(guessed_letters=None, guesses=0, words=None):
     if guessed_letters is None:
         guessed_letters = []
     #Ask if the player wants to play again
-    if guesses == len(guessed_letters):
+    if guesses == len(guessed_letters) or guesses < len(guessed_letters):
         print("*Perfect!*\n")
     print(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n")
     response = yes_or_no()
