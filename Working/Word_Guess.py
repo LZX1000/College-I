@@ -122,7 +122,7 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
                     missed_letters.append(guess)
                 guesses += 1
         #Display game results and ask if the player wants to play again    
-        if "_" not in guessed_letters:
+        else:
             clear_screen(display_game)
             response = try_again(guesses=guesses, words=words, perfect_word=perfect_word)
             if response is None:
