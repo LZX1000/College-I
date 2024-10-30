@@ -11,7 +11,7 @@ def input_words(words=None):
             print("Enter the words/phrases you want to guess one at a time.\nWhen you are done, type 'done'.\n" + f"[{', '.join(word for word, _ in words)}]")
         else:
             print("Enter the words/phrases you want to guess one at a time.\nWhen you are done, type 'done'.")
-        word = input("\nEnter a word: ").lower().strip()
+        word = input("\nEnter a word or phrase: ").lower().strip()
         if word == "done":
             if len(words) == 0:
                 clear_screen("You must enter at least one word or phrase.\n")
@@ -24,14 +24,12 @@ def input_words(words=None):
         elif word in words:
             clear_screen("You already entered that word/phrase. Please enter a new word or phrase.\n")
         else:
-            word = (word, 1) if " " in word else (word, 0)
-            words.append(word)
+            words.append((word, "Phrase") if " " in word else (word, "Word"))
             clear_screen()
         #Sort words alphabetically
         words.sort()
     #Chooses a random word from words[] list
     game_word, option = choice(words)
-    #Returns a random word
     perfect_word = ''.join(sorted(set(char for char in game_word if char.isalpha())))
     return game_word, option, perfect_word, words
 
@@ -48,7 +46,7 @@ def try_again(guesses=0, words=None, perfect_word=None):
     if response == "y":
         #Checks if the player wants new words
         clear_screen()
-        same_words = yes_or_no("Would you like to use the same words/phrases? (Y/N)\n")
+        same_words = yes_or_no("Would you like to use the same words/phrases? (Y/N)\n\n")
         clear_screen()
         if same_words == "y":
             return words
@@ -59,7 +57,7 @@ def try_again(guesses=0, words=None, perfect_word=None):
         return response
 
 #Check Guess
-def check_guess(display_game="",guessed_letters=None, missed_letters=None, guesses=0):
+def check_guess(display_game,guessed_letters=None, missed_letters=None):
     #Check parameters
     if guessed_letters is None:
         guessed_letters = []
@@ -104,15 +102,12 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
         if missed_letters is None:
             missed_letters = []
         #Word or phrase for game screen
-        if option == 0:
-            display_game = f"Word: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
-        elif option == 1:
-            display_game = f"Phrase: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
+        display_game = f"{option}: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
         clear_screen(display_game)
         #Check if there are characters left to guess
         if "ab" in guessed_letters:
             #Get a proper guess 
-            guess = check_guess(display_game=display_game, guessed_letters=guessed_letters, missed_letters=missed_letters, guesses=guesses)
+            guess = check_guess(display_game, guessed_letters=guessed_letters, missed_letters=missed_letters)
             #Check if the guess is in the word
             if guess in game_letters:
                 for i, letter in enumerate(game_letters):
