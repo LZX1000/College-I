@@ -1,6 +1,6 @@
 from Nim import main as nim
 from Word_Guess import main as word_guess
-from Extras import handle_value_error, clear_screen
+from Extras import clear_screen
 
 #Check if the choice is in the menu
 def check_menu_choice(menu, prompt=''):
