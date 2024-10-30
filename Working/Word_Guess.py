@@ -21,8 +21,6 @@ def input_words(words=None):
             clear_screen("Numbers are not allowed. Please enter a valid word.\n")
         elif not any(char.isalpha() for char in word):
             clear_screen("You need at least one letter. Please enter a valid word.\n")
-        elif any(char == '_' for char in word):
-            clear_screen("Underscores are not currently supported. Please enter another word.\n")
         elif word in words:
             clear_screen("You already entered that word. Please enter a new word.\n")
         else:
@@ -101,13 +99,13 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
         if game_letters is None:
             game_letters = list(game_word)
         if guessed_letters is None:
-            guessed_letters = ['_' if letter.isalpha() else letter for letter in game_letters]
+            guessed_letters = ['ab' if letter.isalpha() else letter for letter in game_letters]
         if missed_letters is None:
             missed_letters = []
-        display_game = f"Word: " + " ".join(guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
+        display_game = f"Word: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
         clear_screen(display_game)
         #Check if there are characters left to guess
-        if "_" in guessed_letters:
+        if "ab" in guessed_letters:
             #Get a proper guess 
             guess = check_guess(display_game=display_game, guessed_letters=guessed_letters, missed_letters=missed_letters, guesses=guesses)
             #Check if the guess is in the word
@@ -132,7 +130,7 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
                 return
             game_word, perfect_word, words = input_words(words=words)
             game_letters = list(game_word)
-            guessed_letters = ['_' if letter.isalpha() else letter for letter in game_letters]
+            guessed_letters = ['ab' if letter.isalpha() else letter for letter in game_letters]
             missed_letters = []
             guesses = 0
 
