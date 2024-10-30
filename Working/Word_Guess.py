@@ -1,4 +1,4 @@
-import random
+from random import choice
 from Extras import yes_or_no, clear_screen
 
 #Input Words
@@ -30,10 +30,10 @@ def input_words(words=None):
         #Sort words alphabetically
         words.sort()
     #Chooses a random word from words[] list
-    game_word, index = random.choice(words)
+    game_word, option = choice(words)
     #Returns a random word
     perfect_word = ''.join(sorted(set(char for char in game_word if char.isalpha())))
-    return game_word, index, perfect_word, words
+    return game_word, option, perfect_word, words
 
 #Try Again
 def try_again(guesses=0, words=None, perfect_word=None):
@@ -47,8 +47,8 @@ def try_again(guesses=0, words=None, perfect_word=None):
     #If the player wants to play again
     if response == "y":
         #Checks if the player wants new words
-        clear_screen("Would you like to use the same words/phrases? (Y/N)\n")
-        same_words = yes_or_no()
+        clear_screen()
+        same_words = yes_or_no("Would you like to use the same words/phrases? (Y/N)\n")
         clear_screen()
         if same_words == "y":
             return words
@@ -94,9 +94,9 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
         clear_screen()
         #Check parameters
         if words is None:
-            game_word, index, perfect_word, words = input_words()
+            game_word, option, perfect_word, words = input_words()
         if game_word is None or perfect_word is None:
-            game_word, index, perfect_word = input_words(words=words)
+            game_word, option, perfect_word = input_words(words=words)
         if game_letters is None:
             game_letters = list(game_word)
         if guessed_letters is None:
@@ -104,9 +104,9 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
         if missed_letters is None:
             missed_letters = []
         #Word or phrase for game screen
-        if index == 0:
+        if option == 0:
             display_game = f"Word: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
-        elif index == 1:
+        elif option == 1:
             display_game = f"Phrase: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
         clear_screen(display_game)
         #Check if there are characters left to guess
@@ -133,7 +133,7 @@ def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, wor
             #Quit game
             if response == "n":
                 return
-            game_word, index, perfect_word, words = input_words(words=words)
+            game_word, option, perfect_word, words = input_words(words=words)
             game_letters = list(game_word)
             guessed_letters = ['ab' if letter.isalpha() else letter for letter in game_letters]
             missed_letters = []
