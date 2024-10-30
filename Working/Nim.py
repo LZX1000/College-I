@@ -94,8 +94,7 @@ def get_robot_choice():
         try:
             return randint(1,3)
         except NameError:
-            from random import randint as randint
-            continue
+            from random import randint
 
 #Main loop
 def main(players=None, num_players=0, game_number=0, current_player_index=0, current_player=None):
