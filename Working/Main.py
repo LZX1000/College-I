@@ -17,8 +17,7 @@ def check_menu_choice(menu, choice=None):
             if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
                 return choice
         #If the choice is not in the menu, ask for a new choice, suggesting the user inputs an integer
-        print("Invalid choice.")
-        choice = handle_value_error()
+        choice = handle_value_error("Invalid choice.")
 
 #Main function
 def main():
