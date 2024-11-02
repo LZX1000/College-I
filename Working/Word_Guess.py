@@ -85,9 +85,9 @@ def check_guess(display_game,guessed_letters=None, missed_letters=None):
         #Ask for a new guess because the guess was just weird
         else:
             clear_screen(display_game + "\nPlease enter a valid letter.\n")
-        
+
 #Guessing
-def main(game_word=None, guesses=0, game_letters=None, guessed_letters=None, words=None, missed_letters=None, perfect_word=None):
+def main(active_user='guest', game_word=None, guesses=0, game_letters=None, guessed_letters=None, words=None, missed_letters=None, perfect_word=None):
     while True:
         clear_screen()
         #Check parameters

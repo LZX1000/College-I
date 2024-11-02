@@ -98,7 +98,7 @@ def get_robot_choice():
             from random import randint
 
 #Main loop
-def main(players=None, num_players=0, game_number=0, current_player_index=0, current_player=None):
+def main(active_user='Guest', players=None, num_players=0, game_number=0, current_player_index=0, current_player=None):
     game = True
     while game == True:
         #Starting functions
