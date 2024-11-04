@@ -48,7 +48,6 @@ def main(active_user='Guest'):
             enemy_x = random.randint(0, map_width-1)
             if (enemy_y, enemy_x) != (starting_y, starting_x) and (enemy_x, enemy_y) not in enemies:
                 enemies.append((enemy_y, enemy_x))
-                break
         #Sword pieces starting positions
         for i in range(sword_pieces):
             sword_y = random.randint(0, map_height-1)
