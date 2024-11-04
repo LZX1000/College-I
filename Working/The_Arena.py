@@ -39,25 +39,24 @@ def main(active_user='Guest'):
                 break
             else:
                 clear_screen("Please select a valid difficulty!\n\n")
-        #Player starting position
-        starting_y = random.randint(0, map_height-1)
-        starting_x = random.randint(0, map_width-1)
-        #Enemy starting positions
+        #Object starting positions
+        starting_position = (random.randint(0, map_height-1), random.randint(0, map_width-1))
         for i in range(enemy_count):
-            enemy_y = random.randint(0, map_height-1)
-            enemy_x = random.randint(0, map_width-1)
-            if (enemy_y, enemy_x) != (starting_y, starting_x) and (enemy_x, enemy_y) not in enemies:
-                enemies.append((enemy_y, enemy_x))
-        #Sword pieces starting positions
+            while True:
+                enemy = (random.randint(0, map_height-1), random.randint(0, map_width-1))
+                if enemy != starting_position and enemy not in enemies:
+                    enemies.append(enemy)
+                    break
         for i in range(sword_pieces):
-            sword_y = random.randint(0, map_height-1)
-            sword_x = random.randint(0, map_width-1)
-            if (sword_y, sword_x) != (starting_y, starting_x) and (sword_y, sword_x) not in enemies and (sword_y, sword_x) not in pieces:
-                pieces.append((sword_y, sword_x))
+            while True:
+                sword = (random.randint(0, map_height-1), random.randint(0, map_width-1))
+                if sword != starting_position and sword not in enemies and sword not in pieces:
+                    pieces.append(sword)
+                    break
         #Display initial map
         game_map = [['x' for _ in range(map_width)] for _ in range(map_height)]
-        game_map[starting_y][starting_x] = 'o'
-        player_position = [starting_y, starting_x]
+        game_map[starting_position[0]][starting_position[1]] = 'o'
+        player_position = [starting_position[0], starting_position[1]]
         #Game loop
         while True:
             #Display game
