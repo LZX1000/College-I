@@ -85,7 +85,7 @@ def main(active_user='Guest'):
                     elif response == "n":
                         break
                 #Movement
-                if keyboard.is_pressed('w') or keyboard.is_pressed('up') or keyboard.is_pressed('u') or keyboard.is_pressed('8'):
+                if keyboard.is_pressed('w') or keyboard.is_pressed('up') or keyboard.is_pressed('8'):
                     if player_position[0]-1 in range(map_height):    
                         game_map[player_position[0]][player_position[1]] = ' '
                         player_position = [player_position[0]-1, player_position[1]]
@@ -95,7 +95,7 @@ def main(active_user='Guest'):
                     else:
                         time.sleep(0.2)
                         break
-                elif keyboard.is_pressed('s') or keyboard.is_pressed('down') or keyboard.is_pressed('d') or keyboard.is_pressed('2'):
+                elif keyboard.is_pressed('s') or keyboard.is_pressed('down') or keyboard.is_pressed('2'):
                     if player_position[0]+1 in range(map_height):
                         game_map[player_position[0]][player_position[1]] = ' '
                         player_position = [player_position[0]+1, player_position[1]]
@@ -105,7 +105,7 @@ def main(active_user='Guest'):
                     else:
                         time.sleep(0.2)
                         break
-                elif keyboard.is_pressed('a') or keyboard.is_pressed('left') or keyboard.is_pressed('l') or keyboard.is_pressed('4'):
+                elif keyboard.is_pressed('a') or keyboard.is_pressed('left') or keyboard.is_pressed('4'):
                     if player_position[1]-1 in range(map_width):
                         game_map[player_position[0]][player_position[1]] = ' '
                         player_position = [player_position[0], player_position[1]-1]
@@ -115,7 +115,7 @@ def main(active_user='Guest'):
                     else:
                         time.sleep(0.2)
                         break
-                elif keyboard.is_pressed('d') or keyboard.is_pressed('right') or keyboard.is_pressed('r') or keyboard.is_pressed('6'):
+                elif keyboard.is_pressed('d') or keyboard.is_pressed('right') or keyboard.is_pressed('6'):
                     if player_position[1]+1 in range(map_width):
                         game_map[player_position[0]][player_position[1]] = ' '
                         player_position = [player_position[0], player_position[1]+1]
