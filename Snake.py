@@ -17,7 +17,7 @@ def main(active_user='Guest'):
         player_position = [(random.randint(0, map_height-1), random.randint(0, map_width-1))]
         for i in range(max_apples):
             while True:
-                apple_poition = [(random.randint(0, map_height-1), random.randint(0, map_width-1))]
+                apple_poition = (random.randint(0, map_height-1), random.randint(0, map_width-1))
                 if apple_poition != player_position and apple_poition not in apples:
                     apples.append(apple_poition)
                     break
@@ -35,7 +35,7 @@ def main(active_user='Guest'):
                         apples.append(apple_poition)
                         break
             for apple in apples:
-                game_map[apple[0][0]][apple[0][1]] = '🍎'
+                game_map[apple[0]][apple[1]] = '🍎'
             for row in game_map:
                 print(''.join(row))
 
