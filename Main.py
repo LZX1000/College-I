@@ -1,7 +1,9 @@
 from Nim import main as nim
 from Word_Guess import main as word_guess
 from The_Arena import main as the_arena
+from Snake import main as snake
 from Extras import clear_screen, yes_or_no
+from Start import main as start_main
 
 def sign_in():
     """
@@ -46,8 +48,14 @@ def sign_in():
             while True:
                 #Check if it's a taken username
                 if any(new_user == user[0] for user in users):
-                    clear_screen("That username is already taken.\n")
-                    new_user = input("\nPlease enter something else\n" + "\nUsername: ")
+                    clear_screen("That username is already taken.\nWould you like to sign in? (Y/N)\n")
+                    response = yes_or_no()
+                    if response == "y":
+                        clear_screen()
+                        break
+                    elif response == "n":
+                        clear_screen()
+                        new_user = input("Username: ")
                 #Not taken, make a password
                 else:
                     new_pass = input("\nPassword: ")
@@ -76,7 +84,7 @@ def main():
     active_user = sign_in()
     while True:
         #Defines the games in the menu as a list
-        menu = ["Quit", "Nim", "Word Guess", "The Arena"]
+        menu = ["Quit", "Nim", "Word Guess", "The Arena", "Snake"]
         clear_screen()
         #Gets a proper input and runs the menu item associated with it
         eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
