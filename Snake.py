@@ -57,22 +57,22 @@ def main(active_user='Guest'):
                 movement = 'right'
 
             if movement == 'up':
-                if player_position[0][0]-1 in range(map_height):
+                if player_position[0][0]-1 in range(map_height) and (player_position[0][0]-1, player_position[0][1]) not in player_position:
                     new_head = (player_position[0][0]-1, player_position[0][1])
                 else:
                     break
             elif movement == 'down':
-                if player_position[0][0]+1 in range(map_height):
+                if player_position[0][0]+1 in range(map_height) and (player_position[0][0]+1, player_position[0][1]) not in player_position:
                     new_head = (player_position[0][0]+1, player_position[0][1])
                 else:
                     break
             elif movement == 'left':
-                if player_position[0][1]-1 in range(map_width):
+                if player_position[0][1]-1 in range(map_width) and (player_position[0][0], player_position[0][1]-1) not in player_position:
                     new_head = (player_position[0][0], player_position[0][1]-1)
                 else:
                     break
             elif movement == 'right':
-                if player_position[0][1]+1 in range(map_width):
+                if player_position[0][1]+1 in range(map_width) and (player_position[0][0], player_position[0][1]+1) not in player_position:
                     new_head = (player_position[0][0], player_position[0][1]+1)
                 else:
                     break
