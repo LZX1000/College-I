@@ -29,13 +29,14 @@ def main(active_user='Guest'):
 
         for row in game_map:
             print("".join(row))
+        print("\n")
         while True:
             if player_position[0] in apples:
                 snake_length += 1
                 apples.remove(player_position[0])
                 while True:
                     apple_position = (random.randint(0, map_height-1), random.randint(0, map_width-1))
-                    if apple_position != player_position[0] and apple_position not in apples:
+                    if apple_position != player_position and apple_position not in apples:
                         apples.append(apple_position)
                         break
 
@@ -46,6 +47,7 @@ def main(active_user='Guest'):
                     if game_map[y][x] != previous_map[y][x]:
                         print(f"\033[{y+1};{x*2+1}H{game_map[y][x]}", end='')
             previous_map = [row[:] for row in game_map]
+            print(f"\33[{map_height+1};0H", end='', flush=True)
 
             if keyboard.is_pressed('w') or keyboard.is_pressed('up') and movement != 'down':
                 movement = 'up'
@@ -91,6 +93,7 @@ def main(active_user='Guest'):
                     if game_map[y][x] != previous_map[y][x]:
                         print(f"\033[{y+1};{x*2+1}H{game_map[y][x]}", end='', flush=True)
             previous_map = [row[:] for row in game_map]
+            print(f"\33[{map_height+1};0H", end='', flush=True)
 
             time.sleep(0.2)
         
