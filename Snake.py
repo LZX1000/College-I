@@ -1,8 +1,18 @@
 import random, keyboard, time
-from Extras import clear_screen, yes_or_no, sleepy
+from Extras import clear_screen, yes_or_no
 
-def main(active_user='Guest', key=None, movement=None, snake_length=1, max_apples=3, apples=[], map_width=16, map_height=16):
+def main(active_user='Guest'):
     while True:
+        key = None
+        movement = None
+        snake_length = 1
+        max_apples = 3
+        apples = []
+        map_width = 16
+        map_height = 16
+        start_time = 0
+        end_time = 0
+
         clear_screen()
         game_map = [['██' for _ in range(map_width)] for _ in range(map_height)]
         previous_map = [['  ' for _ in range(map_width)] for _ in range(map_height)]
@@ -41,53 +51,60 @@ def main(active_user='Guest', key=None, movement=None, snake_length=1, max_apple
             previous_map = [row[:] for row in game_map]
             print(f"\33[{map_height+1};0H", end='', flush=True)
 
-            if keyboard.is_pressed('w') or keyboard.is_pressed('up') or key == 'w' or key == 'up' and movement != 'down':
-                movement = 'up'
-            elif keyboard.is_pressed('s') or keyboard.is_pressed('down') or key == 's' or key == 'down' and movement != 'up':
-                movement = 'down'
-            elif keyboard.is_pressed('a') or keyboard.is_pressed('left') or key == 'a' or key == 'left' and movement != 'right':
-                movement = 'left'
-            elif keyboard.is_pressed('d') or keyboard.is_pressed('right') or key == 'd' or key == 'right' and movement != 'left':
-                movement = 'right'
+            if keyboard.is_pressed('w') or keyboard.is_pressed('up') or key == 'w' or key == 'up':
+                if movement != 'down':
+                    movement = 'up'
+            elif keyboard.is_pressed('s') or keyboard.is_pressed('down') or key == 's' or key == 'down':
+                if movement != 'up':
+                    movement = 'down'
+            elif keyboard.is_pressed('a') or keyboard.is_pressed('left') or key == 'a' or key == 'left':
+                if movement != 'right':
+                    movement = 'left'
+            elif keyboard.is_pressed('d') or keyboard.is_pressed('right') or key == 'd' or key == 'right':
+                if movement != 'left':
+                    movement = 'right'
 
-            if movement == 'up':
-                if player_position[0][0]-1 in range(map_height) and (player_position[0][0]-1, player_position[0][1]) not in player_position:
-                    new_head = (player_position[0][0]-1, player_position[0][1])
+            if start_time == None or end_time-start_time >= 0.2:
+                start_time = time.monotonic()
+
+                if movement == 'up':
+                    if player_position[0][0]-1 in range(map_height) and (player_position[0][0]-1, player_position[0][1]) not in player_position:
+                        new_head = (player_position[0][0]-1, player_position[0][1])
+                    else:
+                        break
+                elif movement == 'down':
+                    if player_position[0][0]+1 in range(map_height) and (player_position[0][0]+1, player_position[0][1]) not in player_position:
+                        new_head = (player_position[0][0]+1, player_position[0][1])
+                    else:
+                        break
+                elif movement == 'left':
+                    if player_position[0][1]-1 in range(map_width) and (player_position[0][0], player_position[0][1]-1) not in player_position:
+                        new_head = (player_position[0][0], player_position[0][1]-1)
+                    else:
+                        break
+                elif movement == 'right':
+                    if player_position[0][1]+1 in range(map_width) and (player_position[0][0], player_position[0][1]+1) not in player_position:
+                        new_head = (player_position[0][0], player_position[0][1]+1)
+                    else:
+                        break
                 else:
-                    break
-            elif movement == 'down':
-                if player_position[0][0]+1 in range(map_height) and (player_position[0][0]+1, player_position[0][1]) not in player_position:
-                    new_head = (player_position[0][0]+1, player_position[0][1])
-                else:
-                    break
-            elif movement == 'left':
-                if player_position[0][1]-1 in range(map_width) and (player_position[0][0], player_position[0][1]-1) not in player_position:
-                    new_head = (player_position[0][0], player_position[0][1]-1)
-                else:
-                    break
-            elif movement == 'right':
-                if player_position[0][1]+1 in range(map_width) and (player_position[0][0], player_position[0][1]+1) not in player_position:
-                    new_head = (player_position[0][0], player_position[0][1]+1)
-                else:
-                    break
-            else:
-                continue
+                    continue
 
-            player_position.insert(0, new_head)
-            if len(player_position) > snake_length:
-                tail = player_position.pop()
-                game_map[tail[0]][tail[1]] = '██'
+                player_position.insert(0, new_head)
+                if len(player_position) > snake_length:
+                    tail = player_position.pop()
+                    game_map[tail[0]][tail[1]] = '██'
 
-            game_map[player_position[0][0]][player_position[0][1]] = '  '
+                game_map[player_position[0][0]][player_position[0][1]] = '  '
 
-            for y in range(map_height):
-                for x in range(map_width):
-                    if game_map[y][x] != previous_map[y][x]:
-                        print(f"\033[{y+1};{x*2+1}H{game_map[y][x]}", end='', flush=True)
-            previous_map = [row[:] for row in game_map]
-            print(f"\33[{map_height+1};0H", end='', flush=True)
+                for y in range(map_height):
+                    for x in range(map_width):
+                        if game_map[y][x] != previous_map[y][x]:
+                            print(f"\033[{y+1};{x*2+1}H{game_map[y][x]}", end='', flush=True)
+                previous_map = [row[:] for row in game_map]
+                print(f"\33[{map_height+1};0H", end='', flush=True)
 
-            key = sleepy(0.2, key=None)
+            end_time = time.monotonic()
         
         # Try again?
         clear_screen("Game Over\n")
