@@ -87,7 +87,7 @@ def main():
         menu = ["Quit", "Nim", "Word Guess", "The Arena", "Snake"]
         clear_screen()
         #Gets a proper input and runs the menu item associated with it
-        eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
+        game, score = eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
 
 if __name__ == "__main__":
     main()
