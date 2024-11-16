@@ -1,19 +1,9 @@
 import random, keyboard, time
-from Extras import clear_screen, yes_or_no, handle_value_error
+from Extras import clear_screen, yes_or_no, sleepy
 
-def main(active_user='Guest'):
+def main(active_user='Guest', key=None, movement=None, snake_length=1, max_apples=3, apples=[], map_width=16, map_height=16):
     while True:
         clear_screen()
-        movement = None
-        snake_length = 1
-        max_apples = 3
-        apples = []
-
-        # map_width = handle_value_error("Map width: ")
-        # map_height = handle_value_error("Map height: ")
-        map_width = 20
-        map_height = 20
-
         game_map = [['██' for _ in range(map_width)] for _ in range(map_height)]
         previous_map = [['  ' for _ in range(map_width)] for _ in range(map_height)]
 
@@ -36,9 +26,11 @@ def main(active_user='Guest'):
                 apples.remove(player_position[0])
                 while True:
                     apple_position = (random.randint(0, map_height-1), random.randint(0, map_width-1))
-                    if apple_position != player_position and apple_position not in apples:
+                    if apple_position not in player_position and apple_position not in apples:
                         apples.append(apple_position)
                         break
+            
+            points = snake_length - 1
 
             for apple in apples:
                 game_map[apple[0]][apple[1]] = '🍎'
@@ -49,13 +41,13 @@ def main(active_user='Guest'):
             previous_map = [row[:] for row in game_map]
             print(f"\33[{map_height+1};0H", end='', flush=True)
 
-            if keyboard.is_pressed('w') or keyboard.is_pressed('up') and movement != 'down':
+            if keyboard.is_pressed('w') or keyboard.is_pressed('up') or key == 'w' or key == 'up' and movement != 'down':
                 movement = 'up'
-            elif keyboard.is_pressed('s') or keyboard.is_pressed('down') and movement != 'up':
+            elif keyboard.is_pressed('s') or keyboard.is_pressed('down') or key == 's' or key == 'down' and movement != 'up':
                 movement = 'down'
-            elif keyboard.is_pressed('a') or keyboard.is_pressed('left') and movement != 'right':
+            elif keyboard.is_pressed('a') or keyboard.is_pressed('left') or key == 'a' or key == 'left' and movement != 'right':
                 movement = 'left'
-            elif keyboard.is_pressed('d') or keyboard.is_pressed('right') and movement != 'left':
+            elif keyboard.is_pressed('d') or keyboard.is_pressed('right') or key == 'd' or key == 'right' and movement != 'left':
                 movement = 'right'
 
             if movement == 'up':
@@ -95,7 +87,7 @@ def main(active_user='Guest'):
             previous_map = [row[:] for row in game_map]
             print(f"\33[{map_height+1};0H", end='', flush=True)
 
-            time.sleep(0.2)
+            key = sleepy(0.2, key=None)
         
         # Try again?
         clear_screen("Game Over\n")
