@@ -37,7 +37,10 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
             print(f"\033[1;1HPoints: {points}\n")
 
             for apple in apples:
-                game_map[apple[0]][apple[1]] = '\033[47m🍎\033[0m'
+                if apple in old:
+                    game_map[apple[0]][apple[1]] = '\033[32m🍎\033[0m'
+                else:
+                    game_map[apple[0]][apple[1]] = '\033[47m🍎\033[0m'
             for y in range(map_height):
                 for x in range(map_width):
                     if game_map[y][x] != previous_map[y][x]:
