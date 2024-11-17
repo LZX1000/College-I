@@ -1,21 +1,22 @@
 import random, time, keyboard
 from Extras import clear_screen, yes_or_no
 
-def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
-    """
+def main(active_user='Guest', high_points=0, map_width=16, map_height=16, max_apples=3):
+    '''
     Main function to run the Snake game.
 
     Parameters:
     active_user (str): The name of the active user playing the game. Default is 'Guest'.
+    high_points (int): The current high score for the game. Default is 0.
     map_width (int): The width of the game map. Default is 16.
     map_height (int): The height of the game map. Default is 16.
     max_apples (int): The maximum number of apples that can appear on the map at once. Default is 3.
 
     Returns:
     tuple: A tuple containing the string 'snake' and the high score achieved during the game.
-    """
+    '''
     while True:
-        #Initialize game specific variables
+        # Initialize game specific variables
         temp_movement = None
         movement = None
         snake_length = 1
@@ -25,20 +26,20 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
         game_map = [['\033[47m  \033[0m' for _ in range(map_width)] for _ in range(map_height)]
         previous_map = [['\033[37m  \033[0m' for _ in range(map_width)] for _ in range(map_height)]
         clear_screen()
-        #Generate initial apples
+        # Generate initial apples
         for _ in range(max_apples):
             while True:
                 apple_position = (random.randint(0, map_height-1), random.randint(0, map_width-1))
                 if apple_position != player_position[0] and apple_position not in apples:
                     apples.append(apple_position)
                     break
-        #Display initial player head
+        # Display initial player head
         game_map[player_position[0][0]][player_position[0][1]] = '\033[93m██\033[0m'
-        #Game start time
+        # Game start time
         start_time = time.monotonic()
-        #Game loop
+        # Game loop
         while True:
-            #Handle apple collisions (generate new apple, increase snake length)
+            # Handle apple collisions (generate new apple, increase snake length)
             if player_position[0] in apples:
                 snake_length += 1
                 apples.remove(player_position[0])
@@ -47,10 +48,10 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                     if apple_position not in player_position and apple_position not in apples:
                         apples.append(apple_position)
                         break
-            #Points
+            # Points
             points = snake_length - 1
             print(f"\033[1;1HPoints: {points}\n")
-            #Display game map
+            # Display game map
             for apple in apples:
                 if apple in old:
                     game_map[apple[0]][apple[1]] = '\033[32m🍎\033[0m'
@@ -62,7 +63,7 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                         print(f"\033[{y+3};{x*2+1}H{game_map[y][x]}", end='')
             previous_map = [row[:] for row in game_map]
             print(f"\33[{map_height+3};0H", end='', flush=True)
-            #Check for movement inputs
+            # Check for movement inputs
             if keyboard.is_pressed('w') or keyboard.is_pressed('up'):
                 if movement != 'down':
                     temp_movement = 'up'
@@ -75,9 +76,9 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
             elif keyboard.is_pressed('d') or keyboard.is_pressed('right'):
                 if movement != 'left':
                     temp_movement = 'right'
-            #Handle movement if enough time has passed
+            # Handle movement if enough time has passed
             end_time = time.monotonic()
-            if start_time == None or end_time-start_time >= 0.15:
+            if start_time is None or end_time-start_time >= 0.15:
                 start_time = time.monotonic()
                 movement = temp_movement
                 if movement == 'up':
@@ -102,7 +103,7 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                         break
                 else:
                     continue
-                #Update player position and handle trail
+                # Update player position and handle trail
                 player_position.insert(0, new_head)
                 if len(player_position) > snake_length:
                     tail = player_position.pop()
@@ -114,7 +115,7 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                             game_map[old_pop[0]][old_pop[1]] = '\033[32m██\033[0m'
                         else:
                             game_map[old_pop[0]][old_pop[1]] = '\033[47m  \033[0m'
-                #Snake colors
+                # Snake colors
                 for i in range(1, len(player_position)):
                     if (i // 2) % 2 == 0:
                         color = 32
@@ -122,15 +123,12 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                         color = 92
                     game_map[player_position[i][0]][player_position[i][1]] = f'\033[{color}m██\033[0m'
                 game_map[player_position[0][0]][player_position[0][1]] = '\033[93m██\033[0m'
-        #Game over
+        # Game over
         clear_screen("Game Over\n")
-        #Update highscore
-        try:
-            if points > high_points:
-                high_points = points
-        except NameError:
+        # Update highscore
+        if points > high_points:
             high_points = points
-        #Play again
+        # Play again
         response = yes_or_no("Would you like to play again? (Y/N)\n")
         if response == "n":
             return 'snake', high_points
