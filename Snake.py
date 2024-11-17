@@ -20,7 +20,7 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                     apples.append(apple_position)
                     break
 
-        game_map[player_position[0][0]][player_position[0][1]] = '\033[32m██\033[0m'
+        game_map[player_position[0][0]][player_position[0][1]] = '\033[93m██\033[0m'
 
         start_time = time.monotonic()
         while True:
@@ -89,7 +89,7 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                 player_position.insert(0, new_head)
                 if len(player_position) > snake_length:
                     tail = player_position.pop()
-                    game_map[tail[0]][tail[1]] = '\033[47m██\033[0m'
+                    game_map[tail[0]][tail[1]] = '\033[247m██\033[0m'
                     old.append(tail)
                     if len(old) > 5:
                         old_pop = old.pop(0)
@@ -98,7 +98,13 @@ def main(active_user='Guest', map_width=16, map_height=16, max_apples=3):
                         else:
                             game_map[old_pop[0]][old_pop[1]] = '\033[47m  \033[0m'
 
-                game_map[player_position[0][0]][player_position[0][1]] = '\033[32m██\033[0m'
+                for i in range(1, len(player_position)):
+                    if (i // 2) % 2 == 0:
+                        color = 32
+                    else:
+                        color = 92
+                    game_map[player_position[i][0]][player_position[i][1]] = f'\033[{color}m██\033[0m'
+                game_map[player_position[0][0]][player_position[0][1]] = '\033[93m██\033[0m'
 
         # Try again?
         clear_screen("Game Over\n")
