@@ -128,6 +128,9 @@ def main(active_user='Guest', high_points=0, map_width=16, map_height=16, max_ap
         # Update highscore
         if points > high_points:
             high_points = points
+        print(f"Score: {points}              High Score: {high_points}")
+        if points == high_points:
+            print("\033[3m*New High Score!*\33[0m\n")
         # Play again
         response = yes_or_no("Would you like to play again? (Y/N)\n")
         if response == "n":
