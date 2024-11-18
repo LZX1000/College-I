@@ -1,0 +1,26 @@
+apple, Word
+banana, Word
+cherry, Word
+date, Word
+elephant, Word
+fig, Word
+grape, Word
+honeydew, Word
+ice cream, Phrase
+jackfruit, Word
+kiwi, Word
+lemon, Word
+mango, Word
+nectarine, Word
+orange, Word
+pineapple, Word
+quince, Word
+raspberry, Word
+strawberry, Word
+tangerine, Word
+umbrella, Word
+vanilla, Word
+watermelon, Word
+xylophone, Word
+yellow submarine, Phrase
+zebra, Word

@@ -2,46 +2,59 @@ from random import choice
 from Extras import yes_or_no, clear_screen
 
 #Input Words
-def input_words(words=None):
-    if words is None:
-        words = []
-    #Entering words loop
-    while True:
-        if len(words) > 0:
-            print("Enter the words/phrases you want to guess one at a time.\nWhen you are done, type 'done'.\n" + f"[{', '.join(word for word, _ in words)}]")
-        else:
-            print("Enter the words/phrases you want to guess one at a time.\nWhen you are done, type 'done'.")
-        word = input("\nEnter a word or phrase: ").lower().strip()
-        if word == "done":
-            if len(words) == 0:
-                clear_screen("You must enter at least one word or phrase.\n")
+def input_words(words=None, parameter=0):
+    if parameter == 0:
+        if words is None:
+            words = []
+        #Entering words loop
+        while True:
+            if len(words) > 0:
+                print("Enter the words/phrases you want to guess one at a time.\nWhen you are done, type 'done'.\n" + f"[{', '.join(word for word, _ in words)}]")
             else:
-                break
-        elif any(char.isdigit() for char in word):
-            clear_screen("Numbers are not allowed. Please enter a valid word or phrase.\n")
-        elif not any(char.isalpha() for char in word):
-            clear_screen("You need at least one letter. Please enter a valid word or phrase.\n")
-        elif word in words:
-            clear_screen("You already entered that word/phrase. Please enter a new word or phrase.\n")
-        else:
-            words.append((word, "Phrase") if " " in word else (word, "Word"))
-            clear_screen()
-        #Sort words alphabetically
-        words.sort()
+                print("Enter the words/phrases you want to guess one at a time.\nWhen you are done, type 'done'.")
+            word = input("\nEnter a word or phrase: ").lower().strip()
+            if word == "done":
+                if len(words) == 0:
+                    clear_screen("You must enter at least one word or phrase.\n")
+                else:
+                    break
+            elif any(char.isdigit() for char in word):
+                clear_screen("Numbers are not allowed. Please enter a valid word or phrase.\n")
+            elif not any(char.isalpha() for char in word):
+                clear_screen("You need at least one letter. Please enter a valid word or phrase.\n")
+            elif word in words:
+                clear_screen("You already entered that word/phrase. Please enter a new word or phrase.\n")
+            else:
+                words.append((word, "Phrase") if " " in word else (word, "Word"))
+                clear_screen()
+            #Sort words alphabetically
+            words.sort()
+            #Add words to the words file
+            try:
+                with open("words.txt", "r") as file:
+                    old_words = [tuple(line.strip().split(', ')) for line in file.readlines()]
+                    for word, option in words:
+                        if (word, option) not in old_words:
+                            with open("words.txt", "a") as file:
+                                file.write(f"{word}, {option}\n")
+            except FileNotFoundError:
+                with open("words.txt", "w") as file:
+                    for word, option in words:
+                        file.write(f"{word}, {option}\n")
     #Chooses a random word from words[] list
     game_word, option = choice(words)
     perfect_word = ''.join(sorted(set(char for char in game_word if char.isalpha())))
     return game_word, option, perfect_word, words
 
 #Try Again
-def try_again(guesses=0, words=None, perfect_word=None):
+def try_again(game_word=None, guesses=0, words=None, perfect_word=None):
     #Check parameters
     if words is None:
         words = input_words()
     #Ask if the player wants to play again
     if guesses == len(perfect_word):
         print("*Perfect!*\n")
-    response = yes_or_no(f"Congrats! You guessed it in {guesses} guesses. Try again? (Y/N)\n\n")
+    response = yes_or_no(f"Congrats! You guessed {game_word} in {guesses} guesses. Try again? (Y/N)\n\n")
     #If the player wants to play again
     if response == "y":
         #Checks if the player wants new words
@@ -92,9 +105,26 @@ def main(active_user='guest', game_word=None, guesses=0, game_letters=None, gues
         clear_screen()
         #Check parameters
         if words is None:
-            game_word, option, perfect_word, words = input_words()
+            response = yes_or_no("Would you like to use random words? (Y/N)\n\n")
+            if response == "n":
+                clear_screen()
+                game_word, option, perfect_word, words = input_words()
+            elif response == "y":
+                #Open existing words file or create a new one
+                try:
+                    with open("words.txt", "r") as file:
+                        words = [tuple(line.strip().split(', ')) for line in file.readlines()]
+                except FileNotFoundError:
+                    with open("words.txt", "w") as file:
+                        clear_screen("No words found. Please enter some words.\n")
+                        game_word, option, perfect_word, words = input_words(words=words)
+                    with open("words.txt", "a") as file:
+                        for word, option in words:
+                            file.write(f"{word}, {option}\n")
+                game_word, option, perfect_word, words = input_words(words=words, parameter=1)
+        #Check more parameters
         if game_word is None or perfect_word is None:
-            game_word, option, perfect_word = input_words(words=words)
+            game_word, option, perfect_word = input_words(words=words, parameter=1)
         if game_letters is None:
             game_letters = list(game_word)
         if guessed_letters is None:
@@ -122,7 +152,7 @@ def main(active_user='guest', game_word=None, guesses=0, game_letters=None, gues
         #Display game results and ask if the player wants to play again    
         else:
             clear_screen(display_game)
-            response = try_again(guesses=guesses, words=words, perfect_word=perfect_word)
+            response = try_again(game_word=game_word, guesses=guesses, words=words, perfect_word=perfect_word)
             if response is None:
                 words = None
             #Quit game
