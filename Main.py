@@ -2,7 +2,7 @@ from Nim import main as nim
 from Word_Guess import main as word_guess
 from The_Arena import main as the_arena
 from Snake import main as snake
-from Extras import clear_screen, yes_or_no
+from Extras import clear_screen, yes_or_no, check_menu_choice
 from Start import main as start_main
 
 def sign_in():
@@ -63,21 +63,6 @@ def sign_in():
                     with open("users.txt", "a") as file:
                         file.write(f"{new_user}, {new_pass}\n")
                     return new_user
-
-#Check if the choice is in the menu
-def check_menu_choice(menu, prompt=''):
-    while True:
-        choice = input(prompt)
-        #Check if the choice is in the menu as an integer
-        try:
-            if int(choice) in range(len(menu)):
-                return menu[int(choice)]
-        #check if the choice is in the menu as a string
-        except ValueError:
-            if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
-                return choice
-        #If the choice is not in the menu, ask for a new choice, suggesting the user inputs an integer
-        clear_screen("Invalid choice.")
 
 #Main function
 def main():
