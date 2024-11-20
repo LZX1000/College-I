@@ -6,7 +6,7 @@ from Extras import clear_screen, yes_or_no
 from Start import main as start_main
 
 def sign_in():
-    """
+    '''
     Handles the sign-in process for users.
 
     This function clears the screen and prompts the user to either sign in with an existing account
@@ -17,7 +17,7 @@ def sign_in():
 
     Returns:
         str: The username of the signed-in or newly created user.
-    """
+    '''
     clear_screen()
     while True:
         #Open existing users file or create a new one
@@ -79,15 +79,29 @@ def check_menu_choice(menu, prompt=''):
         #If the choice is not in the menu, ask for a new choice, suggesting the user inputs an integer
         clear_screen("Invalid choice.")
 
+def unpack_game(game, active_user, high_score=[], opinion=None):
+    try:
+        with open("stats.txt", "w") as file:
+            while True:
+                for line in file.readlines():
+                    main_line = line if active_user in line else file.write(f"{active_user}, 0\n")
+                    for line in file.readlines() > main_line:
+                        if line.startswith(' '):
+
+    except FileNotFoundError:
+        with open("stats.txt", "w") as file:
+            users = []
+    pass
+
 #Main function
 def main():
     active_user = sign_in()
     while True:
         #Defines the games in the menu as a list
-        menu = ["Quit", "Nim", "Word Guess", "The Arena", "Snake"]
+        menu = [("Quit", 0), ("Nim", 0), ("Word Guess", 0), ("The Arena", 0), ("Snake", 1)]
         clear_screen()
         #Gets a proper input and runs the menu item associated with it
-        game, score = eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
+        unpack_game(eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)')))
 
 if __name__ == "__main__":
     main()
