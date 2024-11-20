@@ -57,7 +57,7 @@ def try_again(guesses=0, words=None, perfect_word=None):
         return response
 
 #Check Guess
-def check_guess(display_game,guessed_letters=None, missed_letters=None):
+def check_guess(display_game, guessed_letters=None, missed_letters=None):
     #Check parameters
     if guessed_letters is None:
         guessed_letters = []
