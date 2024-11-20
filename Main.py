@@ -92,34 +92,37 @@ def check_menu_choice(menu, prompt=''):
         #If the choice is not in the menu, ask for a new choice, suggesting the user inputs an integer
         clear_screen("Invalid choice.")
 
-def unpack_game(game, active_user, high_score=[], main_line=None, sublines=[]):
+def unpack_game(game, active_user, high_score=[]):
     try:
         with open("stats.txt", "r+") as file:
-            while user_found is False:
-                file_lines = file.readlines()
-                for i, line in enumerate(file_lines):
-                    if active_user in line:
-                        user_found = True
-                        main_line = line
-                    else:
-                        file.write(f"{active_user}\n")
-                    for subline in file_lines[i+1]:
-                        if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
-                            sublines.append(subline)
-                        else:
-                            break
-                    break
-            for i, line in sublines:
-                if game in line:
-                    stats = line.strip().split(", ")
-                    stats[1] += 1
-                    stats_highscores = stats[2].split(" ")
-                    for i, score in enumerate(stats_highscores):
-                        if high_score[i] > score:
-                            score = high_score[i]
-                    line = f"{game}, {stats[1]}, {stats_highscores}\n"
+            file_lines = file.readlines()
+
+        main_line = None
+        sublines = []
+        while user_found is False:
+            for i, line in enumerate(file_lines):
+                if active_user in line:
+                    user_found = True
+                    main_line = line
+            if user_found is False:
+                file.write(f"{active_user}\n    ")
+            for subline in file_lines[i+1]:
+                if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
+                    sublines.append(subline)
                 else:
-                    sublines.append(f"{game}, 1, {high_score}\n")
+                    break
+        for i, line in sublines:
+            if game in line:
+                stats = line.strip().split(", ")
+                stats[1] += 1
+                stats_highscores = stats[2].split(" ")
+                for i, score in enumerate(stats_highscores):
+                    if high_score[i] > score:
+                        score = high_score[i]
+                line = f"{game}, {stats[1]}, {stats_highscores}\n"
+            else:
+                sublines.append(f"{game}, 1, {high_score}\n")
+        file.write(main_line + "\n    " + "\n    ".join(sublines))
     except FileNotFoundError:
         with open("stats.txt", "w") as file:
             file.write(f"{active_user}\n" + f"    {game}, 1, {high_score}\n")
