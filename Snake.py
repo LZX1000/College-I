@@ -1,7 +1,7 @@
 import random, time, keyboard
 from Extras import clear_screen, yes_or_no
 
-def main(active_user='Guest', high_points=0, map_width=16, map_height=16, max_apples=3):
+def main(active_user='Guest', high_points=0, map_width=16, map_height=16, max_apples=3, movement_time=0.15, user_quit=False):
     '''
     Main function to run the Snake game.
 
@@ -11,6 +11,8 @@ def main(active_user='Guest', high_points=0, map_width=16, map_height=16, max_ap
     map_width (int): The width of the game map. Default is 16.
     map_height (int): The height of the game map. Default is 16.
     max_apples (int): The maximum number of apples that can appear on the map at once. Default is 3.
+    movement_time (float): The time in seconds between each movement of the snake. Default is 0.15.
+    user_quit (bool): A flag to determine if the user has quit the game. Default is False.
 
     Returns:
     tuple: A tuple containing the string 'snake' and the high score achieved during the game.
@@ -76,9 +78,22 @@ def main(active_user='Guest', high_points=0, map_width=16, map_height=16, max_ap
             elif keyboard.is_pressed('d') or keyboard.is_pressed('right'):
                 if movement != 'left':
                     temp_movement = 'right'
-            # Handle movement if enough time has passed
             end_time = time.monotonic()
-            if start_time is None or end_time-start_time >= 0.15:
+            # Handle quit
+            if keyboard.is_pressed('esc'):
+                pause_time = end_time - start_time
+                clear_screen()
+                response = yes_or_no("Are you sure you want to quit? (Y/N)\n")
+                if response == "y":
+                    user_quit = True
+                    break
+                elif response == "n":
+                    clear_screen()
+                    previous_map = [['\033[37m  \033[0m' for _ in range(map_width)] for _ in range(map_height)]
+                    start_time = time.monotonic() - pause_time
+                    end_time = time.monotonic()
+            # Handle movement
+            if start_time is None or end_time-start_time >= movement_time:
                 start_time = time.monotonic()
                 movement = temp_movement
                 if movement == 'up':
@@ -123,16 +138,17 @@ def main(active_user='Guest', high_points=0, map_width=16, map_height=16, max_ap
                         color = 92
                     game_map[player_position[i][0]][player_position[i][1]] = f'\033[{color}m██\033[0m'
                 game_map[player_position[0][0]][player_position[0][1]] = '\033[93m██\033[0m'
-        # Game over
-        clear_screen("Game Over\n")
-        # Update highscore
-        if points > high_points:
-            high_points = points
-        print(f"Score: {points}             High Score: {high_points}")
-        if points == high_points:
-            print("\033[3m*New High Score!*\33[0m")
-        # Play again
-        response = yes_or_no("\nWould you like to play again? (Y/N)\n")
+        if user_quit == False:
+            # Game over
+            clear_screen("Game Over\n")
+            # Update highscore
+            if points > high_points:
+                high_points = points
+            print(f"Score: {points}             High Score: {high_points}")
+            if points == high_points and points != 0:
+                print("\033[3m*New High Score!*\33[0m")
+            # Play again
+            response = yes_or_no("\nWould you like to play again? (Y/N)\n")
         if response == "n":
             return 'Snake', active_user, high_points
         if response == "y":
