@@ -64,8 +64,21 @@ def sign_in():
                         file.write(f"{new_user}, {new_pass}\n")
                     return new_user
 
-#Check if the choice is in the menu
 def check_menu_choice(menu, prompt=''):
+    """
+    Continuously prompts the user to make a choice from the given menu until a valid choice is made.
+
+    Args:
+        menu (list): A list of menu items to choose from.
+        prompt (str, optional): A string to display as the prompt message. Defaults to an empty string.
+
+    Returns:
+        str: The selected menu item as a string.
+
+    The function checks if the user's input is a valid integer corresponding to an index in the menu list.
+    If not, it checks if the input matches any menu item as a string (case-insensitive and spaces replaced by underscores).
+    If the input is invalid, it clears the screen and prompts the user again.
+    """
     while True:
         choice = input(prompt)
         #Check if the choice is in the menu as an integer
@@ -79,23 +92,35 @@ def check_menu_choice(menu, prompt=''):
         #If the choice is not in the menu, ask for a new choice, suggesting the user inputs an integer
         clear_screen("Invalid choice.")
 
-def unpack_game(game, active_user, high_score=[], lines=[]):
+def unpack_game(game, active_user, high_score=[], main_line=None, sublines=[]):
     with open("stats.txt", "w") as file:
-        while True:
-            for i, line in enumerate(file.readlines()):
-                main_line = line if active_user in line else file.write(f"{active_user}\n")
-                for sublines in file.readlines()[i+1]:
-                    if len(sublines) - len(sublines.lstrip()) > len(main_line) - len(main_line.lstrip()):
-                        lines.append(sublines)
+        while user_found is False:
+            file_lines = file.readlines()
+            for i, line in enumerate(file_lines):
+                if active_user in line:
+                    user_found = True
+                    main_line = line
+                else:
+                    file.write(f"{active_user}\n")
+                for subline in file_lines[i+1]:
+                    if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
+                        sublines.append(subline)
                     else:
                         break
                 break
-            if main_line is not None:
-                break
         for i, line in sublines:
             if game in line:
-
-
+                stats = line.strip().split(", ")
+                stats[0] += 1
+                if stats[1] < high_score and len (high_score) == 1:
+                    stats[1] = high_score
+                else:
+                    stats_highscores = stats[1].split(" ")
+                    for i, score in enumerate(stats_highscores):
+                        if high_score[i] > score:
+                            score = high_score[i]
+            else:
+                pass
     pass
 
 #Main function
