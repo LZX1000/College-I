@@ -37,7 +37,7 @@ def sign_in():
             if attempt in users:
                 #Correct credentials
                 clear_screen(f"Welcome, {username_try}!")
-                return username_try
+                return username_try, True
             else:
                 #To the beginning of the loop
                 clear_screen("Invalid username or password.")
@@ -62,17 +62,21 @@ def sign_in():
                     users.append((new_user, new_pass))
                     with open("users.txt", "a") as file:
                         file.write(f"{new_user}, {new_pass}\n")
-                    return new_user
+                    return new_user, True
+
+def sign_out(active_user):
+    return False
 
 #Main function
 def main():
-    active_user = sign_in()
     while True:
-        #Defines the games in the menu as a list
-        menu = ["Quit", "Nim", "Word Guess", "The Arena", "Snake"]
-        clear_screen()
-        #Gets a proper input and runs the menu item associated with it
-        eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
+        active_user, signed_in = sign_in()
+        while signed_in == True:
+            #Defines the games in the menu as a list
+            menu = ["Quit", "Sign Out", "Nim", "Word Guess", "The Arena", "Snake"]
+            clear_screen()
+            #Gets a proper input and runs the menu item associated with it
+            signed_in = eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
 
 if __name__ == "__main__":
     main()
