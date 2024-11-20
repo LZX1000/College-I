@@ -79,18 +79,23 @@ def check_menu_choice(menu, prompt=''):
         #If the choice is not in the menu, ask for a new choice, suggesting the user inputs an integer
         clear_screen("Invalid choice.")
 
-def unpack_game(game, active_user, high_score=[], opinion=None):
-    try:
-        with open("stats.txt", "w") as file:
-            while True:
-                for line in file.readlines():
-                    main_line = line if active_user in line else file.write(f"{active_user}, 0\n")
-                    for line in file.readlines() > main_line:
-                        if line.startswith(' '):
+def unpack_game(game, active_user, high_score=[], lines=[]):
+    with open("stats.txt", "w") as file:
+        while True:
+            for i, line in enumerate(file.readlines()):
+                main_line = line if active_user in line else file.write(f"{active_user}\n")
+                for sublines in file.readlines()[i+1]:
+                    if len(sublines) - len(sublines.lstrip()) > len(main_line) - len(main_line.lstrip()):
+                        lines.append(sublines)
+                    else:
+                        break
+                break
+            if main_line is not None:
+                break
+        for i, line in sublines:
+            if game in line:
 
-    except FileNotFoundError:
-        with open("stats.txt", "w") as file:
-            users = []
+
     pass
 
 #Main function
@@ -98,7 +103,7 @@ def main():
     active_user = sign_in()
     while True:
         #Defines the games in the menu as a list
-        menu = [("Quit", 0), ("Nim", 0), ("Word Guess", 0), ("The Arena", 0), ("Snake", 1)]
+        menu = ["Quit", "Nim", "Word Guess", "The Arena", "Snake"]
         clear_screen()
         #Gets a proper input and runs the menu item associated with it
         unpack_game(eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)')))
