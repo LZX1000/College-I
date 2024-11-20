@@ -134,7 +134,7 @@ def main(active_user='Guest', players=None, num_players=0, game_number=0, curren
                 game_number -= player_choice
                 current_player_index = (current_player_index + 1) % num_players
     #End of game
-    return
+    return 'Nim', active_user
     
 if __name__ == "__main__":
     main()

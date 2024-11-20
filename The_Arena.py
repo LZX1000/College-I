@@ -125,7 +125,7 @@ def main(active_user='Guest'):
         #Try again?
         response = yes_or_no("Would you like to play again? (Y/N)\n")
         if response == "n":
-            return
+            return 'The Arena', active_user
         if response == "y":
             continue
 
