@@ -22,6 +22,17 @@ def handle_value_error(prompt=""):
         except ValueError:
             clear_screen("Please enter a valid integer.\n")
 
+def check_menu_choice(menu, prompt=''):
+    while True:
+        choice = input(prompt)
+        try:
+            if int(choice) in range(len(menu)):
+                return menu[int(choice)]
+        except ValueError:
+            if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
+                return choice
+        clear_screen("Invalid choice.")
+
 def main():
     print("I am but a humble module file.")
 
