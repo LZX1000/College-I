@@ -19,24 +19,27 @@ def main(active_user='Guest'):
     map_height = 16
     max_apples = 3
     # Get high_points
-    with open("stats.txt", "r") as file:
-        file_lines = file.readlines()
-        for i, line in enumerate(file_lines):
-            if line.startswith(active_user):
-                main_line = line
-                main_line_number = i
-                sublines = []
-            for subline in file_lines[main_line_number + 1:]:
-                if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
-                    sublines.append(subline)
-                else:
-                    break
-            for subline in sublines:
-                if "Snake" in subline:
-                    stats = subline.strip().split(", ")
-                    high_points = int(stats[2].split(" ")[0])
-        else:
-            high_points = 0
+    try:
+        with open("stats.txt", "r") as file:
+            file_lines = file.readlines()
+            for i, line in enumerate(file_lines):
+                if line.startswith(active_user):
+                    main_line = line
+                    main_line_number = i
+                    sublines = []
+                for subline in file_lines[main_line_number + 1:]:
+                    if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
+                        sublines.append(subline)
+                    else:
+                        break
+                for subline in sublines:
+                    if "Snake" in subline:
+                        stats = subline.strip().split(", ")
+                        high_points = int(stats[2].split(" ")[0])
+            else:
+                high_points = 0
+    except FileNotFoundError:
+        high_points = 0
     while True:
         # Initialize game specific variables
         temp_movement = None
