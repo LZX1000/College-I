@@ -1,3 +1,7 @@
 # Ignore Python cache files and directories
 __pycache__/
 *.pyc
+
+# Ignore player-specific files
+stats.txt
+users.txt
