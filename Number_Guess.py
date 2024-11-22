@@ -67,6 +67,7 @@ def main(active_user='Guest'):
                     guess = handle_value_error("\n".join(playing_screen))
 
                     if guess == secret_number:
+                        guesses += 1
                         clear_screen(f"Congratulations! You guessed the number in {guesses} guesses.\n")
                         break
                     elif guess > high_bound or guess < low_bound:
