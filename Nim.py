@@ -1,5 +1,8 @@
 from Extras import yes_or_no, clear_screen, handle_value_error
-#Imports randint from random when it needs it later
+
+"""
+Rework this to be more cohesive in a main function
+"""
 
 #Prompts for and recieves the number of players, returning them as a list
 def identify_players():
