@@ -74,15 +74,6 @@ def number_check(player_number=None, game_number=None, current_player=None):
             player_number = handle_value_error("\nPlease choose an integer between 1 and 3.\n\n")
             condition = True
 
-#Start the game with the given players and number of players
-def start(players=None, num_players=None):
-    #Check variables
-    if players == None or num_players == None:
-        players, num_players = identify_players()
-    game_number = choose_starting_number(players=players)
-    #Return values
-    return players, num_players, game_number
-
 #Prompt for and recieve the player's number
 def get_player_choice(game_number=None, current_player=None):
     #Check/initialize variables
@@ -101,13 +92,19 @@ def get_robot_choice():
             from random import randint
 
 #Main loop
-def main(active_user='Guest', players=None, num_players=0, game_number=0, current_player_index=0, current_player=None):
+def main(active_user='Guest'):
+    players = None
+    num_players = 0
+    game_number = 0
+    current_player = None
     game = True
     while game == True:
         #Starting functions
         clear_screen()
         current_player_index = 0
-        players, num_players, game_number = start(players=players, num_players=num_players)
+        if players is None:
+            players, num_players = identify_players()
+        game_number = choose_starting_number(players=players)
         if game_number == 0:
             game_number = choose_starting_number(players=players)
         #Game loop
