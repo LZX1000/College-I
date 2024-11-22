@@ -3,7 +3,7 @@ from Extras import yes_or_no, clear_screen, handle_value_error, check_menu_choic
 
 def main(active_user='Guest', highscore=None):
     main_menu = ["Quit", "Play Game", "Settings"]
-    settings_menu = ["Change high bound", "Change low bound", "Back to game"]
+    settings_menu = ["Back to game", "Change high bound", "Change low bound"]
     high_bound = 100
     low_bound = 1
     
@@ -20,14 +20,21 @@ def main(active_user='Guest', highscore=None):
 
                 if settings_choice == 'Change high bound':
                     clear_screen()
-                    new_high_bound = handle_value_error("Enter a new high bound: ")
-                    if new_high_bound > low_bound:
-                        high_bound = new_high_bound
+                    while True:
+                        new_high_bound = handle_value_error("Enter a new high bound: ")
+                        if new_high_bound > low_bound:
+                            high_bound = new_high_bound
+                            break
+                        else:
+                            clear_screen("High bound must be greater than low bound.\n")
                 elif settings_choice == 'Change low bound':
                     clear_screen()
-                    new_low_bound = handle_value_error("Enter a new low bound: ")
-                    if new_low_bound < high_bound:
-                        low_bound = new_low_bound
+                    while True:
+                        new_low_bound = handle_value_error("Enter a new low bound: ")
+                        if new_low_bound < high_bound:
+                            low_bound = new_low_bound
+                        else:
+                            clear_screen("Low bound must be less than high bound.\n")
                 elif settings_choice == 'Back to game':
                     break
         
@@ -47,6 +54,8 @@ def main(active_user='Guest', highscore=None):
                     if guess == secret_number:
                         clear_screen(f"Congratulations! You guessed the number in {guesses} guesses.\n")
                         break
+                    elif guess > high_bound or guess < low_bound:
+                        clear_screen(f"Please enter a valid guess between {low_bound} and {high_bound}.\n")
                     elif guess < secret_number:
                         clear_screen("Too low!\n")
                         guesses += 1
@@ -58,7 +67,7 @@ def main(active_user='Guest', highscore=None):
                         if guess < highest_guess:
                             highest_guess = guess - 1
                 if highscore == None or guesses < highscore:
-                    print("You got a new bestscore!\n" + f"Best score: {guesses}")
+                    print("You got a new best score!\n" + f"Best score: {guesses}")
                     highscore = guesses
                 response = yes_or_no("Would you like to play again? (Y/N)\n")
                 if response == 'n':
