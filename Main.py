@@ -38,7 +38,7 @@ def sign_in():
             if attempt in users:
                 #Correct credentials
                 clear_screen(f"Welcome, {username_try}!")
-                return username_try
+                return username_try, True
             else:
                 #To the beginning of the loop
                 clear_screen("Invalid username or password.")
@@ -63,7 +63,7 @@ def sign_in():
                     users.append((new_user, new_pass))
                     with open("users.txt", "a") as file:
                         file.write(f"{new_user}, {new_pass}\n")
-                    return new_user
+                    return new_user, True
 
 def unpack_game(game, active_user, highscore=[]):
     try:
@@ -83,7 +83,7 @@ def unpack_game(game, active_user, highscore=[]):
                         sublines.append(subline)
                     else:
                         break
-            for i, line in enumerate(sublines):
+            for i, subline in enumerate(sublines):
                 if game in subline:
                     stats = subline.strip().split(", ")
                     stats[1] = str(int(stats[1]) + 1)
@@ -95,7 +95,10 @@ def unpack_game(game, active_user, highscore=[]):
                     break
             else:
                 sublines.append(f"{game}, 1, {' '.join(map(str, highscore))}\n")
-            file.write(main_line + "\n    " + "\n    ".join(sublines))
+            file.seek(0)
+            for line in file:
+                if line in sublines:
+                    file.write(line)
     except FileNotFoundError:
         with open("stats.txt", "w") as file:
             file.write(f"{active_user}\n" + f"    {game}, 1, {' '.join(map(str, highscore))}\n")
@@ -109,7 +112,7 @@ def main():
             menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
             #Gets a proper input and runs the menu item associated with it
-            unpack_game(eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)')))
+            unpack_game(eval(check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
 
 if __name__ == "__main__":
     main()
