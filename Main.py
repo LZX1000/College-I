@@ -65,46 +65,88 @@ def sign_in():
                         file.write(f"{new_user}, {new_pass}\n")
                     return new_user, True
 
-def unpack_game(game, active_user, highscore=[]):
+def update_game_stats(game, active_user, highscore=[]):
+    """
+    Updates the game statistics for a given user in the "stats.txt" file.
+
+    If the user or game does not exist in the file, they will be added. If the game exists for the user,
+    the number of times played will be incremented and the high scores will be updated if the new scores
+    are higher.
+
+    Args:
+        game (str): The name of the game to update statistics for.
+        active_user (str): The username of the active user.
+        highscore (list, optional): A list of high scores to compare and update. Defaults to an empty list.
+
+    Raises:
+        Exception: If an error occurs while attempting to create the stats file.
+    """
+    if isinstance(highscore, int):
+        highscore = [highscore]
     try:
         main_line = None
         sublines = []
         with open("stats.txt", "r+") as file:
-            while user_found is False:
-                for i, line in enumerate(file):
-                    if active_user in line:
-                        user_found = True
-                        main_line = line
-                        main_line_number = i
-                if user_found is False:
-                    file.write(f"{active_user}\n    ")
-                for subline in file[main_line_number + 1:]:
-                    if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
-                        sublines.append(subline)
-                    else:
-                        break
+            file_lines = file.readlines()
+            user_found = False
+            for i, line in enumerate(file_lines):
+                if active_user in line:
+                    user_found = True
+                    main_line = line
+                    main_line_number = i
+                    break
+            if not user_found:
+                file_lines.append(f"{active_user}\n")
+                main_line = file_lines[-1]
+                main_line_number = len(file_lines) - 1
+            for subline in file_lines[main_line_number + 1:]:
+                if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
+                    sublines.append(subline)
+                else:
+                    break
             for i, subline in enumerate(sublines):
                 if game in subline:
                     stats = subline.strip().split(", ")
                     stats[1] = str(int(stats[1]) + 1)
-                    stats_highscores = stats[2].split(" ")
+                    stats_highscores = list(map(int, stats[2].split(" ")))
                     for i, stats_highscore in enumerate(stats_highscores):
-                        if highscore[i] > int(stats_highscore):
+                        if highscore[i] > stats_highscore:
                             stats_highscores[i] = highscore[i]
-                    sublines[i] = f"{game}, {stats[1]}, {' '.join(stats_highscores)}\n"
+                    sublines[i] = f"    {game}, {stats[1]}, {' '.join(map(str, stats_highscores))}\n"
                     break
             else:
                 sublines.append(f"{game}, 1, {' '.join(map(str, highscore))}\n")
             file.seek(0)
-            for line in file:
-                if line in sublines:
-                    file.write(line)
+            file.writelines(file_lines[:main_line_number + 1] + sublines + file_lines[main_line_number + 1 + len(sublines):])
     except FileNotFoundError:
-        with open("stats.txt", "w") as file:
-            file.write(f"{active_user}\n" + f"    {game}, 1, {' '.join(map(str, highscore))}\n")
+        try:
+            with open("stats.txt", "w") as file:
+                file.write(f"{active_user}\n" + f"    {game}, 1, {' '.join(map(str, highscore))}\n")
+        except Exception as e:
+            print(f"An error occured while attempting to create the stats file: {e}")
 
-#Main function
 def main():
+    """
+    Main function that runs the game menu loop.
+
+    This function continuously prompts the user to sign in and then presents a menu of games to play.
+    The user can choose to play a game, sign out, or quit the program. The user's game statistics are
+    updated after each game.
+
+    The menu includes the following options:
+    - Quit
+    - Sign Out
+    - Nim
+    - Number Guess
+    - Word Guess
+    - The Arena
+    - Snake
+
+    The function handles user input to navigate the menu and execute the corresponding game functions.
+
+    Returns:
+        None
+    """
     while True:
         active_user, signed_in = sign_in()
         while signed_in == True:
@@ -112,7 +154,14 @@ def main():
             menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
             #Gets a proper input and runs the menu item associated with it
-            unpack_game(eval(check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)'))
+            choice = check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_")
+            if choice == "quit":
+                return
+            elif choice == "sign_out":
+                signed_in = False
+            else:
+                game, active_user, highscore, = eval(choice)(active_user)
+                update_game_stats(game, active_user, highscore)
 
 if __name__ == "__main__":
     main()
