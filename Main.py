@@ -65,36 +65,40 @@ def sign_in():
                         file.write(f"{new_user}, {new_pass}\n")
                     return new_user
 
-def unpack_game(game, active_user, high_score=[], main_line=None, sublines=[]):
-    with open("stats.txt", "w") as file:
-        while user_found is False:
+def unpack_game(game, active_user, high_score=[]):
+    try:
+        with open("stats.txt", "r+") as file:
             file_lines = file.readlines()
+
+        main_line = None
+        sublines = []
+        while user_found is False:
             for i, line in enumerate(file_lines):
                 if active_user in line:
                     user_found = True
                     main_line = line
+            if user_found is False:
+                file.write(f"{active_user}\n    ")
+            for subline in file_lines[i+1]:
+                if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
+                    sublines.append(subline)
                 else:
-                    file.write(f"{active_user}\n")
-                for subline in file_lines[i+1]:
-                    if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
-                        sublines.append(subline)
-                    else:
-                        break
-                break
+                    break
         for i, line in sublines:
             if game in line:
                 stats = line.strip().split(", ")
-                stats[0] += 1
-                if stats[1] < high_score and len (high_score) == 1:
-                    stats[1] = high_score
-                else:
-                    stats_highscores = stats[1].split(" ")
-                    for i, score in enumerate(stats_highscores):
-                        if high_score[i] > score:
-                            score = high_score[i]
+                stats[1] += 1
+                stats_highscores = stats[2].split(" ")
+                for i, score in enumerate(stats_highscores):
+                    if high_score[i] > score:
+                        score = high_score[i]
+                line = f"{game}, {stats[1]}, {stats_highscores}\n"
             else:
-                pass
-    pass
+                sublines.append(f"{game}, 1, {high_score}\n")
+        file.write(main_line + "\n    " + "\n    ".join(sublines))
+    except FileNotFoundError:
+        with open("stats.txt", "w") as file:
+            file.write(f"{active_user}\n" + f"    {game}, 1, {high_score}\n")
 
 #Main function
 def main():
