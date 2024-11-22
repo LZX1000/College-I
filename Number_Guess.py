@@ -4,6 +4,8 @@ from Extras import yes_or_no, clear_screen, handle_value_error, check_menu_choic
 def main(active_user='Guest', highscore=None):
     main_menu = ["Quit", "Play Game", "Settings"]
     settings_menu = ["Change high bound", "Change low bound", "Back to game"]
+    high_bound = 100
+    low_bound = 1
     
     while True:
         clear_screen()
@@ -32,14 +34,9 @@ def main(active_user='Guest', highscore=None):
         elif menu_choice == 'Play Game':
             Playing = True
             while Playing == True:
-                try:
-                    secret_number = random.randint(low_bound, high_bound)
-                    lowest_guess = low_bound
-                    highest_guess = high_bound
-                except NameError:
-                    secret_number = random.randint(1, 100)
-                    lowest_guess = 1
-                    highest_guess = 100
+                secret_number = random.randint(low_bound, high_bound)
+                lowest_guess = low_bound
+                highest_guess = high_bound
                 guesses = 0
                 clear_screen()
 
