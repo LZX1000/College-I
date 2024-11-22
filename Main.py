@@ -81,29 +81,36 @@ def update_game_stats(game, active_user, highscore=[]):
     Raises:
         Exception: If an error occurs while attempting to create the stats file.
     """
+    # Convert highscore to a list if it is an integer
     if isinstance(highscore, int):
         highscore = [highscore]
+    # Open file if it exists
     try:
         main_line = None
         sublines = []
         with open("stats.txt", "r+") as file:
+            # Read file and initialize user_found variable
             file_lines = file.readlines()
             user_found = False
+            # Find user
             for i, line in enumerate(file_lines):
                 if active_user in line:
                     user_found = True
                     main_line = line
                     main_line_number = i
                     break
+            # If user not found, add user to file
             if not user_found:
                 file_lines.append(f"{active_user}\n")
                 main_line = file_lines[-1]
                 main_line_number = len(file_lines) - 1
+            # Identify sublines
             for subline in file_lines[main_line_number + 1:]:
                 if len(subline) - len(subline.lstrip()) > len(main_line) - len(main_line.lstrip()):
                     sublines.append(subline)
                 else:
                     break
+            # Update game stats
             for i, subline in enumerate(sublines):
                 if game in subline:
                     stats = subline.strip().split(", ")
@@ -114,14 +121,18 @@ def update_game_stats(game, active_user, highscore=[]):
                             stats_highscores[i] = highscore[i]
                     sublines[i] = f"    {game}, {stats[1]}, {' '.join(map(str, stats_highscores))}\n"
                     break
+            # If game not found, add game to user
             else:
                 sublines.append(f"{game}, 1, {' '.join(map(str, highscore))}\n")
+            # Write updated stats to file
             file.seek(0)
             file.writelines(file_lines[:main_line_number + 1] + sublines + file_lines[main_line_number + 1 + len(sublines):])
+    # If file does not exist, create file and write user and game stats
     except FileNotFoundError:
         try:
             with open("stats.txt", "w") as file:
                 file.write(f"{active_user}\n" + f"    {game}, 1, {' '.join(map(str, highscore))}\n")
+        # If an error occurs while attempting to create the stats file, raise and print an exception
         except Exception as e:
             print(f"An error occured while attempting to create the stats file: {e}")
 
