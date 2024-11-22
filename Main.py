@@ -2,7 +2,8 @@ from Nim import main as nim
 from Word_Guess import main as word_guess
 from The_Arena import main as the_arena
 from Snake import main as snake
-from Extras import clear_screen, yes_or_no
+from Number_Guess import main as number_guess
+from Extras import clear_screen, yes_or_no, check_menu_choice
 from Start import main as start_main
 
 def sign_in():
@@ -64,34 +65,6 @@ def sign_in():
                         file.write(f"{new_user}, {new_pass}\n")
                     return new_user
 
-def check_menu_choice(menu, prompt=''):
-    """
-    Continuously prompts the user to make a choice from the given menu until a valid choice is made.
-
-    Args:
-        menu (list): A list of menu items to choose from.
-        prompt (str, optional): A string to display as the prompt message. Defaults to an empty string.
-
-    Returns:
-        str: The selected menu item as a string.
-
-    The function checks if the user's input is a valid integer corresponding to an index in the menu list.
-    If not, it checks if the input matches any menu item as a string (case-insensitive and spaces replaced by underscores).
-    If the input is invalid, it clears the screen and prompts the user again.
-    """
-    while True:
-        choice = input(prompt)
-        #Check if the choice is in the menu as an integer
-        try:
-            if int(choice) in range(len(menu)):
-                return menu[int(choice)]
-        #check if the choice is in the menu as a string
-        except ValueError:
-            if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
-                return choice
-        #If the choice is not in the menu, ask for a new choice, suggesting the user inputs an integer
-        clear_screen("Invalid choice.")
-
 def unpack_game(game, active_user, high_score=[], main_line=None, sublines=[]):
     with open("stats.txt", "w") as file:
         while user_found is False:
@@ -125,13 +98,14 @@ def unpack_game(game, active_user, high_score=[], main_line=None, sublines=[]):
 
 #Main function
 def main():
-    active_user = sign_in()
     while True:
-        #Defines the games in the menu as a list
-        menu = ["Quit", "Nim", "Word Guess", "The Arena", "Snake"]
-        clear_screen()
-        #Gets a proper input and runs the menu item associated with it
-        unpack_game(eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)')))
+        active_user, signed_in = sign_in()
+        while signed_in == True:
+            #Defines the games in the menu as a list
+            menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
+            clear_screen()
+            #Gets a proper input and runs the menu item associated with it
+            unpack_game(eval((check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_") + '(active_user=active_user)')))
 
 if __name__ == "__main__":
     main()
