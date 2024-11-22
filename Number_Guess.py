@@ -18,10 +18,14 @@ def main(active_user='Guest', highscore=None):
 
                 if settings_choice == 'Change high bound':
                     clear_screen()
-                    high_bound = handle_value_error("Enter a new high bound: ")
+                    new_high_bound = handle_value_error("Enter a new high bound: ")
+                    if new_high_bound > low_bound:
+                        high_bound = new_high_bound
                 elif settings_choice == 'Change low bound':
                     clear_screen()
-                    low_bound = handle_value_error("Enter a new low bound: ")
+                    new_low_bound = handle_value_error("Enter a new low bound: ")
+                    if new_low_bound < high_bound:
+                        low_bound = new_low_bound
                 elif settings_choice == 'Back to game':
                     break
         
@@ -56,7 +60,7 @@ def main(active_user='Guest', highscore=None):
                         guesses += 1
                         if guess < highest_guess:
                             highest_guess = guess - 1
-                if guesses < highscore or highscore == None:
+                if highscore == None or guesses < highscore:
                     print("You got a new bestscore!\n" + f"Best score: {guesses}")
                     highscore = guesses
                 response = yes_or_no("Would you like to play again? (Y/N)\n")
