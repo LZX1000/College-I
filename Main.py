@@ -69,14 +69,14 @@ def update_game_stats(game, active_user, highscore=[]):
     """
     Updates the game statistics for a given user in the "stats.txt" file.
 
-    If the user or game does not exist in the file, they will be added. If the game exists for the user,
-    the number of times played will be incremented and the high scores will be updated if the new scores
-    are higher.
+    If the file does not exist, it creates the file and writes the initial stats.
+    If the user or game is not found in the file, it adds the user or game with initial stats.
+    If the user and game are found, it updates the game stats and highscores.
 
     Args:
-        game (str): The name of the game to update statistics for.
+        game (str): The name of the game to update stats for.
         active_user (str): The username of the active user.
-        highscore (list, optional): A list of high scores to compare and update. Defaults to an empty list.
+        highscore (list or int, optional): A list of highscores or a single highscore to update. Defaults to an empty list.
 
     Raises:
         Exception: If an error occurs while attempting to create the stats file.
@@ -84,6 +84,8 @@ def update_game_stats(game, active_user, highscore=[]):
     # Convert highscore to a list if it is an integer
     if isinstance(highscore, int):
         highscore = [highscore]
+    if highscore is None:
+        highscore = ["None"]
     # Open file if it exists
     try:
         main_line = None
@@ -117,13 +119,15 @@ def update_game_stats(game, active_user, highscore=[]):
                     stats[1] = str(int(stats[1]) + 1)
                     stats_highscores = list(map(int, stats[2].split(" ")))
                     for i, stats_highscore in enumerate(stats_highscores):
-                        if highscore[i] > stats_highscore:
+                        if highscore[i] is not None and highscore[i] != "None" and highscore[i] > stats_highscore:
                             stats_highscores[i] = highscore[i]
-                    sublines[i] = f"    {game}, {stats[1]}, {' '.join(map(str, stats_highscores))}\n"
+                        else:
+                            stats_highscores[i] = stats_highscore if stats_highscore != "None" else highscore[i]
+                    sublines[i] = f"    {game}, {stats[1]}, {' '.join(map(lambda x: str(x) if x is not None else 'None', stats_highscores))}\n"
                     break
             # If game not found, add game to user
             else:
-                sublines.append(f"{game}, 1, {' '.join(map(str, highscore))}\n")
+                sublines.append(f"    {game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
             # Write updated stats to file
             file.seek(0)
             file.writelines(file_lines[:main_line_number + 1] + sublines + file_lines[main_line_number + 1 + len(sublines):])
@@ -131,7 +135,7 @@ def update_game_stats(game, active_user, highscore=[]):
     except FileNotFoundError:
         try:
             with open("stats.txt", "w") as file:
-                file.write(f"{active_user}\n" + f"    {game}, 1, {' '.join(map(str, highscore))}\n")
+                file.write(f"{active_user}\n" + f"    {game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
         # If an error occurs while attempting to create the stats file, raise and print an exception
         except Exception as e:
             print(f"An error occured while attempting to create the stats file: {e}")
