@@ -31,7 +31,7 @@ def check_menu_choice(menu, prompt=''):
         except ValueError:
             if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
                 return choice
-        clear_screen("Invalid choice.")
+        clear_screen("Invalid choice.\n")
 
 def main():
     print("I am but a humble module file.")

@@ -1,11 +1,25 @@
 import random, keyboard
 from Extras import yes_or_no, clear_screen, handle_value_error, check_menu_choice
 
-def main(active_user='Guest', highscore=None):
+def main(active_user='Guest'):
+    """
+    Main function to run the Number Guess game.
+    The function provides a main menu with options to Quit, Play Game, or access Settings.
+    In the Settings menu, users can change the low and high bounds for the guessing range.
+    The Play Game option starts the number guessing game where the user tries to guess a randomly generated number within the specified bounds.
+    The game tracks the number of guesses and updates the highscore if a new best score is achieved
+
+    Parameters:
+    active_user (str): The username of the active user. Default is 'Guest'.
+
+    Returns:
+    tuple: A tuple containing the game name 'Number Guess' and the active user's name..
+    """
     main_menu = ["Quit", "Play Game", "Settings"]
-    settings_menu = ["Back to game", "Change high bound", "Change low bound"]
+    settings_menu = ["Back to game", "Change low bound", "Change high bound"]
     high_bound = 100
     low_bound = 1
+    highscore = None
     
     while True:
         clear_screen()
@@ -33,6 +47,7 @@ def main(active_user='Guest', highscore=None):
                         new_low_bound = handle_value_error("Enter a new low bound: ")
                         if new_low_bound < high_bound:
                             low_bound = new_low_bound
+                            break
                         else:
                             clear_screen("Low bound must be less than high bound.\n")
                 elif settings_choice == 'Back to game':
@@ -59,12 +74,12 @@ def main(active_user='Guest', highscore=None):
                     elif guess < secret_number:
                         clear_screen("Too low!\n")
                         guesses += 1
-                        if guess > lowest_guess:
+                        if guess >= lowest_guess:
                             lowest_guess = guess + 1
                     elif guess > secret_number:
                         clear_screen("Too high!\n")
                         guesses += 1
-                        if guess < highest_guess:
+                        if guess <= highest_guess:
                             highest_guess = guess - 1
                 if highscore == None or guesses < highscore:
                     print("You got a new best score!\n" + f"Best score: {guesses}")
