@@ -2,7 +2,8 @@ import random, keyboard, time
 from Extras import clear_screen, yes_or_no
 
 def main(active_user='Guest'):
-    while True:
+    active = True
+    while active ==True:
         enemies = []
         pieces = []
         pieces_collected = 0
@@ -15,7 +16,7 @@ def main(active_user='Guest'):
                 clear_screen()
                 response = yes_or_no("Are you sure you want to quit? (Y/N)\n")
                 if response == "y":
-                    return
+                    active = False
                 elif response == "n":
                     continue
             #Difficulty sets
@@ -81,7 +82,7 @@ def main(active_user='Guest'):
                     clear_screen()
                     response = yes_or_no("Are you sure you want to quit? (Y/N)\n")
                     if response == "y":
-                        return
+                        active = False
                     elif response == "n":
                         break
                 #Movement
@@ -125,9 +126,10 @@ def main(active_user='Guest'):
         #Try again?
         response = yes_or_no("Would you like to play again? (Y/N)\n")
         if response == "n":
-            return 'The Arena', active_user
+            active = False
         if response == "y":
             continue
+    return 'The Arena', active_user, None
 
 if __name__ == "__main__":
     main()

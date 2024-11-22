@@ -26,7 +26,7 @@ def main(active_user='Guest'):
         menu_choice = check_menu_choice(main_menu, "\n".join([f"{index} : {main_menu[index]}" for index in range(len(main_menu))]) + "\n\n")
 
         if menu_choice == 'Quit':
-            return 'Number Guess', active_user
+            return 'Number Guess', active_user, None
         elif menu_choice == 'Settings':
             while True:
                 clear_screen()
