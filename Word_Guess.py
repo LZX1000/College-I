@@ -157,7 +157,7 @@ def main(active_user='guest', game_word=None, guesses=0, game_letters=None, gues
                 words = None
             #Quit game
             if response == "n":
-                return
+                return 'Word Guess', active_user, None
             game_word, option, perfect_word, words = input_words(words=words)
             game_letters = list(game_word)
             guessed_letters = ['ab' if letter.isalpha() else letter for letter in game_letters]
