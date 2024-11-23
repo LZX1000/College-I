@@ -20,6 +20,7 @@ def sign_in():
         str: The username of the signed-in or newly created user.
     '''
     clear_screen()
+    response_1 = ""
     while True:
         #Open existing users file or create a new one
         try:
@@ -28,44 +29,48 @@ def sign_in():
         except FileNotFoundError:
             with open("users.txt", "w") as file:
                 users = []
-        response = yes_or_no("Do you already have an account? (Y/N)\n\n")
+        if response_1 != "y":
+            response = yes_or_no("Do you already have an account? (Y/N)\n\n")
         #Sign in
-        if response == "y":
+        if response == "y" or response_1 == "y":
             clear_screen()
-            username_try = input("Username: ")
+            username_try = input("Username: ").strip()
             password_try = input("\nPassword: ")
             attempt = (username_try, password_try)
             if attempt in users:
                 #Correct credentials
                 clear_screen(f"Welcome, {username_try}!")
-                return username_try, True
+                return attempt, True
             else:
-                #To the beginning of the loop
                 clear_screen("Invalid username or password.")
         #Create new account
         elif response == "n":
             clear_screen("What should we call you?\n")
-            new_user = input("Username: ")
+            new_user = input("Username: ").strip()
             while True:
-                #Check if it's a taken username
-                if any(new_user == user[0] for user in users):
+                #Check if username is valid
+                if not new_user:
+                    clear_screen("Please enter a valid username.")
+                    new_user = input("Username: ").strip()
+                elif any(new_user == user[0] for user in users) or new_user == "Guest":
                     clear_screen("That username is already taken.\nWould you like to sign in? (Y/N)\n")
-                    response = yes_or_no()
-                    if response == "y":
+                    response_1 = yes_or_no()
+                    if response_1 == "y":
                         clear_screen()
                         break
-                    elif response == "n":
+                    elif response_1 == "n":
                         clear_screen()
-                        new_user = input("Username: ")
+                        new_user = input("Username: ").strip()
                 #Not taken, make a password
                 else:
                     new_pass = input("\nPassword: ")
-                    users.append((new_user, new_pass))
+                    attempt = (new_user, new_pass)
+                    users.append(attempt)
                     with open("users.txt", "a") as file:
                         file.write(f"{new_user}, {new_pass}\n")
-                    return new_user, True
+                    return attempt, True
 
-def update_game_stats(game, active_user, highscore=[]):
+def update_game_stats(game, active_account, highscore=[]):
     """
     Updates the game statistics for a given user in the "stats.txt" file.
 
@@ -75,7 +80,7 @@ def update_game_stats(game, active_user, highscore=[]):
 
     Args:
         game (str): The name of the game to update stats for.
-        active_user (str): The username of the active user.
+        active_account (str): The username of the active user.
         highscore (list or int, optional): A list of highscores or a single highscore to update. Defaults to an empty list.
 
     Raises:
@@ -96,14 +101,14 @@ def update_game_stats(game, active_user, highscore=[]):
             user_found = False
             # Find user
             for i, line in enumerate(file_lines):
-                if active_user in line:
+                if f"{active_account[0]}, {active_account[1]}" in line:
                     user_found = True
                     main_line = line
                     main_line_number = i
                     break
             # If user not found, add user to file
             if not user_found:
-                file_lines.append(f"{active_user}\n")
+                file_lines.append(f"{active_account[0]}, {active_account[1]}\n")
                 main_line = file_lines[-1]
                 main_line_number = len(file_lines) - 1
             # Identify sublines
@@ -135,7 +140,7 @@ def update_game_stats(game, active_user, highscore=[]):
     except FileNotFoundError:
         try:
             with open("stats.txt", "w") as file:
-                file.write(f"{active_user}\n" + f"    {game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
+                file.write(f"{active_account[0]}, {active_account[1]}\n" + f"    {game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
         # If an error occurs while attempting to create the stats file, raise and print an exception
         except Exception as e:
             print(f"An error occured while attempting to create the stats file: {e}")
@@ -163,7 +168,7 @@ def main():
         None
     """
     while True:
-        active_user, signed_in = sign_in()
+        active_account, signed_in = sign_in()
         while signed_in == True:
             #Defines the games in the menu as a list
             menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
@@ -175,8 +180,8 @@ def main():
             elif choice == "sign_out":
                 signed_in = False
             else:
-                game, active_user, highscore, = eval(choice)(active_user)
-                update_game_stats(game, active_user, highscore)
+                game, active_account, highscore, = eval(choice)(active_account)
+                update_game_stats(game, active_account, highscore)
 
 if __name__ == "__main__":
     main()
