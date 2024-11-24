@@ -24,10 +24,15 @@ def sign_in():
     while True:
         #Open existing users file or create a new one
         try:
-            with open("users.txt", "r") as file:
-                users = [tuple(line.strip().split(', ')) for line in file.readlines()]
+            with open("stats.txt", "r") as file:
+                file_lines = file.readlines()
+                for line in file_lines:
+                    if line and line[0] == " ":
+                        continue
+                    else:
+                        users = [tuple(line.strip().split(', ')) for line in file.readlines()]
         except FileNotFoundError:
-            with open("users.txt", "w") as file:
+            with open("stats.txt", "w") as file:
                 users = []
         if response_1 != "y":
             response = yes_or_no("Do you already have an account? (Y/N)\n\n")
@@ -52,23 +57,28 @@ def sign_in():
                 if not new_user:
                     clear_screen("Please enter a valid username.")
                     new_user = input("Username: ").strip()
-                elif any(new_user == user[0] for user in users) or new_user == "Guest":
-                    clear_screen("That username is already taken.\nWould you like to sign in? (Y/N)\n")
-                    response_1 = yes_or_no()
-                    if response_1 == "y":
-                        clear_screen()
-                        break
-                    elif response_1 == "n":
-                        clear_screen()
-                        new_user = input("Username: ").strip()
-                #Not taken, make a password
                 else:
-                    new_pass = input("\nPassword: ")
-                    attempt = (new_user, new_pass)
-                    users.append(attempt)
-                    with open("users.txt", "a") as file:
-                        file.write(f"{new_user}, {new_pass}\n")
-                    return attempt, True
+                    for char in new_user:
+                        if char == " " or char == ",":
+                            clear_screen("Please enter a valid username.")
+                            new_user = input("Username: ").strip()
+                    if any(new_user == user[0] for user in users) or new_user == "Guest":
+                        clear_screen("That username is already taken.\nWould you like to sign in? (Y/N)\n")
+                        response_1 = yes_or_no()
+                        if response_1 == "y":
+                            clear_screen()
+                            break
+                        elif response_1 == "n":
+                            clear_screen()
+                            new_user = input("Username: ").strip()
+                    #Not taken, make a password
+                    else:
+                        new_pass = input("\nPassword: ")
+                        attempt = (new_user, new_pass)
+                        users.append(attempt)
+                        with open("stats.txt", "a") as file:
+                            file.write(f"{new_user}, {new_pass}\n")
+                        return attempt, True
 
 def update_game_stats(game, active_account, highscore=[]):
     """
