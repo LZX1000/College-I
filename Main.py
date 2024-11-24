@@ -7,18 +7,16 @@ from Extras import clear_screen, yes_or_no, check_menu_choice
 from Start import main as start_main
 
 def sign_in():
-    '''
-    Handles the sign-in process for users.
+    """
+    Handles user sign-in and account creation.
 
-    This function clears the screen and prompts the user to either sign in with an existing account
-    or create a new one. If the user chooses to sign in, they are asked for their username and password.
-    If the credentials match an existing user, they are welcomed. If the credentials do not match,
-    an error message is displayed. If the user chooses to create a new account, they are prompted to
-    enter a new username and password. The new account is then saved to the "users.txt" file.
+    This function prompts the user to either sign in with an existing account or create a new one.
+    It reads from or writes to a file named "stats.txt" to store user credentials.
 
     Returns:
-        str: The username of the signed-in or newly created user.
-    '''
+        tuple: A tuple containing the username and password of the signed-in or newly created account.
+        bool: A boolean indicating successful sign-in or account creation.
+    """
     clear_screen()
     response_1 = ""
     while True:
@@ -82,19 +80,16 @@ def sign_in():
 
 def update_game_stats(game, active_account, highscore=[]):
     """
-    Updates the game statistics for a given user in the "stats.txt" file.
+    Updates the game statistics for a given user in the stats.txt file.
 
-    If the file does not exist, it creates the file and writes the initial stats.
-    If the user or game is not found in the file, it adds the user or game with initial stats.
-    If the user and game are found, it updates the game stats and highscores.
-
-    Args:
-        game (str): The name of the game to update stats for.
-        active_account (str): The username of the active user.
-        highscore (list or int, optional): A list of highscores or a single highscore to update. Defaults to an empty list.
+    Parameters:
+    game (str): The name of the game to update stats for.
+    active_account (tuple): A tuple containing the user's account information (username, user_id).
+    highscore (list or int, optional): A list of high scores or a single high score to update. Defaults to an empty list.
 
     Raises:
-        Exception: If an error occurs while attempting to create the stats file.
+    FileNotFoundError: If the "stats.txt" file does not exist and cannot be created.
+    Exception: If an error occurs while attempting to create the stats file.
     """
     # Convert highscore to a list if it is an integer
     if isinstance(highscore, int):
@@ -157,25 +152,16 @@ def update_game_stats(game, active_account, highscore=[]):
 
 def main():
     """
-    Main function that runs the game menu loop.
+    Main function that handles the user sign-in process and game menu navigation.
 
-    This function continuously prompts the user to sign in and then presents a menu of games to play.
-    The user can choose to play a game, sign out, or quit the program. The user's game statistics are
-    updated after each game.
+    The function runs an infinite loop that:
+    1. Prompts the user to sign in.
+    2. Displays a menu of games to the signed-in user.
+    3. Executes the selected game or handles sign-out/quit actions.
 
-    The menu includes the following options:
-    - Quit
-    - Sign Out
-    - Nim
-    - Number Guess
-    - Word Guess
-    - The Arena
-    - Snake
+    The function updates game statistics after each game is played.
 
-    The function handles user input to navigate the menu and execute the corresponding game functions.
-
-    Returns:
-        None
+    Does not return
     """
     while True:
         active_account, signed_in = sign_in()
@@ -183,8 +169,9 @@ def main():
             #Defines the games in the menu as a list
             menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
-            #Gets a proper input and runs the menu item associated with it
+            #Gets a proper input
             choice = check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_")
+            #Executes the choice
             if choice == "quit":
                 return
             elif choice == "sign_out":
