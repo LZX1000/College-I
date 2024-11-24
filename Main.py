@@ -24,11 +24,7 @@ def sign_in():
         try:
             with open("stats.txt", "r") as file:
                 file_lines = file.readlines()
-                for line in file_lines:
-                    if line and line[0] == " ":
-                        continue
-                    else:
-                        users = [tuple(line.strip().split(', ')) for line in file.readlines()]
+                users = [tuple(line.strip().split(', ')) for line in file_lines if line and not line[0].isspace()]
         except FileNotFoundError:
             with open("stats.txt", "w") as file:
                 users = []
