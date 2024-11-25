@@ -5,7 +5,7 @@ def main(active_user='Guest'):
     map_width = 16
     map_height = 16
     movement_time = 0.15
-    tile_states = {}
+    saved_coordinates = {}
     playing = True
     while playing:
         # Initialize game specific variables
@@ -58,12 +58,10 @@ def main(active_user='Guest'):
                 old_position = player_position
                 color = random.choice(['\033[41m  \033[0m', '\033[42m  \033[0m', '\033[43m  \033[0m', '\033[44m  \033[0m', '\033[45m  \033[0m', '\033[46m  \033[0m'])
                 game_map[old_position[0]][old_position[1]] = color
-                tile_states[old_position] = color
+                saved_coordinates[old_position] = color
                 for y in range(map_height):
                     for x in range(map_width):
-                        tile_states[(y, x)] = game_map[y][x]
-                for y in range(map_height):
-                    for x in range(map_width):
+                        saved_coordinates[(y, x)] = game_map[y][x]
                         new_y = y + y_movement
                         new_x = x + x_movement
                         if new_y < 0:
@@ -74,7 +72,7 @@ def main(active_user='Guest'):
                             new_x = 0
                         elif new_x >= map_width:
                             new_x = map_width-1
-                        game_map[y][x] = tile_states.get((new_y, new_x), previous_map[new_y][new_x] if previous_map[new_y][new_x] == '\033[47m  \033[0m' else '\033[47m  \033[0m')
+                        game_map[y][x] = saved_coordinates.get((new_y, new_x), previous_map[new_y][new_x] if previous_map[new_y][new_x] == '\033[47m  \033[0m' else '\033[47m  \033[0m')
         # Game over
         clear_screen("Game Over")
         # Play again
