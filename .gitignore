@@ -2,5 +2,6 @@
 __pycache__/
 *.pyc
 
-words.txt
+# Ignore player-specific files
 stats.txt
+words.txt
