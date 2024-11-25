@@ -155,15 +155,19 @@ def main(active_user='Guest'):
                     game_map[player_position[i][0]][player_position[i][1]] = f'\033[{color}m██\033[0m'
                 game_map[player_position[0][0]][player_position[0][1]] = '\033[93m██\033[0m'
         # Game over
+        keyboard.send('enter')
+        input()
         clear_screen("Game Over\n")
         # Update highscore
         if points > high_points:
             high_points = points
         print(f"Score: {points}             High Score: {high_points}")
         if points == high_points:
-            print("\033[3m*New High Score!*\33[0m")
+            print("\033[3m*New High Score!*\33[0m\n")
+        else:
+            print()
         # Play again
-        response = yes_or_no("\nWould you like to play again? (Y/N)\n")
+        response = yes_or_no("Would you like to play again? (Y/N)\n\n")
         if response == "n":
             return 'Snake', active_user, high_points
         if response == "y":
