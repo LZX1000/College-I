@@ -5,6 +5,7 @@ def main(active_user='Guest'):
     map_width = 16
     map_height = 16
     movement_time = 0.15
+    tile_states = {}
     playing = True
     while playing:
         # Initialize game specific variables
@@ -12,12 +13,11 @@ def main(active_user='Guest'):
         game_map = [['\033[47m  \033[0m' for _ in range(map_width)] for _ in range(map_height)]
         previous_map = [['\033[37m  \033[0m' for _ in range(map_width)] for _ in range(map_height)]
         clear_screen()
-        # Display initial player head
-        game_map[player_position[0]][player_position[1]] = '\033[93m██\033[0m'
         # Game start time
         start_time = time.monotonic()
         # Game loop
         while True:
+            game_map[player_position[0]][player_position[1]] = '\033[93m██\033[0m'
             print("\033[1;1HPoints: {points}\n")
             # Display game map
             for y in range(map_height):
@@ -31,9 +31,9 @@ def main(active_user='Guest'):
             x_movement = 0
             while True:
                 if keyboard.is_pressed('w') or keyboard.is_pressed('up'):
-                    y_movement = 1
-                elif keyboard.is_pressed('s') or keyboard.is_pressed('down'):
                     y_movement = -1
+                elif keyboard.is_pressed('s') or keyboard.is_pressed('down'):
+                    y_movement = 1
                 if keyboard.is_pressed('a') or keyboard.is_pressed('left'):
                     x_movement = -1
                 elif keyboard.is_pressed('d') or keyboard.is_pressed('right'):
@@ -52,16 +52,29 @@ def main(active_user='Guest'):
                 if end_time-start_time >= movement_time or start_time is None:
                     start_time = time.monotonic()
                     break
-            old_position = (player_position[0]+y_movement, player_position[1]-x_movement)
-            # Update player position and handle trail
-            if old_position != player_position:
+            if not playing:
+                break
+            if y_movement != 0 or x_movement != 0:
+                old_position = player_position
                 color = random.choice(['\033[41m  \033[0m', '\033[42m  \033[0m', '\033[43m  \033[0m', '\033[44m  \033[0m', '\033[45m  \033[0m', '\033[46m  \033[0m'])
                 game_map[old_position[0]][old_position[1]] = color
+                tile_states[old_position] = color
                 for y in range(map_height):
                     for x in range(map_width):
-                        game_map[y][x] = previous_map[y+y_movement][x-x_movement]
-                        if game_map[y][x] not in range(map_height) or game_map[y][x] not in range(map_width):
-                            # Make it so the map moves
+                        tile_states[(y, x)] = game_map[y][x]
+                for y in range(map_height):
+                    for x in range(map_width):
+                        new_y = y + y_movement
+                        new_x = x + x_movement
+                        if new_y < 0:
+                            new_y = 0
+                        elif new_y >= map_height:
+                            new_y = map_height-1
+                        if new_x < 0:
+                            new_x = 0
+                        elif new_x >= map_width:
+                            new_x = map_width-1
+                        game_map[y][x] = tile_states.get((new_y, new_x), previous_map[new_y][new_x] if previous_map[new_y][new_x] == '\033[47m  \033[0m' else '\033[47m  \033[0m')
         # Game over
         clear_screen("Game Over")
         # Play again
