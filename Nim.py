@@ -57,7 +57,10 @@ def main(active_user='Guest'):
             current_player = players[current_player_index]
             # Get choices
             if current_player == "Robot":
-                player_choice = randint(1,3)
+                for i in range(1, 4):
+                    if (game_number - i) % 4 == 1:
+                        player_choice = i
+                        break
             else:
                 player_choice = handle_value_error(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n")
                 condition = False
