@@ -1,8 +1,6 @@
 from Extras import yes_or_no, clear_screen, handle_value_error
 from random import randint
 
-# Next feature: Smarter robot
-
 def main(active_user='Guest'):
     """
     Main function to run the Nim game.
