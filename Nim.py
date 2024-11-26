@@ -35,7 +35,13 @@ def main(active_user='Guest'):
             if player == "Robot":
                 continue
             else:
-                start_nums.append(handle_value_error(f"{player}, choose a starting number: "))
+                while True:
+                    start_choice = handle_value_error(f"{player}, choose a starting number: ")
+                    if start_choice < 1:
+                        clear_screen("Please choose a positive integer.\n")
+                    else:
+                        start_nums.append(handle_value_error(f"{player}, choose a starting number: "))
+                        break
         num_sums = sum(start_nums)
         # Average starting numbers
         if "Robot" not in [players for players in players]:
