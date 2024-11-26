@@ -61,6 +61,8 @@ def main(active_user='Guest'):
                     if (game_number - i) % 4 == 1:
                         player_choice = i
                         break
+                    else:
+                        player_choice = randint(1, 3)
             else:
                 player_choice = handle_value_error(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n")
                 condition = False
