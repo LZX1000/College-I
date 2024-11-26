@@ -40,7 +40,7 @@ def main(active_user='Guest'):
                     if start_choice < 1:
                         clear_screen("Please choose a positive integer.\n")
                     else:
-                        start_nums.append(handle_value_error(f"{player}, choose a starting number: "))
+                        start_nums.append(start_choice)
                         break
         num_sums = sum(start_nums)
         # Average starting numbers
