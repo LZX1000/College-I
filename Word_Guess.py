@@ -1,7 +1,7 @@
 from random import choice
 from Extras import yes_or_no, clear_screen
 
-def input_words(words, parameter=0):
+def input_words(words=None, parameter=0):
     if parameter == 0:
         words = []
         #Entering words loop
@@ -54,7 +54,7 @@ def main(active_user='guest, None'):
             response = yes_or_no("Would you like to use random words? (Y/N)\n\n")
             if response == "n":
                 clear_screen()
-                game_word, words = input_words()
+                (game_word, option, perfect_word), words = input_words()
             # Open existing words file or create a new one
             elif response == "y":
                 try:
