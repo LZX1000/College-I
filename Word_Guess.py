@@ -3,8 +3,7 @@ from Extras import yes_or_no, clear_screen
 
 def input_words(words, parameter=0):
     if parameter == 0:
-        if words is None:
-            words = []
+        words = []
         #Entering words loop
         while True:
             if len(words) > 0:
@@ -42,11 +41,13 @@ def input_words(words, parameter=0):
                         perfect_word = ''.join(sorted(set(char for char in word if char.isalpha())))
                         file.write(f"{word}, {option}, {perfect_word}\n")
     #Chooses a random word from words[] list
-    game_word = (choice(words)) + ''.join(sorted(set(char for char in game_word[0] if char.isalpha())))
+    game_word = choice(words)
+    game_word = (game_word[0], game_word[1], ''.join(sorted(set(char for char in game_word[0] if char.isalpha()))))
     return game_word, words
 
 def main(active_user='guest, None'):
     words = None
+    game_word = None
     while True:
         clear_screen()
         if not words:
@@ -62,7 +63,7 @@ def main(active_user='guest, None'):
                 except FileNotFoundError:
                     clear_screen("No words found. Please enter some words.\n")
                     game_word, words = input_words()
-                game_word, option, perfect_word, words = input_words(words, parameter=1)
+                (game_word, option, perfect_word), words = input_words(words, parameter=1)
         else:
             game_word, option, perfect_word = input_words(words, parameter=1)
         game_letters = list(game_word)
