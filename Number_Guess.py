@@ -64,7 +64,7 @@ def main(active_user='Guest'):
 
                 while True:
                     if lowest_guess == highest_guess:
-                        clear_screen(f"Unfortunately you were unable to guess the number\n")
+                        clear_screen(f"Unfortunately you were unable to guess the number.\n")
                         break
 
                     playing_screen = [f"Between : {lowest_guess} - {highest_guess}", f"Guesses : {guesses}", "", "Guess: "]
