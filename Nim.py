@@ -48,11 +48,14 @@ def main(active_user='Guest'):
             game_number = num_sums
         print(f"\nThe starting number is {game_number}.\n")
         current_player_index = 0
+        player_choice = False
         # Playing loop
         while True:
-            player_choice = 0
             clear_screen()
+            if player_choice:
+                print(f"{players[(current_player_index - 1) % num_players]} took {player_choice} from the pile.\n")
             current_player = players[current_player_index]
+            player_choice = 0
             # Get choices
             if current_player == "Robot":
                 for i in range(1, 4):
