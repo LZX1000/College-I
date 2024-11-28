@@ -1,4 +1,4 @@
-from random import choice
+from random import choice, shuffle
 from Extras import yes_or_no, clear_screen, handle_value_error, check_menu_choice
 
 class Player:
@@ -17,9 +17,21 @@ class Player:
     def __str__(self):
         return self.name
 
+def get_deck():
+    deck = []
+    try:
+        with open ("gvtdeck.txt", "r") as file:
+            for line in file:
+                deck.append(line.strip())
+    except FileNotFoundError:
+        print("Deck file not found.")
+        return None
+
 def main(active_user='Guest'):
     clear_screen()
-    deck = ["Card1", "Card2", "Card3", "Card4", "Card5", "Card6", "Card7", "Card8", "Card9", "Card10"]
+    deck = get_deck()
+    if deck is None:
+        return "Goats V Trolls", active_user, None
     main_menu = ["Quit", "Single Player", "Multiplayer"]
     playing = True
     while playing:
