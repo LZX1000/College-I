@@ -88,10 +88,10 @@ def update_game_stats(game, active_account, highscore=[]):
     Exception: If an error occurs while attempting to create the stats file.
     """
     # Convert highscore to a list if it is an integer
-    if isinstance(highscore, int):
-        highscore = [highscore]
     if highscore is None:
         highscore = ["None"]
+    if isinstance(highscore, int):
+        highscore = [highscore]
     # Open file if it exists
     try:
         main_line = None
@@ -123,12 +123,10 @@ def update_game_stats(game, active_account, highscore=[]):
                 if game in subline:
                     stats = subline.strip().split(", ")
                     stats[1] = str(int(stats[1]) + 1)
-                    stats_highscores = list(map(int, stats[2].split(" ")))
-                    for i, stats_highscore in enumerate(stats_highscores):
-                        if highscore[i] is not None and highscore[i] != "None" and highscore[i] > stats_highscore:
-                            stats_highscores[i] = highscore[i]
-                        else:
-                            stats_highscores[i] = stats_highscore if stats_highscore != "None" else highscore[i]
+                    stats_highscores = list(map(lambda x: int(x) if x != "None" else None, stats[2].split(" ")))
+                    for j, stats_highscore in enumerate(stats_highscores):
+                        if highscore[j] is not None and highscore[j] != "None" and (stats_highscore is None or highscore[j] > stats_highscore):
+                            stats_highscores[j] = highscore[j]
                     sublines[i] = f"    {game}, {stats[1]}, {' '.join(map(lambda x: str(x) if x is not None else 'None', stats_highscores))}\n"
                     break
             # If game not found, add game to user
@@ -144,7 +142,7 @@ def update_game_stats(game, active_account, highscore=[]):
                 file.write(f"{active_account[0]}, {active_account[1]}\n" + f"    {game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
         # If an error occurs while attempting to create the stats file, raise and print an exception
         except Exception as e:
-            print(f"An error occured while attempting to create the stats file: {e}")
+            print(f"An error occurred while attempting to create the stats file: {e}")
 
 def main():
     """
