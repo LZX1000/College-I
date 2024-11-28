@@ -27,19 +27,17 @@ def input_words(words=None, parameter=0):
                 clear_screen()
             words.sort()
             #Add words to the words file
-            try:
-                with open("words.txt", "r") as file:
-                    old_words = [line for line in file.readlines()]
-                    for word, option in words:
-                        if (word, option) not in (old_words[0], old_words[1]):
-                            perfect_word = ''.join(sorted(set(char for char in word if char.isalpha())))
-                            with open("words.txt", "a") as file:
-                                file.write(f"{word}, {option}, {perfect_word}\n")
-            except FileNotFoundError:
-                with open("words.txt", "w") as file:
-                    for word, option in words:
-                        perfect_word = ''.join(sorted(set(char for char in word if char.isalpha())))
-                        file.write(f"{word}, {option}, {perfect_word}\n")
+        try:
+            with open("words.txt", "r+") as file:
+                old_words = [line for line in file.readlines()]
+                for word, option in set(words):
+                    if (word, option) not in (old_words[0], old_words[1]):
+                        file.write(f"{word}, {option}\n")
+        except FileNotFoundError:
+            with open("words.txt", "w") as file:
+                for word, option in words:
+                    perfect_word = ''.join(sorted(set(char for char in word if char.isalpha())))
+                    file.write(f"{word}, {option}, {perfect_word}\n")
     #Chooses a random word from words[] list
     game_word = choice(words)
     game_word = (game_word[0], game_word[1], ''.join(sorted(set(char for char in game_word[0] if char.isalpha()))))
