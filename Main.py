@@ -6,87 +6,60 @@ from Number_Guess import main as number_guess
 from Extras import clear_screen, yes_or_no, check_menu_choice
 from Start import main as start_main
 
-def sign_in():
-    """
-    Handles user sign-in and account creation.
+class Player:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
 
-    This function prompts the user to either sign in with an existing account or create a new one.
-    It reads from or writes to a file named "stats.txt" to store user credentials.
+    def __str__(self):
+        return f"{self.name}, {self.password}"
 
-    Returns:
-        tuple: A tuple containing the username and password of the signed-in or newly created account.
-        bool: A boolean indicating successful sign-in or account creation.
-    """
+def sign_in(users):
     clear_screen()
     response_1 = ""
     while True:
-        #Open existing users file or create a new one
-        try:
-            with open("stats.txt", "r") as file:
-                file_lines = file.readlines()
-                users = [tuple(line.strip().split(', ')) for line in file_lines if line and not line[0].isspace()]
-        except FileNotFoundError:
-            with open("stats.txt", "w") as file:
-                users = []
         if response_1 != "y":
             response = yes_or_no("Do you already have an account? (Y/N)\n\n")
-        #Sign in
+        # Sign in
         if response == "y" or response_1 == "y":
             clear_screen()
             username_try = input("Username: ").strip()
             password_try = input("\nPassword: ")
             attempt = (username_try, password_try)
-            if attempt in users:
-                #Correct credentials
-                clear_screen(f"Welcome, {username_try}!")
-                return attempt, True
-            else:
-                clear_screen("Invalid username or password.")
-        #Create new account
+            # Check if the user exists
+            for user in users:
+                if attempt == (user.username, user.password):
+                    #Correct credentials
+                    clear_screen(f"Welcome, {username_try}!")
+                    return attempt, True
+            clear_screen("Invalid username or password.")
+        # Create new account
         elif response == "n":
             clear_screen("What should we call you?\n")
-            new_user = input("Username: ").strip()
+            new_username = input("Username: ").strip()
+            vaildate_username = lambda username: any(char == " " or char == "," for char in username)
             while True:
-                #Check if username is valid
-                if not new_user:
+                # Check if username is valid
+                if vaildate_username(new_username):
                     clear_screen("Please enter a valid username.")
-                    new_user = input("Username: ").strip()
+                    new_username = input("Username: ").strip()
+                elif any(new_username == user.username for user in users) or new_username == "Guest":
+                    clear_screen("That username is already taken.\nWould you like to sign in? (Y/N)\n")
+                    response_1 = yes_or_no()
+                    if response_1 == "y":
+                        clear_screen()
+                        break
+                    elif response_1 == "n":
+                        clear_screen()
+                        new_username = input("Username: ").strip()
+                # Not taken, make a password
                 else:
-                    for char in new_user:
-                        if char == " " or char == ",":
-                            clear_screen("Please enter a valid username.")
-                            new_user = input("Username: ").strip()
-                    if any(new_user == user[0] for user in users) or new_user == "Guest":
-                        clear_screen("That username is already taken.\nWould you like to sign in? (Y/N)\n")
-                        response_1 = yes_or_no()
-                        if response_1 == "y":
-                            clear_screen()
-                            break
-                        elif response_1 == "n":
-                            clear_screen()
-                            new_user = input("Username: ").strip()
-                    #Not taken, make a password
-                    else:
-                        new_pass = input("\nPassword: ")
-                        attempt = (new_user, new_pass)
-                        users.append(attempt)
-                        with open("stats.txt", "a") as file:
-                            file.write(f"{new_user}, {new_pass}\n")
-                        return attempt, True
+                    new_user = Player(new_username, input("\nPassword: "))
+                    with open("stats.txt", "a") as file:
+                        file.write(f"{new_user}\n")
+                    return new_user, True
 
 def update_game_stats(game, active_account, highscore=[]):
-    """
-    Updates the game statistics for a given user in the stats.txt file.
-
-    Parameters:
-    game (str): The name of the game to update stats for.
-    active_account (tuple): A tuple containing the user's account information (username, user_id).
-    highscore (list or int, optional): A list of high scores or a single high score to update. Defaults to an empty list.
-
-    Raises:
-    FileNotFoundError: If the "stats.txt" file does not exist and cannot be created.
-    Exception: If an error occurs while attempting to create the stats file.
-    """
     # Convert highscore to a list if it is an integer
     if highscore is None:
         highscore = ["None"]
@@ -145,20 +118,18 @@ def update_game_stats(game, active_account, highscore=[]):
             print(f"An error occurred while attempting to create the stats file: {e}")
 
 def main():
-    """
-    Main function that handles the user sign-in process and game menu navigation.
-
-    The function runs an infinite loop that:
-    1. Prompts the user to sign in.
-    2. Displays a menu of games to the signed-in user.
-    3. Executes the selected game or handles sign-out/quit actions.
-
-    The function updates game statistics after each game is played.
-
-    Does not return
-    """
+    users = []
+    try:
+        with open("stats.txt", "r") as file:
+            for line in file:
+                user_info = line.strip().split("; ")
+                retreived_player = user_info[0].strip().split(", ")
+                users.append(Player(retreived_player[0], retreived_player[1]))
+    except FileNotFoundError:
+        with open("stats.txt", "w") as file:
+            pass
     while True:
-        active_account, signed_in = sign_in()
+        active_account, signed_in = sign_in(users)
         while signed_in == True:
             #Defines the games in the menu as a list
             menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
