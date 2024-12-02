@@ -1,7 +1,7 @@
-from Extras import yes_or_no, clear_screen, handle_value_error
+from Extras import Player, yes_or_no, clear_screen, handle_value_error
 from random import randint
 
-def main(active_user='Guest'):
+def main(active_user=Player("Guest", "")):
     """
     Main function to run the Nim game.
 
@@ -21,6 +21,7 @@ def main(active_user='Guest'):
             break
     # Prep players list
     players = [f"Player{i+1}" for i in range(num_players)]
+    players[0] = active_user.username
     if len(players) == 1:
         players.append("Robot")
         num_players += 1

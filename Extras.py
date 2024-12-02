@@ -1,4 +1,12 @@
-import os, keyboard, time
+import os
+
+class Player:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def __str__(self):
+        return f"{self.username}, {self.password}"
 
 def yes_or_no(prompt=""):
     while True:

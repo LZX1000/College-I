@@ -3,16 +3,8 @@ from Word_Guess import main as word_guess
 from The_Arena import main as the_arena
 from Snake import main as snake
 from Number_Guess import main as number_guess
-from Extras import clear_screen, yes_or_no, check_menu_choice
+from Extras import Player, clear_screen, yes_or_no, check_menu_choice
 from Start import main as start_main
-
-class Player:
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
-    def __str__(self):
-        return f"{self.username}, {self.password}"
 
 def sign_in(users):
     clear_screen()
