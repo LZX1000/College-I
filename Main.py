@@ -12,7 +12,7 @@ class Player:
         self.password = password
 
     def __str__(self):
-        return f"{self.name}, {self.password}"
+        return f"{self.username}, {self.password}"
 
 def sign_in(users):
     clear_screen()
@@ -31,7 +31,7 @@ def sign_in(users):
                 if attempt == (user.username, user.password):
                     #Correct credentials
                     clear_screen(f"Welcome, {username_try}!")
-                    return attempt, True
+                    return user, True
             clear_screen("Invalid username or password.")
         # Create new account
         elif response == "n":
@@ -75,7 +75,7 @@ def update_game_stats(game, active_account, highscore=[]):
             user_found = False
             # Find user
             for i, line in enumerate(file_lines):
-                if f"{active_account[0]}, {active_account[1]}" in line:
+                if f"{active_account.username}, {active_account.password}" in line:
                     user_found = True
                     user_line = line
                     user_line_number = i
@@ -86,19 +86,21 @@ def update_game_stats(game, active_account, highscore=[]):
                 user_line = file_lines[-1]
                 user_line_number = len(file_lines) - 1
             # Update game stats
+            game_found = False
             games_stats = user_line.strip().split("; ")
             for i, game_stats in enumerate(games_stats):
                 stats = game_stats.strip().split(", ")   
-                if game_stats[0] == game:
+                if stats[0] == game:
+                    game_found = True
                     stats[1] = str(int(stats[1]) + 1)
                     stats_highscores = list(map(lambda x: int(x) if x != "None" else None, stats[2].split(" ")))
                     for j, stats_highscore in enumerate(stats_highscores):
                         if highscore[j] is not None and highscore[j] != "None" and (stats_highscore is None or highscore[j] > stats_highscore):
                             stats_highscores[j] = highscore[j]
-                    game_stats[i] = f"{game}, {stats[1]}, {' '.join(map(lambda x: str(x) if x is not None else 'None', stats_highscores))}\n"
+                    games_stats[i] = f"{game}, {stats[1]}, {' '.join(map(lambda x: str(x) if x is not None else 'None', stats_highscores))}\n"
                     break
             # If game not found, add game to user
-            else:
+            if not game_found:
                 games_stats.append(f"{game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
             # Write updated stats to file
             file_lines[user_line_number] = "; ".join(games_stats)
