@@ -7,6 +7,15 @@ from Extras import Player, clear_screen, yes_or_no, check_menu_choice
 from Start import main as start_main
 
 def sign_in(users):
+    """
+    Handles the sign-in or account creation process for users.
+
+    Parameters:
+    users (list): A list of existing user objects, where each user has 'username' and 'password' attributes.
+
+    Returns:
+    tuple: A tuple containing the user object and a boolean indicating successful sign-in or account creation.
+    """
     clear_screen()
     response_1 = ""
     while True:
@@ -52,6 +61,19 @@ def sign_in(users):
                     return new_user, True
 
 def update_game_stats(game, active_account, highscore=[]):
+    """
+    Updates the game statistics for a given user account.
+    If the "stats.txt" file does not exist, it creates the file and writes the user and game stats.
+
+    Parameters:
+    game (str): The name of the game to update stats for.
+    active_account (tuple): A tuple containing the username and password of the active account.
+    highscore (list, optional): A list of high scores to update. Defaults to an empty list.
+
+    Raises:
+    FileNotFoundError: If the "stats.txt" file does not exist and cannot be created.
+    Exception: If an error occurs while attempting to create the stats file.
+    """
     # Convert highscore to a list if it is an integer
     if highscore is None:
         highscore = ["None"]
@@ -108,6 +130,12 @@ def update_game_stats(game, active_account, highscore=[]):
             print(f"An error occurred while attempting to create the stats file: {e}")
 
 def main():
+    """
+    Main function to handle user sign-in and game selection.
+
+    Returns:
+        None
+    """
     users = []
     try:
         with open("stats.txt", "r") as file:
