@@ -1,7 +1,7 @@
 import random, time, keyboard
-from Extras import clear_screen, yes_or_no
+from Extras import Player, clear_screen, yes_or_no
 
-def main(active_user='Guest'):
+def main(active_user=Player("Guest", "")):
     '''
     Main function to run the Snake game.
 

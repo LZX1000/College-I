@@ -1,7 +1,7 @@
 import random, keyboard, time
-from Extras import clear_screen, yes_or_no
+from Extras import Player, clear_screen, yes_or_no
 
-def main(active_user='Guest'):
+def main(active_user=Player("Guest", "")):
     active = True
     while active ==True:
         enemies = []

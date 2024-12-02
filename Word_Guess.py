@@ -1,5 +1,5 @@
 from random import choice
-from Extras import yes_or_no, clear_screen
+from Extras import Player, yes_or_no, clear_screen
 
 def input_words(words=None, parameter=0):
     if parameter == 0:
@@ -43,7 +43,7 @@ def input_words(words=None, parameter=0):
     game_word = (game_word[0], game_word[1], ''.join(sorted(set(char for char in game_word[0] if char.isalpha()))))
     return game_word, words
 
-def main(active_user='guest, None'):
+def main(active_user=Player("Guest", "")):
     words = None
     game_word = None
     while True:

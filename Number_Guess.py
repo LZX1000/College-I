@@ -1,7 +1,7 @@
 import random, keyboard
-from Extras import yes_or_no, clear_screen, handle_value_error, check_menu_choice
+from Extras import Player, yes_or_no, clear_screen, handle_value_error, check_menu_choice
 
-def main(active_user='Guest'):
+def main(active_user=Player("Guest", "")):
     """
     Main function to run the Number Guess game.
     The function provides a main menu with options to Quit, Play Game, or access Settings.
