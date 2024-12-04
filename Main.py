@@ -149,12 +149,12 @@ def main():
     while True:
         active_account, signed_in = sign_in(users)
         while signed_in == True:
-            #Defines the games in the menu as a list
+            # Defines the games in the menu as a list
             menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
-            #Gets a proper input
+            # Gets a proper input
             choice = check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_")
-            #Executes the choice
+            # Executes the choice
             if choice == "quit":
                 return
             elif choice == "sign_out":
