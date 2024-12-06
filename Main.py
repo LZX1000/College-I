@@ -154,7 +154,7 @@ def main():
             menu = ["Quit", "Sign Out", "Leaderboard", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
             # Gets a proper input
-            choice = check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_")
+            choice = check_menu_choice(menu, "Which game would you like to play?\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_")
             # Executes the choice
             if choice == "quit":
                 return
