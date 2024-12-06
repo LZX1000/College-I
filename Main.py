@@ -3,6 +3,7 @@ from Word_Guess import main as word_guess
 from The_Arena import main as the_arena
 from Snake import main as snake
 from Number_Guess import main as number_guess
+from Leaderboard import main as leaderboard
 from Extras import Player, clear_screen, yes_or_no, check_menu_choice
 from Start import main as start_main
 
@@ -150,7 +151,7 @@ def main():
         active_account, signed_in = sign_in(users)
         while signed_in == True:
             # Defines the games in the menu as a list
-            menu = ["Quit", "Sign Out", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
+            menu = ["Quit", "Sign Out", "Leaderboard", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
             # Gets a proper input
             choice = check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_")
