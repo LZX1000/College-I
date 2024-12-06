@@ -48,10 +48,9 @@ def check_menu_choice(menu, prompt=''):
                     clear_input()
                     return menu[int(event.name)]
             except ValueError:
-                continue
-        choice = input()
-        if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
-            return choice
+                choice = input()
+                if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
+                    return choice
         clear_screen("Invalid choice.\n")
 
 def main():

@@ -13,7 +13,7 @@ def main():
 
     while playing:
         clear_screen()
-        choice = check_menu_choice(leaderboard_menu, "Leaderboard:\n" + "\n".join([f"{index} : {leaderboard_menu[index]}" for index in range(len(leaderboard_menu))]) + "\n\n").strip().lower().replace(" ", "_")
+        choice = check_menu_choice(leaderboard_menu, "Leaderboard:\n" + "\n".join([f"{index} : {leaderboard_menu[index]}" for index in range(len(leaderboard_menu))]) + "\n").strip().lower().replace(" ", "_")
         while choice != "back":
             leaderboard_option = 1
             leaderboards = []
@@ -31,7 +31,8 @@ def main():
                 leaderboard = []
                 stat_option = 3 if leaderboard_option == 1 else 2
                 for user in stats:
-                    for game in user:
+                    games = (user.strip().split("; ")).pop(0)
+                    for game in games:
                         if game[0] == choice:
                             leaderboard.append((user[0], game[stat_option]))
                 leaderboards.append(leaderboard)
@@ -45,12 +46,13 @@ def main():
                 event = keyboard.read_event()
                 if event.event_type == keyboard.KEY_DOWN:
                     if event.name == "enter":
-                        playing = False
                         break
                     elif event.name == "up" or event.name == "2":
                         leaderboard_option = leaderboard_option + 1 if leaderboard_option < 2 else 2
                     elif event.name == "down" or event.name == "1":
                         leaderboard_option = leaderboard_option - 1 if leaderboard_option > 1 else 1
+            break
+    return
 
 if __name__ == "__main__":
     main()

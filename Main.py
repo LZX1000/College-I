@@ -39,10 +39,9 @@ def sign_in(users):
         elif response == "n":
             clear_screen("What should we call you?\n")
             new_username = input("Username: ").strip()
-            vaildate_username = lambda username: any(char == " " or char == "," for char in username)
             while True:
                 # Check if username is valid
-                if vaildate_username(new_username):
+                if len(new_username) == 0 or any(char == " " or char == "," for char in new_username) or new_username == "Guest":
                     clear_screen("Please enter a valid username.")
                     new_username = input("Username: ").strip()
                 elif any(new_username == user.username for user in users) or new_username == "Guest":

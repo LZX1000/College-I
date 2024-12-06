@@ -24,7 +24,7 @@ def main(active_user=Player("Guest", "")):
             file_lines = file.readlines()
             main_line_number = None
             for i, line in enumerate(file_lines):
-                if line.startswith(active_user):
+                if line.startswith(f"{active_user.username}, {active_user.password}"):
                     main_line = line
                     main_line_number = i
                     sublines = []
