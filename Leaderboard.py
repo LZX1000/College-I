@@ -1,7 +1,7 @@
 import keyboard
-from Extras import check_menu_choice, clear_screen
+from Extras import Player, check_menu_choice, clear_screen
 
-def main():
+def main(active_user=Player("Guest", "")):
     leaderboard_menu = ["Back", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
     choice = " "
 
