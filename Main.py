@@ -4,19 +4,19 @@ from The_Arena import main as the_arena
 from Snake import main as snake
 from Number_Guess import main as number_guess
 from Leaderboard import main as leaderboard
-from Extras import Player, clear_screen, yes_or_no, check_menu_choice, handle_value
+from Extras import *
 from Start import main as start_main
-from typing import List
+from typing import List, Tuple
 
-def sign_in(users: list) -> tuple:
+def sign_in(users: List[Player]) -> Tuple[Player, bool]:
     """
     Handles the sign-in or account creation process for users.
 
     Parameters:
-    users (list): A list of existing user objects, where each user has 'username' and 'password' attributes.
+    users (List[Player]): A list of existing user objects, where each user has 'username' and 'password' attributes.
 
     Returns:
-    tuple: A tuple containing the user object and a boolean indicating successful sign-in or account creation.
+    Tuple[Player, bool]: A tuple containing the user object and a boolean indicating successful sign-in or account creation.
     """
     clear_screen()
     response_1 = ""
@@ -28,12 +28,12 @@ def sign_in(users: list) -> tuple:
             clear_screen()
             username_try = handle_value("Username: ", " ", "username")
             clear_screen()
-            password_try = handle_value(f"Username: {username_try}" + "\n\n" + "Password: ", " ", "password")
+            password_try = handle_value(f"Username: {username_try}\n\nPassword: ", " ", "password")
             attempt = (username_try, password_try)
             # Check if the user exists
             for user in users:
                 if attempt == (user.username, user.password):
-                    #Correct credentials
+                    # Correct credentials
                     return user, True
             clear_screen("Invalid username or password.")
         # Create new account
@@ -63,7 +63,7 @@ def sign_in(users: list) -> tuple:
 
 def update_game_stats(
     game: str,
-    active_account: tuple,
+    active_account: Player,
     highscore: List[int | None] = []
 ) -> None:
     """
@@ -72,8 +72,8 @@ def update_game_stats(
 
     Parameters:
     game (str): The name of the game to update stats for.
-    active_account (tuple): A tuple containing the username and password of the active account.
-    highscore (list, optional): A list of high scores to update. Defaults to an empty list.
+    active_account (Player): The active user account.
+    highscore (List[int | None], optional): A list of high scores to update. Defaults to an empty list.
 
     Raises:
     FileNotFoundError: If the "stats.txt" file does not exist and cannot be created.
@@ -100,7 +100,7 @@ def update_game_stats(
                     break
             # If user not found, add user to file
             if not user_found:
-                file_lines.append(f"{active_account[0]}, {active_account[1]}\n")
+                file_lines.append(f"{active_account.username}, {active_account.password}\n")
                 user_line = file_lines[-1]
                 user_line_number = len(file_lines) - 1
             # Update game stats
@@ -128,31 +128,22 @@ def update_game_stats(
     except FileNotFoundError:
         try:
             with open("stats.txt", "w") as file:
-                file.write(f"{active_account[0]}, {active_account[1]}\n" + f"    {game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
+                file.write(f"{active_account.username}, {active_account.password}\n" + f"    {game}, 1, {' '.join(map(lambda x: str(x) if x is not None else 'None', highscore))}\n")
         # If an error occurs while attempting to create the stats file, raise and print an exception
         except Exception as e:
             print(f"An error occurred while attempting to create the stats file: {e}")
 
-def main():
+def main() -> None:
     """
     Main function to handle user sign-in and game selection.
 
     Returns:
         None
     """
-    users = []
-    try:
-        with open("stats.txt", "r") as file:
-            for line in file:
-                user_info = line.strip().split("; ")
-                retreived_player = user_info[0].strip().split(", ")
-                users.append(Player(retreived_player[0], retreived_player[1]))
-    except FileNotFoundError:
-        with open("stats.txt", "w") as file:
-            pass
+    users = load_users()
     while True:
         active_account, signed_in = sign_in(users)
-        while signed_in == True:
+        while signed_in:
             # Defines the games in the menu as a list
             menu = ["Quit", "Sign Out", "Leaderboard", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
@@ -164,7 +155,7 @@ def main():
             elif choice == "sign_out":
                 signed_in = False
             else:
-                game, active_account, highscore, = eval(choice)(active_account)
+                game, active_account, highscore = eval(choice)(active_account)
                 update_game_stats(game, active_account, highscore)
 
 if __name__ == "__main__":

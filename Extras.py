@@ -18,9 +18,9 @@ def exception_handler(func: callable) -> callable:
             print(f"An error occurred: {e}")
     return wrapper
 
-def clear_screen(prompt: str | None = " ") -> None:
+def clear_screen(prompt: str | None = None) -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
-    if prompt != " ": print(prompt)
+    if prompt: print(prompt)
 
 @exception_handler
 def clear_input() -> None:
@@ -46,21 +46,23 @@ def handle_value(
     name: str | None = "string"
 ) -> Union[int, float, str]:
     while True:
-        try:
-            user_input = input(prompt)
-            if isinstance(style, int):
+        user_input = input(prompt)
+        if isinstance(style, int):
+            if user_input.isdigit():
                 return int(user_input)
-            elif isinstance(style, float):
+            else:
+                clear_screen(f"Please enter a valid integer.\n")
+        elif isinstance(style, float):
+            try:
                 return float(user_input)
-            elif isinstance(style, str):
-                user_input = user_input.strip()
-                if user_input:
-                    if style == " ":
-                        return user_input
-                    elif style == "_":
-                        return user_input.replace(" ", "_")
-        except ValueError:
-            clear_screen(f"Please enter a valid {name if isinstance(style, str) else "number"}.\n")
+            except ValueError:
+                clear_screen(f"Please enter a valid float.\n")
+        elif isinstance(style, str):
+            if style == " ":
+                return user_input.strip()
+            elif style == "_":
+                return user_input.strip().replace(" ", "_")
+        clear_screen(f"Please enter a valid {name}.\n")
 
 @exception_handler
 def yes_or_no(prompt: str | None = " ") -> str:
@@ -91,6 +93,19 @@ def check_menu_choice(menu: List[str], prompt: str | None = " ") -> str:
                 if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
                     return choice
         clear_screen() if event.name == "enter" else clear_screen("Invalid choice.\n")
+
+def load_users() -> List[Player]:
+    users = []
+    try:
+        with open("stats.txt", "r") as file:
+            for line in file:
+                user_info = line.strip().split("; ")
+                retrieved_player = user_info[0].strip().split(", ")
+                users.append(Player(retrieved_player[0], retrieved_player[1]))
+    except FileNotFoundError:
+        with open("stats.txt", "w") as file:
+            pass
+    return users
 
 def main() -> None:
     pass
