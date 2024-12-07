@@ -31,12 +31,25 @@ def clear_screen(prompt=""):
     if prompt != "":
         print(prompt)
 
-def handle_value_error(prompt=""):
+def handle_int_input(prompt=""):
     while True:
         try:
             return int(input(prompt))
         except ValueError:
             clear_screen("Please enter a valid integer.\n")
+
+def handle_str_input(prompt="", style=" ", name="string"):
+    while True:
+        try:
+            choice = str(input(prompt))
+            if len(choice.strip()) > 0:
+                if style == " ":
+                    return choice
+                elif style == "_":
+                    return choice.replace(" ", "_")
+        except ValueError:
+            continue
+        clear_screen(f"Please enter a valid {name}.\n")
 
 def check_menu_choice(menu, prompt=''):
     while True:
@@ -51,7 +64,7 @@ def check_menu_choice(menu, prompt=''):
                 choice = input()
                 if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
                     return choice
-        clear_screen("Invalid choice.\n")
+        clear_screen() if event.name == "enter" else clear_screen("Invalid choice.\n")
 
 def main():
     print("I am but a humble module file.")

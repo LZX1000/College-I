@@ -1,5 +1,5 @@
 import random, keyboard
-from Extras import Player, yes_or_no, clear_screen, handle_value_error, check_menu_choice
+from Extras import Player, yes_or_no, clear_screen, handle_int_input, check_menu_choice
 
 def main(active_user=Player("Guest", "")):
     """
@@ -35,7 +35,7 @@ def main(active_user=Player("Guest", "")):
                 if settings_choice == 'Change high bound':
                     clear_screen()
                     while True:
-                        new_high_bound = handle_value_error("Enter a new high bound: ")
+                        new_high_bound = handle_int_input("Enter a new high bound: ")
                         if new_high_bound > low_bound:
                             high_bound = new_high_bound
                             break
@@ -44,7 +44,7 @@ def main(active_user=Player("Guest", "")):
                 elif settings_choice == 'Change low bound':
                     clear_screen()
                     while True:
-                        new_low_bound = handle_value_error("Enter a new low bound: ")
+                        new_low_bound = handle_int_input("Enter a new low bound: ")
                         if new_low_bound < high_bound and new_low_bound >= 0:
                             low_bound = new_low_bound
                             break
@@ -68,7 +68,7 @@ def main(active_user=Player("Guest", "")):
                         break
 
                     playing_screen = [f"Between : {lowest_guess} - {highest_guess}", f"Guesses : {guesses}", "", "Guess: "]
-                    guess = handle_value_error("\n".join(playing_screen))
+                    guess = handle_int_input("\n".join(playing_screen))
 
                     if guess == secret_number:
                         guesses += 1

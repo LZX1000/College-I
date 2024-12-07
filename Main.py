@@ -4,7 +4,7 @@ from The_Arena import main as the_arena
 from Snake import main as snake
 from Number_Guess import main as number_guess
 from Leaderboard import main as leaderboard
-from Extras import Player, clear_screen, yes_or_no, check_menu_choice
+from Extras import Player, clear_screen, yes_or_no, check_menu_choice, handle_str_input
 from Start import main as start_main
 
 def sign_in(users):
@@ -21,18 +21,18 @@ def sign_in(users):
     response_1 = ""
     while True:
         if response_1 != "y":
-            response = yes_or_no("Do you already have an account? (Y/N)\n\n")
+            response = yes_or_no("Do you already have an account? (Y/N)\n")
         # Sign in
         if response == "y" or response_1 == "y":
             clear_screen()
-            username_try = input("Username: ").strip()
-            password_try = input("\nPassword: ")
+            username_try = handle_str_input("Username: ", " ", "username")
+            clear_screen()
+            password_try = handle_str_input(f"Username: {username_try}" + "\n\n" + "Password: ", " ", "password")
             attempt = (username_try, password_try)
             # Check if the user exists
             for user in users:
                 if attempt == (user.username, user.password):
                     #Correct credentials
-                    clear_screen(f"Welcome, {username_try}!")
                     return user, True
             clear_screen("Invalid username or password.")
         # Create new account
@@ -153,7 +153,7 @@ def main():
             menu = ["Quit", "Sign Out", "Leaderboard", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
             # Gets a proper input
-            choice = check_menu_choice(menu, "Which game would you like to play?\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n\n").strip().lower().replace(" ", "_")
+            choice = check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n").strip().lower().replace(" ", "_")
             # Executes the choice
             if choice == "quit":
                 return
