@@ -10,7 +10,7 @@ class Player:
     def __str__(self) -> str:
         return f"{self.username}, {self.password}"
 
-def exception_handler(func):
+def exception_handler(func: callable) -> callable:
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -18,9 +18,9 @@ def exception_handler(func):
             print(f"An error occurred: {e}")
     return wrapper
 
-def clear_screen(prompt: str | None) -> None:
+def clear_screen(prompt: str | None = " ") -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
-    if prompt: print(prompt)
+    if prompt != " ": print(prompt)
 
 @exception_handler
 def clear_input() -> None:
