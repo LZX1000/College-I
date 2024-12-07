@@ -87,7 +87,6 @@ def update_game_stats(
     # Open file if it exists
     try:
         user_line = None
-        sublines = []
         with open("stats.txt", "r+") as file:
             # Read file and initialize user_found variable
             file_lines = file.readlines()
