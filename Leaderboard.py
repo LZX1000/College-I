@@ -9,7 +9,7 @@ def main():
         with open("stats.txt", "r") as file:
             stats = [line for line in file.readlines()]
     except FileNotFoundError:
-       stats = []
+        stats = []
 
     while playing:
         clear_screen()
@@ -31,10 +31,11 @@ def main():
                 leaderboard = []
                 stat_option = 3 if leaderboard_option == 1 else 2
                 for user in stats:
-                    games = (user.strip().split("; ")).pop(0)
-                    for game in games:
-                        if game[0] == choice:
-                            leaderboard.append((user[0], game[stat_option]))
+                    games = user.strip().split("; ")
+                    for game in games[1:]:
+                        game_stats = game.strip().split(", ")
+                        if game_stats[0] == choice:
+                            leaderboard.append((user[0], game_stats[stat_option]))
                 leaderboards.append(leaderboard)
             leaderboard_option = 1
             while True:

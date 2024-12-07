@@ -1,4 +1,4 @@
-from Extras import Player, yes_or_no, clear_screen, handle_int_input
+from Extras import Player, yes_or_no, clear_screen, handle_value
 from random import randint
 
 def main(active_user=Player("Guest", "")):
@@ -14,7 +14,7 @@ def main(active_user=Player("Guest", "")):
     clear_screen()
     # Get player count
     while True:
-        num_players = handle_int_input("How many players are playing?\n")
+        num_players = handle_value("How many players are playing?\n")
         if num_players < 1:
             clear_screen("This game requires at least 1 player.\n")
         else:
@@ -35,7 +35,7 @@ def main(active_user=Player("Guest", "")):
                 continue
             else:
                 while True:
-                    start_choice = handle_int_input(f"{player}, choose a starting number: ")
+                    start_choice = handle_value(f"{player}, choose a starting number: ")
                     if start_choice < 1:
                         clear_screen("Please choose a positive integer.\n")
                     else:
@@ -66,14 +66,14 @@ def main(active_user=Player("Guest", "")):
                     else:
                         player_choice = randint(1, 3)
             else:
-                player_choice = handle_int_input(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n")
+                player_choice = handle_value(f"There are currently {game_number} left.\n{current_player}, how many do you want to take?\n\n")
                 condition = False
                 while True:
                     if player_choice <= 3 and player_choice >= 1:
                         break
                     elif condition == True:
                         clear_screen()
-                        player_choice = handle_int_input("Please choose an integer between 1 and 3.\n\n" + f"There are currently {game_number} left." + f"\n{current_player}, how many do you want to take?\n\n")
+                        player_choice = handle_value("Please choose an integer between 1 and 3.\n\n" + f"There are currently {game_number} left." + f"\n{current_player}, how many do you want to take?\n\n")
                     else:
                         condition = True
             # Evaluate choice

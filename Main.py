@@ -4,7 +4,7 @@ from The_Arena import main as the_arena
 from Snake import main as snake
 from Number_Guess import main as number_guess
 from Leaderboard import main as leaderboard
-from Extras import Player, clear_screen, yes_or_no, check_menu_choice, handle_str_input
+from Extras import Player, clear_screen, yes_or_no, check_menu_choice, handle_value
 from Start import main as start_main
 
 def sign_in(users):
@@ -25,9 +25,9 @@ def sign_in(users):
         # Sign in
         if response == "y" or response_1 == "y":
             clear_screen()
-            username_try = handle_str_input("Username: ", " ", "username")
+            username_try = handle_value("Username: ", " ", "username")
             clear_screen()
-            password_try = handle_str_input(f"Username: {username_try}" + "\n\n" + "Password: ", " ", "password")
+            password_try = handle_value(f"Username: {username_try}" + "\n\n" + "Password: ", " ", "password")
             attempt = (username_try, password_try)
             # Check if the user exists
             for user in users:

@@ -167,7 +167,7 @@ def main(active_user=Player("Guest", "")):
         else:
             print()
         # Play again
-        response = yes_or_no("Would you like to play again? (Y/N)\n\n")
+        response = yes_or_no("Would you like to play again? (Y/N)\n")
         if response == "n":
             return 'Snake', active_user, high_points
         if response == "y":
