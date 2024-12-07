@@ -1,57 +1,77 @@
-import os, keyboard
+import os
+import keyboard
+from functools import singledispatch
+from typing import Union
 
 class Player:
-    def __init__(self, username, password):
+    def __init__(self, username: str, password: str) -> None:
         self.username = username
         self.password = password
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.username}, {self.password}"
 
-def clear_input():
+def clear_screen(prompt: str | None) -> None:
+    os.system('cls' if os.name == 'nt' else 'clear')
+    if prompt:
+        print(prompt)
+
+@singledispatch
+def handle_input(prompt: str | None) -> None:
+    raise NotImplementedError("Unsupported type")
+
+@handle_input.register
+def _(
+    prompt: str | None = " ",
+    style: Union[int, float] = 0
+    ) -> Union[int, float]:
+    while True:
+        try:
+            user_input = input(prompt)
+            if isinstance(style, int):
+                return int(user_input)
+            elif isinstance(style, float):
+                return float(user_input)
+        except ValueError:
+            clear_screen("Please enter a valid number.\n")
+
+@handle_input.register
+def _(
+    prompt: str | None = " ",
+    style: str | None = " ",
+    name: str | None = "string"
+    ) -> str:
+    while True:
+        user_input = input(prompt).strip()
+        if user_input:
+            if style == " ":
+                return user_input
+            elif style == "_":
+                return user_input.replace(" ", "_")
+        clear_screen(f"Please enter a valid {name}.\n")
+
+def clear_input() -> None:
     keyboard.send('enter')
     input()
 
-def yes_or_no(prompt=""):
+def yes_or_no(prompt: str | None = " ") -> str:
     while True:
         print(prompt)
         event = keyboard.read_event()
         if event.event_type == keyboard.KEY_DOWN:
-            if event.name == "y" or event.name == "1":
-                clear_input()
-                return "y"
-            elif event.name == "n" or event.name == "0":
+            if event.name in ["n", "0"]:
                 clear_input()
                 return "n"
+            elif event.name in ["y", "1"]:
+                clear_input()
+                return "y"
         else:
             clear_screen('Please enter "Y" or "N".\n')
 
-def clear_screen(prompt=""):
-    os.system('cls' if os.name == 'nt' else 'clear')
-    if prompt != "":
-        print(prompt)
-
-def handle_int_input(prompt=""):
-    while True:
-        try:
-            return int(input(prompt))
-        except ValueError:
-            clear_screen("Please enter a valid integer.\n")
-
-def handle_str_input(prompt="", style=" ", name="string"):
-    while True:
-        try:
-            choice = str(input(prompt))
-            if len(choice.strip()) > 0:
-                if style == " ":
-                    return choice
-                elif style == "_":
-                    return choice.replace(" ", "_")
-        except ValueError:
-            continue
-        clear_screen(f"Please enter a valid {name}.\n")
-
-def check_menu_choice(menu, prompt=''):
+def check_menu_choice(
+    menu: list[str],
+    prompt: str | None = " "
+    ) -> str:
     while True:
         print(prompt)
         event = keyboard.read_event()
@@ -66,8 +86,8 @@ def check_menu_choice(menu, prompt=''):
                     return choice
         clear_screen() if event.name == "enter" else clear_screen("Invalid choice.\n")
 
-def main():
-    print("I am but a humble module file.")
+def main() -> None:
+    pass
 
 if __name__ == "__main__":
     main()
