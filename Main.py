@@ -6,7 +6,7 @@ from Number_Guess import main as number_guess
 from Leaderboard import main as leaderboard
 from Extras import Player, clear_screen, yes_or_no, check_menu_choice, handle_value
 from Start import main as start_main
-from typing import List, Union
+from typing import List
 
 def sign_in(users: list) -> tuple:
     """
@@ -65,7 +65,7 @@ def update_game_stats(
     game: str,
     active_account: tuple,
     highscore: List[int | None] = []
-    ) -> None:
+) -> None:
     """
     Updates the game statistics for a given user account.
     If the "stats.txt" file does not exist, it creates the file and writes the user and game stats.
