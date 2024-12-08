@@ -17,11 +17,21 @@ def clear_screen(prompt: str | None = None) -> None:
 
 def clear_input() -> None:
     keyboard.send('enter')
-    input()
+    input(end="")
 
-def wait_for_key_release(keys: List[str]) -> None:
-    while any(keyboard.is_pressed(key) for key in keys):
-        pass
+def release_key(keys: Union[List[str], str]) -> None:
+    if isinstance(keys, str):
+        keys = [keys]
+
+    keys_pressed = set(keys)
+
+    while keys_pressed:
+        event = keyboard.read_event(suppress=True)
+        if event.event_type == keyboard.KEY_UP and event.name in keys_pressed:
+            keys_pressed.remove(event.name)
+        if event.event_type == keyboard.KEY_DOWN and event.name in keys:
+            if event.name not in keys_pressed:
+                keys_pressed.add(event.name)
 
 @overload
 def handle_value(
@@ -42,22 +52,24 @@ def handle_value(
     name: str | None = "string"
 ) -> Union[int, float, str]:
     while True:
+        release_key("enter")
         user_input = input(prompt)
-        if isinstance(style, int):
-            if user_input.isdigit():
-                return int(user_input)
-            else:
-                clear_screen(f"Please enter a valid integer.\n")
-        elif isinstance(style, float):
-            try:
-                return float(user_input)
-            except ValueError:
-                clear_screen(f"Please enter a valid float.\n")
-        elif isinstance(style, str):
-            if style == " ":
-                return user_input.strip()
-            elif style == "_":
-                return user_input.strip().replace(" ", "_")
+        if user_input:
+            if isinstance(style, int):
+                if user_input.isdigit():
+                    return int(user_input)
+                else:
+                    clear_screen(f"Please enter a valid integer.\n")
+            elif isinstance(style, float):
+                try:
+                    return float(user_input)
+                except ValueError:
+                    clear_screen(f"Please enter a valid float.\n")
+            elif isinstance(style, str):
+                if style == " ":
+                    return user_input.strip()
+                elif style == "_":
+                    return user_input.strip().replace(" ", "_")
         clear_screen(f"Please enter a valid {name}.\n")
 
 def multiple_choice(
@@ -80,7 +92,7 @@ def multiple_choice(
     clear_screen()
     render()
 
-    wait_for_key_release(["enter", "space"])
+    release_key(["enter", "space"])
 
     while True:
         event = keyboard.read_event()
@@ -91,7 +103,7 @@ def multiple_choice(
             elif event.name in ["down", "s"]:
                 active_option = (active_option + 1) % len(options)
             elif event.name in ["enter", "space"]:
-                wait_for_key_release(["enter", "space"])
+                release_key(["enter", "space"])
                 print("\033[?25h", end="", flush=True)
                 if options == ["Yes", "No"]:
                     return options[active_option].lower()[0]
@@ -101,21 +113,7 @@ def multiple_choice(
                 clear_screen()
                 render()
 
-def load_users() -> List[Player]:
-    users = []
-    try:
-        with open("stats.txt", "r") as file:
-            for line in file:
-                user_info = line.strip().split("; ")
-                retrieved_player = user_info[0].strip().split(", ")
-                users.append(Player(retrieved_player[0], retrieved_player[1]))
-    except FileNotFoundError:
-        with open("stats.txt", "w") as file:
-            pass
-    return users
-
 def main() -> None:
-    multiple_choice()
     pass
 
 if __name__ == "__main__":

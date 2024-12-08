@@ -140,7 +140,16 @@ def main() -> None:
     Returns:
         None
     """
-    users = load_users()
+    users = []
+    try:
+        with open("stats.txt", "r") as file:
+            for line in file:
+                user_info = line.strip().split("; ")
+                retrieved_player = user_info[0].strip().split(", ")
+                users.append(Player(retrieved_player[0], retrieved_player[1]))
+    except FileNotFoundError:
+        with open("stats.txt", "w") as file:
+            pass
     while True:
         active_account, signed_in = sign_in(users)
         while signed_in:
