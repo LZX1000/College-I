@@ -11,10 +11,12 @@ def main(active_user=Player("Guest", "")):
     except FileNotFoundError:
         stats = []
 
-    while choice != "back":
+    while True:
         clear_screen()
         choice = multiple_choice("Leaderboard:", options=leaderboard_menu)
-
+        if choice == "back":
+            break
+        
         leaderboard_option = 1
         leaderboards = []
         was_space = False
