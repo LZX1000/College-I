@@ -17,21 +17,11 @@ def clear_screen(prompt: str | None = None) -> None:
 
 def clear_input() -> None:
     keyboard.send('enter')
-    input(end="")
+    input()
 
 def release_key(keys: Union[List[str], str]) -> None:
-    if isinstance(keys, str):
-        keys = [keys]
-
-    keys_pressed = set(keys)
-
-    while keys_pressed:
-        event = keyboard.read_event(suppress=True)
-        if event.event_type == keyboard.KEY_UP and event.name in keys_pressed:
-            keys_pressed.remove(event.name)
-        if event.event_type == keyboard.KEY_DOWN and event.name in keys:
-            if event.name not in keys_pressed:
-                keys_pressed.add(event.name)
+    while any(keyboard.is_pressed(key) for key in keys):
+        pass
 
 @overload
 def handle_value(

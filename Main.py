@@ -42,7 +42,10 @@ def sign_in(users: List[Player]) -> Tuple[Player, bool]:
             new_username = input("Username: ").strip()
             while True:
                 # Check if username is valid
-                if len(new_username) == 0 or any(char == " " or char == "," for char in new_username) or new_username == "Guest":
+                if len(new_username) == 0:
+                    clear_screen()
+                    new_username = input("Username: ").strip()
+                elif any(char == " " or char == "," for char in new_username):
                     clear_screen("Please enter a valid username.")
                     new_username = input("Username: ").strip()
                 elif any(new_username == user.username for user in users) or new_username == "Guest":
