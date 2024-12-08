@@ -1,5 +1,5 @@
 import random, keyboard
-from Extras import Player, yes_or_no, clear_screen, handle_value, check_menu_choice
+from Extras import Player, multiple_choice, clear_screen, handle_value
 
 def main(active_user=Player("Guest", "")):
     """
@@ -23,14 +23,14 @@ def main(active_user=Player("Guest", "")):
     
     while True:
         clear_screen()
-        menu_choice = check_menu_choice(main_menu, "\n".join([f"{index} : {main_menu[index]}" for index in range(len(main_menu))]) + "\n\n")
+        menu_choice = multiple_choice(options=main_menu)
 
         if menu_choice == 'Quit':
             return 'Number Guess', active_user, None
         elif menu_choice == 'Settings':
             while True:
                 clear_screen()
-                settings_choice = check_menu_choice(settings_menu, "\n".join([f"{index} : {settings_menu[index]}" for index in range(len(settings_menu))]) + "\n\n")
+                settings_choice = multiple_choice(options=settings_menu)
 
                 if settings_choice == 'Change high bound':
                     clear_screen()
@@ -89,7 +89,7 @@ def main(active_user=Player("Guest", "")):
                 if highscore == None or guesses < highscore:
                     print("You got a new best score!\n" + f"Best score: {guesses}")
                     highscore = guesses
-                response = yes_or_no("Would you like to play again? (Y/N)\n")
+                response = multiple_choice("Would you like to play again?")
                 if response == 'n':
                     Playing = False
                     break

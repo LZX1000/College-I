@@ -1,5 +1,5 @@
 from random import choice
-from Extras import Player, yes_or_no, clear_screen
+from Extras import Player, multiple_choice, clear_screen
 
 def input_words(words=None, parameter=0):
     if parameter == 0:
@@ -49,7 +49,7 @@ def main(active_user=Player("Guest", "")):
     while True:
         clear_screen()
         if not words:
-            response = yes_or_no("Would you like to use random words? (Y/N)\n\n")
+            response = multiple_choice("Would you like to use random words?")
             if response == "n":
                 clear_screen()
                 (game_word, option, perfect_word), words = input_words()
@@ -107,11 +107,11 @@ def main(active_user=Player("Guest", "")):
                 clear_screen(display_game)
                 if guesses == len(perfect_word):
                     print("*Perfect!*\n")
-                response = yes_or_no(f"Congrats! You guessed {game_word} in {guesses} guesses. Try again? (Y/N)\n\n")
+                response = multiple_choice(f"Congrats! You guessed {game_word} in {guesses} guesses. Try again?")
                 # Player plays again
                 if response == "y":
                     clear_screen()
-                    same_words = yes_or_no("Would you like to use the same words/phrases? (Y/N)\n\n")
+                    same_words = multiple_choice("Would you like to use the same words/phrases?")
                     clear_screen()
                     if same_words == "n":
                         words = None

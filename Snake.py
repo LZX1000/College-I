@@ -1,5 +1,5 @@
 import random, time, keyboard
-from Extras import Player, clear_screen, yes_or_no
+from Extras import Player, clear_screen, multiple_choice
 
 def main(active_user=Player("Guest", "")):
     '''
@@ -167,7 +167,7 @@ def main(active_user=Player("Guest", "")):
         else:
             print()
         # Play again
-        response = yes_or_no("Would you like to play again? (Y/N)\n")
+        response = multiple_choice("Would you like to play again?")
         if response == "n":
             return 'Snake', active_user, high_points
         if response == "y":

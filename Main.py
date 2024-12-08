@@ -22,11 +22,11 @@ def sign_in(users: List[Player]) -> Tuple[Player, bool]:
     response_1 = ""
     while True:
         if response_1 != "y":
-            response = yes_or_no("Do you already have an account? (Y/N)\n")
+            response = multiple_choice("Do you already have an account?")
         # Sign in
         if response == "y" or response_1 == "y":
             clear_screen()
-            username_try = handle_value("Username: ", " ", "username")
+            username_try = handle_value("Username:", " ", "username")
             clear_screen()
             password_try = handle_value(f"Username: {username_try}\n\nPassword: ", " ", "password")
             attempt = (username_try, password_try)
@@ -46,8 +46,8 @@ def sign_in(users: List[Player]) -> Tuple[Player, bool]:
                     clear_screen("Please enter a valid username.")
                     new_username = input("Username: ").strip()
                 elif any(new_username == user.username for user in users) or new_username == "Guest":
-                    clear_screen("That username is already taken.\nWould you like to sign in? (Y/N)\n")
-                    response_1 = yes_or_no()
+                    clear_screen()
+                    response_1 = multiple_choice("That username is already taken.\nWould you like to sign in?")
                     if response_1 == "y":
                         clear_screen()
                         break
@@ -148,7 +148,7 @@ def main() -> None:
             menu = ["Quit", "Sign Out", "Leaderboard", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
             clear_screen()
             # Gets a proper input
-            choice = check_menu_choice(menu, "Which game would you like to play?\n\n" + "\n".join([f"{index} : {menu[index]}" for index in range(len(menu))]) + "\n").strip().lower().replace(" ", "_")
+            choice = multiple_choice("Which game would you like to play?", options=menu)
             # Executes the choice
             if choice == "quit":
                 return

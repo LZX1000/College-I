@@ -1,5 +1,5 @@
 import keyboard
-from Extras import Player, check_menu_choice, clear_screen
+from Extras import Player, multiple_choice, clear_screen
 
 def main(active_user=Player("Guest", "")):
     leaderboard_menu = ["Back", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
@@ -13,7 +13,7 @@ def main(active_user=Player("Guest", "")):
 
     while choice != "back":
         clear_screen()
-        choice = check_menu_choice(leaderboard_menu, "Leaderboard:\n" + "\n".join([f"{index} : {leaderboard_menu[index]}" for index in range(len(leaderboard_menu))]) + "\n").strip().lower().replace(" ", "_")
+        choice = multiple_choice("Leaderboard:", options=leaderboard_menu)
 
         leaderboard_option = 1
         leaderboards = []
@@ -40,7 +40,7 @@ def main(active_user=Player("Guest", "")):
         leaderboard_option = 1
         while True:
             clear_screen()
-            print(f"{"a" if leaderboard_option == 1 else "b"}.) {choice} Leaderboard:\n")
+            print(f"{'a' if leaderboard_option == 1 else 'b'}.) {choice} Leaderboard:\n")
             for i, player in enumerate(leaderboards[leaderboard_option - 1]):
                 print(f"{i + 1}. {player[0]} : {player[1]}")
             print("\nPress enter to continue. . .", end="")

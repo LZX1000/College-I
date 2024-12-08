@@ -1,4 +1,4 @@
-from Extras import Player, yes_or_no, clear_screen, handle_value
+from Extras import Player, multiple_choice, clear_screen, handle_value
 from random import randint
 
 def main(active_user=Player("Guest", "")):
@@ -78,7 +78,7 @@ def main(active_user=Player("Guest", "")):
                         condition = True
             # Evaluate choice
             if player_choice >= game_number:
-                response = yes_or_no(f"{current_player} lost. Try again? (Y/N)\n")
+                response = multiple_choice(f"{current_player} lost. Try again?")
                 break
             else:
                 game_number -= player_choice
