@@ -12,11 +12,16 @@ class Player:
 
 def clear_screen(prompt: str | None = None) -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
-    if prompt: print(prompt)
+    if prompt:
+        print(prompt)
 
 def clear_input() -> None:
     keyboard.send('enter')
     input()
+
+def wait_for_key_release(keys: List[str]) -> None:
+    while any(keyboard.is_pressed(key) for key in keys):
+        pass
 
 @overload
 def handle_value(
@@ -55,33 +60,46 @@ def handle_value(
                 return user_input.strip().replace(" ", "_")
         clear_screen(f"Please enter a valid {name}.\n")
 
-def yes_or_no(prompt: str | None = " ") -> str:
-    while True:
-        print(prompt)
-        event = keyboard.read_event()
-        if event.event_type == keyboard.KEY_DOWN:
-            if event.name in ["n", "0"]:
-                clear_input()
-                return "n"
-            elif event.name in ["y", "1"]:
-                clear_input()
-                return "y"
-        clear_screen('Please enter "Y" or "N".\n')
+def multiple_choice(
+    prompt: str | None = " ",
+    options: List[str] | None = ["Yes", "No"],
+    end: str = "\n\n",
+    active_option: int | None = 0
+) -> str:
+    def render() -> None:
+        print(prompt, end=end)
+        for i, option in enumerate(options):
+            if i == active_option:
+                print(f"\033[30;47m{option}\033[0m")
+            else:
+                print(option)
 
-def check_menu_choice(menu: List[str], prompt: str | None = " ") -> str:
+    options = [str(option) for option in options]
+
+    print("\033[?25l", end="")
+    clear_screen()
+    render()
+
+    wait_for_key_release(["enter", "space"])
+
     while True:
-        print(prompt)
         event = keyboard.read_event()
+        old_active_option = active_option
         if event.event_type == keyboard.KEY_DOWN:
-            try:
-                if int(event.name) in range(len(menu)):
-                    clear_input()
-                    return menu[int(event.name)]
-            except ValueError:
-                choice = input()
-                if choice.strip().lower().replace(" ", "_") in [item.strip().lower().replace(" ", "_") for item in menu]:
-                    return choice
-        clear_screen() if event.name == "enter" else clear_screen("Invalid choice.\n")
+            if event.name in ["up", "w"]:
+                active_option = (active_option - 1) % len(options)
+            elif event.name in ["down", "s"]:
+                active_option = (active_option + 1) % len(options)
+            elif event.name in ["enter", "space"]:
+                wait_for_key_release(["enter", "space"])
+                print("\033[?25h", end="", flush=True)
+                if options == ["Yes", "No"]:
+                    return options[active_option].lower()[0]
+                else:
+                    return options[active_option].lower().replace(" ", "_")
+            if active_option != old_active_option:
+                clear_screen()
+                render()
 
 def load_users() -> List[Player]:
     users = []
@@ -97,6 +115,7 @@ def load_users() -> List[Player]:
     return users
 
 def main() -> None:
+    multiple_choice()
     pass
 
 if __name__ == "__main__":
