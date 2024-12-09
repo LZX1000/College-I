@@ -39,15 +39,15 @@ def sign_in(users: List[Player]) -> Tuple[Player, bool]:
         # Create new account
         elif response == "n":
             clear_screen("What should we call you?\n")
-            new_username = input("Username: ").strip()
+            new_username = handle_value("Username: ", " ", "username").strip()
             while True:
                 # Check if username is valid
                 if len(new_username) == 0:
                     clear_screen()
-                    new_username = input("Username: ").strip()
+                    new_username = handle_value("Username: ", " ", "username").strip()
                 elif any(char == " " or char == "," for char in new_username):
                     clear_screen("Please enter a valid username.")
-                    new_username = input("Username: ").strip()
+                    new_username = handle_value("Username: ", " ", "username").strip()
                 elif any(new_username == user.username for user in users) or new_username == "Guest":
                     clear_screen()
                     response_1 = multiple_choice("That username is already taken.\nWould you like to sign in?")
@@ -56,10 +56,11 @@ def sign_in(users: List[Player]) -> Tuple[Player, bool]:
                         break
                     elif response_1 == "n":
                         clear_screen()
-                        new_username = input("Username: ").strip()
+                        new_username = handle_value("Username: ", " ", "username").strip()
                 # Not taken, make a password
                 else:
-                    new_user = Player(new_username, input("\nPassword: "))
+                    clear_screen()
+                    new_user = Player(new_username, handle_value(f"Username: {new_username}\n\nPassword: ", " ", "password"))
                     with open("stats.txt", "a") as file:
                         file.write(f"{new_user}\n")
                     return new_user, True

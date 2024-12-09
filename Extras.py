@@ -15,13 +15,9 @@ def clear_screen(prompt: str | None = None) -> None:
     if prompt:
         print(prompt)
 
-def clear_input() -> None:
-    keyboard.send('enter')
-    input()
-
-def release_key(keys: Union[List[str], str]) -> None:
+def clear_input(keys: List[str] = "enter") -> None:
     while any(keyboard.is_pressed(key) for key in keys):
-        pass
+        keyboard.read_event(suppress=True)
 
 @overload
 def handle_value(
@@ -42,7 +38,7 @@ def handle_value(
     name: str | None = "string"
 ) -> Union[int, float, str]:
     while True:
-        release_key("enter")
+        clear_input()
         user_input = input(prompt)
         if user_input:
             if isinstance(style, int):
@@ -82,8 +78,7 @@ def multiple_choice(
     clear_screen()
     render()
 
-    release_key(["enter", "space"])
-
+    clear_input()
     while True:
         event = keyboard.read_event()
         old_active_option = active_option
@@ -93,7 +88,7 @@ def multiple_choice(
             elif event.name in ["down", "s"]:
                 active_option = (active_option + 1) % len(options)
             elif event.name in ["enter", "space"]:
-                release_key(["enter", "space"])
+                clear_input()
                 print("\033[?25h", end="", flush=True)
                 if options == ["Yes", "No"]:
                     return options[active_option].lower()[0]
