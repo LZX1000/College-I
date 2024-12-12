@@ -83,6 +83,8 @@ def update_game_stats(
     FileNotFoundError: If the "stats.txt" file does not exist and cannot be created.
     Exception: If an error occurs while attempting to create the stats file.
     """
+    if not game:
+        return
     # Convert highscore to a list if it is an integer
     if highscore is None:
         highscore = ["None"]
@@ -158,7 +160,10 @@ def main() -> None:
         active_account, signed_in = sign_in(users)
         while signed_in:
             # Defines the games in the menu as a list
-            menu = ["Quit", "Sign Out", "Leaderboard", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
+            menu = [
+                "Nim", "Number Guess", "Word Guess", "The Arena",
+                "Snake", "Leaderboard", "Sign Out", "Quit"
+            ]
             clear_screen()
             # Gets a proper input
             choice = multiple_choice("Which game would you like to play?", options=menu)

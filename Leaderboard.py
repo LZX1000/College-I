@@ -1,7 +1,8 @@
 import keyboard
+from typing import Tuple
 from Extras import Player, multiple_choice, clear_screen
 
-def main(active_user=Player("Guest", "")):
+def main(active_user: Player = Player("Guest", "")) -> Tuple[str, Player, str]:
     leaderboard_menu = ["Back", "Nim", "Number Guess", "Word Guess", "The Arena", "Snake"]
     choice = " "
 
@@ -54,7 +55,7 @@ def main(active_user=Player("Guest", "")):
                     leaderboard_option = leaderboard_option + 1 if leaderboard_option < 2 else 2
                 elif event.name == "up" or event.name == "1":
                     leaderboard_option = leaderboard_option - 1 if leaderboard_option > 1 else 1
-    return
+    return None, active_user, None
 
 if __name__ == "__main__":
     main()
