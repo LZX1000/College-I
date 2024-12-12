@@ -103,7 +103,7 @@ def multiple_choice(
                 active_option = (active_option + 1) % len(options)
             elif event.name in {"enter", "space"}:
                 print("\033[?25h", end="", flush=True)
-                f_input(end="")
+                sys.stdin.flush()
                 if set(options) == {"Yes", "No"}:
                     return options[active_option].lower()[0]
                 else:
