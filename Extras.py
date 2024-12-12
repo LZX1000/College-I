@@ -1,4 +1,5 @@
 import os
+import time
 import keyboard
 from typing import overload, Union, List
 
@@ -10,14 +11,18 @@ class Player:
     def __str__(self) -> str:
         return f"{self.username}, {self.password}"
 
-def clear_screen(prompt: str | None = None) -> None:
+def clear_screen(
+    prompt: str | None = None,
+    flush: bool | None = False
+) -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
     if prompt:
-        print(prompt)
+        print(prompt, flush=flush)
 
-def clear_input(keys: List[str] = "enter") -> None:
-    while any(keyboard.is_pressed(key) for key in keys):
-        keyboard.read_event(suppress=True)
+def remove_overflow_inputs(keys: List[str] = ["enter"]) -> None:
+    if any(keyboard.is_pressed(key) for key in keys):
+        print(end="", flush=True)
+        time.sleep(0.05)
 
 @overload
 def handle_value(
@@ -37,8 +42,8 @@ def handle_value(
     style: Union[int, float, str] | None = 0,
     name: str | None = "string"
 ) -> Union[int, float, str]:
+    remove_overflow_inputs()
     while True:
-        clear_input()
         user_input = input(prompt)
         if user_input:
             if isinstance(style, int):
@@ -52,10 +57,10 @@ def handle_value(
                 except ValueError:
                     clear_screen(f"Please enter a valid float.\n")
             elif isinstance(style, str):
-                if style == " ":
-                    return user_input.strip()
-                elif style == "_":
-                    return user_input.strip().replace(" ", "_")
+                    if style == " ":
+                        return user_input.strip()
+                    elif style == "_":
+                        return user_input.strip().replace(" ", "_")
         clear_screen(f"Please enter a valid {name}.\n")
 
 def multiple_choice(
@@ -78,7 +83,7 @@ def multiple_choice(
     clear_screen()
     render()
 
-    clear_input()
+    remove_overflow_inputs(["enter", "space"])
     while True:
         event = keyboard.read_event()
         old_active_option = active_option
@@ -88,7 +93,6 @@ def multiple_choice(
             elif event.name in ["down", "s"]:
                 active_option = (active_option + 1) % len(options)
             elif event.name in ["enter", "space"]:
-                clear_input()
                 print("\033[?25h", end="", flush=True)
                 if options == ["Yes", "No"]:
                     return options[active_option].lower()[0]
