@@ -1,7 +1,7 @@
 import os
 import time
 import keyboard
-from typing import overload, Union, List
+from typing import overload, Union, List, Set
 
 class Player:
     def __init__(self, username: str, password: str) -> None:
@@ -12,14 +12,14 @@ class Player:
         return f"{self.username}, {self.password}"
 
 def clear_screen(
-    prompt: str | None = None,
+    prompt: str | None = None, /, 
     flush: bool | None = False
 ) -> None:
     os.system('cls' if os.name == 'nt' else 'clear')
     if prompt:
         print(prompt, flush=flush)
 
-def remove_overflow_inputs(keys: List[str] = ["enter"]) -> None:
+def remove_overflow_inputs(keys: Set[str] = {"enter"}, /) -> None:
     if any(keyboard.is_pressed(key) for key in keys):
         print(end="", flush=True)
         time.sleep(0.05)
@@ -27,7 +27,8 @@ def remove_overflow_inputs(keys: List[str] = ["enter"]) -> None:
 @overload
 def handle_value(
     prompt: str | None = " ",
-    style: Union[int, float] = 0
+    style: Union[int, float] = 0,
+    name: str | None = "number"
 ) -> Union[int, float]: ...
 
 @overload
@@ -40,11 +41,16 @@ def handle_value(
 def handle_value(
     prompt: str | None = " ",
     style: Union[int, float, str] | None = 0,
-    name: str | None = "string"
+    name: str | None = "input"
 ) -> Union[int, float, str]:
-    remove_overflow_inputs()
+    if isinstance(style, int or float):
+        name = "number"
+    elif isinstance(style, str):
+        name = "string"
+
     while True:
-        user_input = input(prompt)
+        print(prompt, end="", flush=True)
+        user_input = input()
         if user_input:
             if isinstance(style, int):
                 if user_input.isdigit():
@@ -61,13 +67,14 @@ def handle_value(
                         return user_input.strip()
                     elif style == "_":
                         return user_input.strip().replace(" ", "_")
-        clear_screen(f"Please enter a valid {name}.\n")
+        else:
+            clear_screen(f"Please enter a valid {name}.\n")
 
 def multiple_choice(
     prompt: str | None = " ",
-    options: List[str] | None = ["Yes", "No"],
-    end: str = "\n\n",
-    active_option: int | None = 0
+    options: Union[List[str], Set[str]] | None = {"Yes", "No"},
+    active_option: int | None = 0,
+    end: str = "\n\n"
 ) -> str:
     def render() -> None:
         print(prompt, end=end)
@@ -77,24 +84,22 @@ def multiple_choice(
             else:
                 print(option)
 
-    options = [str(option) for option in options]
-
-    print("\033[?25l", end="")
+    print("\033[?25l", end="", flush=True)
     clear_screen()
     render()
 
-    remove_overflow_inputs(["enter", "space"])
+    options = list(options)
     while True:
         event = keyboard.read_event()
         old_active_option = active_option
         if event.event_type == keyboard.KEY_DOWN:
-            if event.name in ["up", "w"]:
+            if event.name in {"up", "w"}:
                 active_option = (active_option - 1) % len(options)
-            elif event.name in ["down", "s"]:
+            elif event.name in {"down", "s"}:
                 active_option = (active_option + 1) % len(options)
-            elif event.name in ["enter", "space"]:
+            elif event.name in {"enter", "space"}:
                 print("\033[?25h", end="", flush=True)
-                if options == ["Yes", "No"]:
+                if set(options) == {"Yes", "No"}:
                     return options[active_option].lower()[0]
                 else:
                     return options[active_option].lower().replace(" ", "_")
