@@ -46,9 +46,9 @@ def handle_value(
     style: Union[int, float, str] | None = 0,
     name: str | None = "input"
 ) -> Union[int, float, str]:
-    if name is "input" and isinstance(style, int or float):
+    if name == "input" and isinstance(style, int or float):
         name = "number"
-    elif name is "input" and isinstance(style, str):
+    elif name == "input" and isinstance(style, str):
         name = "string"
 
     while True:
