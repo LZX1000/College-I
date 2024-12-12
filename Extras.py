@@ -76,7 +76,7 @@ def handle_value(
 
 def multiple_choice(
     prompt: str | None = " ", /,
-    options: Union[List[str], Set[str]] | None = {"Yes", "No"},
+    options: Union[List[str], Set[str]] | None = ["Yes", "No"],
     active_option: int | None = 0,
     end: str = "\n\n"
 ) -> str:
