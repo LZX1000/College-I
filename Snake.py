@@ -69,6 +69,7 @@ def main(active_user=Player("Guest", "")):
         # Game start time
         start_time = time.monotonic()
         # Game loop
+        print("\033[?25l", end="")
         while True:
             # Handle apple collisions (generate new apple, increase snake length)
             if player_position[0] in apples:
@@ -93,7 +94,7 @@ def main(active_user=Player("Guest", "")):
                     if game_map[y][x] != previous_map[y][x]:
                         print(f"\033[{y+3};{x*2+1}H{game_map[y][x]}", end='')
             previous_map = [row[:] for row in game_map]
-            print(f"\33[{map_height+3};0H", end='', flush=True)
+            print(f"\33[{map_height+3};0H", end='')
             # Check for movement inputs
             if keyboard.is_pressed('w') or keyboard.is_pressed('up'):
                 if movement != 'down':

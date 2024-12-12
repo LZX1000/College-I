@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import keyboard
 from typing import overload, Union, List, Set
@@ -29,20 +30,20 @@ def f_input(
 
 @overload
 def handle_value(
-    prompt: str | None = " ",
+    prompt: str | None = " ", /,
     style: Union[int, float] = 0,
     name: str | None = "number"
 ) -> Union[int, float]: ...
 
 @overload
 def handle_value(
-    prompt: str | None = " ",
+    prompt: str | None = " ", /,
     style: str | None = " ",
     name: str | None = "string"
 ) -> str: ...
 
 def handle_value(
-    prompt: str | None = " ",
+    prompt: str | None = " ", /,
     style: Union[int, float, str] | None = 0,
     name: str | None = "input"
 ) -> Union[int, float, str]:
@@ -51,8 +52,9 @@ def handle_value(
     elif name == "input" and isinstance(style, str):
         name = "string"
 
+    sys.stdin.flush()
     while True:
-        user_input = f_input(prompt, flush=True)
+        user_input = input(prompt)
         if user_input:
             if isinstance(style, int):
                 if user_input.isdigit():
@@ -73,7 +75,7 @@ def handle_value(
             clear_screen(f"Please enter a valid {name}.\n")
 
 def multiple_choice(
-    prompt: str | None = " ",
+    prompt: str | None = " ", /,
     options: Union[List[str], Set[str]] | None = {"Yes", "No"},
     active_option: int | None = 0,
     end: str = "\n\n"

@@ -15,7 +15,7 @@ def main(active_user=Player("Guest", "")):
     Returns:
     tuple: A tuple containing the game name 'Number Guess' and the active user's name..
     """
-    main_menu = ["Quit", "Play Game", "Settings"]
+    main_menu = ["Play Game", "Settings", "Quit"]
     settings_menu = ["Back to game", "Change low bound", "Change high bound"]
     high_bound = 100
     low_bound = 1
@@ -25,14 +25,14 @@ def main(active_user=Player("Guest", "")):
         clear_screen()
         menu_choice = multiple_choice(options=main_menu)
 
-        if menu_choice == 'Quit':
+        if menu_choice == 'quit':
             return 'Number Guess', active_user, None
-        elif menu_choice == 'Settings':
+        elif menu_choice == 'settings':
             while True:
                 clear_screen()
                 settings_choice = multiple_choice(options=settings_menu)
 
-                if settings_choice == 'Change high bound':
+                if settings_choice == 'change_high_ bound':
                     clear_screen()
                     while True:
                         new_high_bound = handle_value("Enter a new high bound: ")
@@ -41,7 +41,7 @@ def main(active_user=Player("Guest", "")):
                             break
                         else:
                             clear_screen("High bound must be greater than low bound.\n")
-                elif settings_choice == 'Change low bound':
+                elif settings_choice == 'change_low_bound':
                     clear_screen()
                     while True:
                         new_low_bound = handle_value("Enter a new low bound: ")
@@ -50,10 +50,10 @@ def main(active_user=Player("Guest", "")):
                             break
                         else:
                             clear_screen("Low bound must be less than high bound.\n")
-                elif settings_choice == 'Back to game':
+                elif settings_choice == 'back_to_game':
                     break
         
-        elif menu_choice == 'Play Game':
+        elif menu_choice == 'play_game':
             Playing = True
             while Playing == True:
                 secret_number = random.randint(low_bound, high_bound)
