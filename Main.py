@@ -26,7 +26,7 @@ def sign_in(users: List[Player]) -> Tuple[Player, bool]:
         # Sign in
         if response == "y" or response_1 == "y":
             clear_screen()
-            username_try = handle_value("Username:", " ", "username")
+            username_try = handle_value("Username: ", " ", "username")
             clear_screen()
             password_try = handle_value(f"Username: {username_try}\n\nPassword: ", " ", "password")
             attempt = (username_try, password_try)

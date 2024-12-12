@@ -19,10 +19,13 @@ def clear_screen(
     if prompt:
         print(prompt, flush=flush)
 
-def remove_overflow_inputs(keys: Set[str] = {"enter"}, /) -> None:
-    if any(keyboard.is_pressed(key) for key in keys):
-        print(end="", flush=True)
-        time.sleep(0.05)
+def f_input(
+    prompt: str | None = " ", /,
+    end: str = "",
+    flush: bool | None = False,
+) -> str:
+    print(prompt, end=end, flush=flush)
+    return input()
 
 @overload
 def handle_value(
@@ -43,14 +46,13 @@ def handle_value(
     style: Union[int, float, str] | None = 0,
     name: str | None = "input"
 ) -> Union[int, float, str]:
-    if isinstance(style, int or float):
+    if name is "input" and isinstance(style, int or float):
         name = "number"
-    elif isinstance(style, str):
+    elif name is "input" and isinstance(style, str):
         name = "string"
 
     while True:
-        print(prompt, end="", flush=True)
-        user_input = input()
+        user_input = f_input(prompt, flush=True)
         if user_input:
             if isinstance(style, int):
                 if user_input.isdigit():
@@ -99,6 +101,7 @@ def multiple_choice(
                 active_option = (active_option + 1) % len(options)
             elif event.name in {"enter", "space"}:
                 print("\033[?25h", end="", flush=True)
+                f_input(end="")
                 if set(options) == {"Yes", "No"}:
                     return options[active_option].lower()[0]
                 else:
