@@ -1,7 +1,7 @@
 import random, keyboard, time
-from Extras import clear_screen, yes_or_no
+from Extras import Player, clear_screen, multiple_choice
 
-def main(active_user='Guest'):
+def main(active_user=Player("Guest", "")):
     active = True
     while active ==True:
         enemies = []
@@ -14,7 +14,7 @@ def main(active_user='Guest'):
             #Check quit
             if keyboard.is_pressed('esc'):
                 clear_screen()
-                response = yes_or_no("Are you sure you want to quit? (Y/N)\n")
+                response = multiple_choice("Are you sure you want to quit?")
                 if response == "y":
                     active = False
                 elif response == "n":
@@ -80,7 +80,7 @@ def main(active_user='Guest'):
                 #Check quit
                 if keyboard.is_pressed('esc'):
                     clear_screen()
-                    response = yes_or_no("Are you sure you want to quit? (Y/N)\n")
+                    response = multiple_choice("Are you sure you want to quit?")
                     if response == "y":
                         active = False
                     elif response == "n":
@@ -124,7 +124,7 @@ def main(active_user='Guest'):
                         time.sleep(0.2)
                         break
         #Try again?
-        response = yes_or_no("Would you like to play again? (Y/N)\n")
+        response = multiple_choice("Would you like to play again?")
         if response == "n":
             active = False
         if response == "y":

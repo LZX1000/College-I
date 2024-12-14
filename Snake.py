@@ -1,7 +1,7 @@
 import random, time, keyboard
-from Extras import clear_screen, yes_or_no
+from Extras import Player, clear_screen, multiple_choice
 
-def main(active_user='Guest'):
+def main(active_user=Player("Guest", "")):
     '''
     Main function to run the Snake game.
 
@@ -24,7 +24,7 @@ def main(active_user='Guest'):
             file_lines = file.readlines()
             main_line_number = None
             for i, line in enumerate(file_lines):
-                if line.startswith(active_user):
+                if line.startswith(f"{active_user.username}, {active_user.password}"):
                     main_line = line
                     main_line_number = i
                     sublines = []
@@ -69,6 +69,7 @@ def main(active_user='Guest'):
         # Game start time
         start_time = time.monotonic()
         # Game loop
+        print("\033[?25l", end="")
         while True:
             # Handle apple collisions (generate new apple, increase snake length)
             if player_position[0] in apples:
@@ -93,7 +94,7 @@ def main(active_user='Guest'):
                     if game_map[y][x] != previous_map[y][x]:
                         print(f"\033[{y+3};{x*2+1}H{game_map[y][x]}", end='')
             previous_map = [row[:] for row in game_map]
-            print(f"\33[{map_height+3};0H", end='', flush=True)
+            print(f"\33[{map_height+3};0H", end='')
             # Check for movement inputs
             if keyboard.is_pressed('w') or keyboard.is_pressed('up'):
                 if movement != 'down':
@@ -155,15 +156,19 @@ def main(active_user='Guest'):
                     game_map[player_position[i][0]][player_position[i][1]] = f'\033[{color}m██\033[0m'
                 game_map[player_position[0][0]][player_position[0][1]] = '\033[93m██\033[0m'
         # Game over
+        keyboard.send('enter')
+        input()
         clear_screen("Game Over\n")
         # Update highscore
         if points > high_points:
             high_points = points
         print(f"Score: {points}             High Score: {high_points}")
         if points == high_points:
-            print("\033[3m*New High Score!*\33[0m")
+            print("\033[3m*New High Score!*\33[0m\n")
+        else:
+            print()
         # Play again
-        response = yes_or_no("\nWould you like to play again? (Y/N)\n")
+        response = multiple_choice("Would you like to play again?")
         if response == "n":
             return 'Snake', active_user, high_points
         if response == "y":

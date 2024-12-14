@@ -1,7 +1,7 @@
 import random, keyboard
-from Extras import yes_or_no, clear_screen, handle_value_error, check_menu_choice
+from Extras import Player, multiple_choice, clear_screen, handle_value
 
-def main(active_user='Guest'):
+def main(active_user=Player("Guest", "")):
     """
     Main function to run the Number Guess game.
     The function provides a main menu with options to Quit, Play Game, or access Settings.
@@ -15,7 +15,7 @@ def main(active_user='Guest'):
     Returns:
     tuple: A tuple containing the game name 'Number Guess' and the active user's name..
     """
-    main_menu = ["Quit", "Play Game", "Settings"]
+    main_menu = ["Play Game", "Settings", "Quit"]
     settings_menu = ["Back to game", "Change low bound", "Change high bound"]
     high_bound = 100
     low_bound = 1
@@ -23,37 +23,37 @@ def main(active_user='Guest'):
     
     while True:
         clear_screen()
-        menu_choice = check_menu_choice(main_menu, "\n".join([f"{index} : {main_menu[index]}" for index in range(len(main_menu))]) + "\n\n")
+        menu_choice = multiple_choice(options=main_menu)
 
-        if menu_choice == 'Quit':
+        if menu_choice == 'quit':
             return 'Number Guess', active_user, None
-        elif menu_choice == 'Settings':
+        elif menu_choice == 'settings':
             while True:
                 clear_screen()
-                settings_choice = check_menu_choice(settings_menu, "\n".join([f"{index} : {settings_menu[index]}" for index in range(len(settings_menu))]) + "\n\n")
+                settings_choice = multiple_choice(options=settings_menu)
 
-                if settings_choice == 'Change high bound':
+                if settings_choice == 'change_high_ bound':
                     clear_screen()
                     while True:
-                        new_high_bound = handle_value_error("Enter a new high bound: ")
+                        new_high_bound = handle_value("Enter a new high bound: ")
                         if new_high_bound > low_bound:
                             high_bound = new_high_bound
                             break
                         else:
                             clear_screen("High bound must be greater than low bound.\n")
-                elif settings_choice == 'Change low bound':
+                elif settings_choice == 'change_low_bound':
                     clear_screen()
                     while True:
-                        new_low_bound = handle_value_error("Enter a new low bound: ")
-                        if new_low_bound < high_bound:
+                        new_low_bound = handle_value("Enter a new low bound: ")
+                        if new_low_bound < high_bound and new_low_bound >= 0:
                             low_bound = new_low_bound
                             break
                         else:
                             clear_screen("Low bound must be less than high bound.\n")
-                elif settings_choice == 'Back to game':
+                elif settings_choice == 'back_to_game':
                     break
         
-        elif menu_choice == 'Play Game':
+        elif menu_choice == 'play_game':
             Playing = True
             while Playing == True:
                 secret_number = random.randint(low_bound, high_bound)
@@ -63,8 +63,12 @@ def main(active_user='Guest'):
                 clear_screen()
 
                 while True:
+                    if lowest_guess == highest_guess:
+                        clear_screen(f"Unfortunately you were unable to guess the number.\n")
+                        break
+
                     playing_screen = [f"Between : {lowest_guess} - {highest_guess}", f"Guesses : {guesses}", "", "Guess: "]
-                    guess = handle_value_error("\n".join(playing_screen))
+                    guess = handle_value("\n".join(playing_screen))
 
                     if guess == secret_number:
                         guesses += 1
@@ -85,7 +89,7 @@ def main(active_user='Guest'):
                 if highscore == None or guesses < highscore:
                     print("You got a new best score!\n" + f"Best score: {guesses}")
                     highscore = guesses
-                response = yes_or_no("Would you like to play again? (Y/N)\n")
+                response = multiple_choice("Would you like to play again?")
                 if response == 'n':
                     Playing = False
                     break

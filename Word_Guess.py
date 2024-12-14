@@ -1,11 +1,9 @@
 from random import choice
-from Extras import yes_or_no, clear_screen
+from Extras import Player, multiple_choice, clear_screen
 
-#Input Words
 def input_words(words=None, parameter=0):
     if parameter == 0:
-        if words is None:
-            words = []
+        words = []
         #Entering words loop
         while True:
             if len(words) > 0:
@@ -27,142 +25,100 @@ def input_words(words=None, parameter=0):
             else:
                 words.append((word, "Phrase") if " " in word else (word, "Word"))
                 clear_screen()
-            #Sort words alphabetically
             words.sort()
             #Add words to the words file
-            try:
-                with open("words.txt", "r") as file:
-                    old_words = [tuple(line.strip().split(', ')) for line in file.readlines()]
-                    for word, option in words:
-                        if (word, option) not in old_words:
-                            with open("words.txt", "a") as file:
-                                file.write(f"{word}, {option}\n")
-            except FileNotFoundError:
-                with open("words.txt", "w") as file:
-                    for word, option in words:
+        try:
+            with open("words.txt", "r+") as file:
+                old_words = [line for line in file.readlines()]
+                for word, option in set(words):
+                    if (word, option) not in (old_words[0], old_words[1]):
                         file.write(f"{word}, {option}\n")
+        except FileNotFoundError:
+            with open("words.txt", "w") as file:
+                for word, option in words:
+                    perfect_word = ''.join(sorted(set(char for char in word if char.isalpha())))
+                    file.write(f"{word}, {option}, {perfect_word}\n")
     #Chooses a random word from words[] list
-    game_word, option = choice(words)
-    perfect_word = ''.join(sorted(set(char for char in game_word if char.isalpha())))
-    return game_word, option, perfect_word, words
+    game_word = choice(words)
+    game_word = (game_word[0], game_word[1], ''.join(sorted(set(char for char in game_word[0] if char.isalpha()))))
+    return game_word, words
 
-#Try Again
-def try_again(game_word=None, guesses=0, words=None, perfect_word=None):
-    #Check parameters
-    if words is None:
-        words = input_words()
-    #Ask if the player wants to play again
-    if guesses == len(perfect_word):
-        print("*Perfect!*\n")
-    response = yes_or_no(f"Congrats! You guessed {game_word} in {guesses} guesses. Try again? (Y/N)\n\n")
-    #If the player wants to play again
-    if response == "y":
-        #Checks if the player wants new words
-        clear_screen()
-        same_words = yes_or_no("Would you like to use the same words/phrases? (Y/N)\n\n")
-        clear_screen()
-        if same_words == "y":
-            return words
-        elif same_words == "n":
-            return None
-    #Returns if the player doesn't want to play again
-    elif response == "n":
-        return response
-
-#Check Guess
-def check_guess(display_game, guessed_letters=None, missed_letters=None):
-    #Check parameters
-    if guessed_letters is None:
-        guessed_letters = []
-    if missed_letters is None:
-        missed_letters = []
-    while True:
-        guess = input("Guess a letter: ").lower()
-        #Check if the guess is a single letter
-        if len(guess) == 1 and guess.isalpha():
-            #Check if the guess is a letter
-            if any(char.isdigit() for char in guess):
-                clear_screen(display_game + "\nNumbers are not allowed. Please enter a single letter.\n")
-            #Check if the guess has already been guessed
-            elif guess in guessed_letters or guess in missed_letters:
-                clear_screen(display_game + "\nYou already guessed that letter. Try again.\n")
-            #Return the proper guess
-            else:
-                return guess
-        #Ask for a new, single-letter guess
-        elif len(guess) > 1:
-            clear_screen(display_game + "\nPlease enter a single letter.\n")
-        #Ask for a new, letter guess
-        elif not guess.isalpha():
-            clear_screen(display_game + "\nPlease enter a letter.\n")
-        #Ask for a new guess because the guess was just weird
-        else:
-            clear_screen(display_game + "\nPlease enter a valid letter.\n")
-
-#Guessing
-def main(active_user='guest', game_word=None, guesses=0, game_letters=None, guessed_letters=None, words=None, missed_letters=None, perfect_word=None):
+def main(active_user=Player("Guest", "")):
+    words = None
+    game_word = None
     while True:
         clear_screen()
-        #Check parameters
-        if words is None:
-            response = yes_or_no("Would you like to use random words? (Y/N)\n\n")
+        if not words:
+            response = multiple_choice("Would you like to use random words?")
             if response == "n":
                 clear_screen()
-                game_word, option, perfect_word, words = input_words()
+                (game_word, option, perfect_word), words = input_words()
+            # Open existing words file or create a new one
             elif response == "y":
-                #Open existing words file or create a new one
                 try:
                     with open("words.txt", "r") as file:
                         words = [tuple(line.strip().split(', ')) for line in file.readlines()]
                 except FileNotFoundError:
-                    with open("words.txt", "w") as file:
-                        clear_screen("No words found. Please enter some words.\n")
-                        game_word, option, perfect_word, words = input_words(words=words)
-                    with open("words.txt", "a") as file:
-                        for word, option in words:
-                            file.write(f"{word}, {option}\n")
-                game_word, option, perfect_word, words = input_words(words=words, parameter=1)
-        #Check more parameters
-        if game_word is None or perfect_word is None:
-            game_word, option, perfect_word = input_words(words=words, parameter=1)
-        if game_letters is None:
-            game_letters = list(game_word)
-        if guessed_letters is None:
-            guessed_letters = ['ab' if letter.isalpha() else letter for letter in game_letters]
-        if missed_letters is None:
-            missed_letters = []
-        #Word or phrase for game screen
-        display_game = f"{option}: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
-        clear_screen(display_game)
-        #Check if there are characters left to guess
-        if "ab" in guessed_letters:
-            #Get a proper guess 
-            guess = check_guess(display_game, guessed_letters=guessed_letters, missed_letters=missed_letters)
-            #Check if the guess is in the word
-            if guess in game_letters:
-                for i, letter in enumerate(game_letters):
-                    if guess == letter:
-                        guessed_letters[i] = letter
-                guesses += 1
-            else:
-                #Guess hasn't been guessed before
-                if guess not in missed_letters:
-                    missed_letters.append(guess)
-                guesses += 1
-        #Display game results and ask if the player wants to play again    
+                    clear_screen("No words found. Please enter some words.\n")
+                    game_word, words = input_words()
+                (game_word, option, perfect_word), words = input_words(words, parameter=1)
         else:
+            game_word, option, perfect_word = input_words(words, parameter=1)
+        game_letters = list(game_word)
+        guessed_letters = ['ab' if letter.isalpha() else letter for letter in game_letters]
+        missed_letters = []
+        guesses = 0
+        while True:
+            # Display game
+            display_game = f"{option}: " + " ".join('_' if letter == "ab" else letter for letter in guessed_letters) + "\nMissed Letters: " + ", ".join(missed_letters) + f"\nGuesses: {guesses}\n"
             clear_screen(display_game)
-            response = try_again(game_word=game_word, guesses=guesses, words=words, perfect_word=perfect_word)
-            if response is None:
-                words = None
-            #Quit game
-            if response == "n":
-                return 'Word Guess', active_user, None
-            game_word, option, perfect_word, words = input_words(words=words)
-            game_letters = list(game_word)
-            guessed_letters = ['ab' if letter.isalpha() else letter for letter in game_letters]
-            missed_letters = []
-            guesses = 0
+            # Get a guess if there are characters left to guess
+            if "ab" in guessed_letters:
+                while True:
+                    guess = input("Guess a letter: ").lower()
+                    # Check guess
+                    if len(guess) == 1 and guess.isalpha():
+                        if any(char.isdigit() for char in guess):
+                            clear_screen(display_game + "\nNumbers are not allowed. Please enter a single letter.\n")
+                        elif guess in guessed_letters or guess in missed_letters:
+                            clear_screen(display_game + "\nYou already guessed that letter. Try again.\n")
+                        else:
+                            break
+                    # Error messages
+                    elif len(guess) > 1:
+                        clear_screen(display_game + "\nPlease enter a single letter.\n")
+                    elif not guess.isalpha():
+                        clear_screen(display_game + "\nPlease enter a letter.\n")
+                    else:
+                        clear_screen(display_game + "\nPlease enter a valid letter.\n")
+                #Check if the guess is in the word
+                if guess in game_letters:
+                    for i, letter in enumerate(game_letters):
+                        if guess == letter:
+                            guessed_letters[i] = letter
+                    guesses += 1
+                else:
+                    #Guess hasn't been guessed before
+                    if guess not in missed_letters:
+                        missed_letters.append(guess)
+                    guesses += 1
+            #Display game results and ask if the player wants to play again    
+            else:
+                clear_screen(display_game)
+                if guesses == len(perfect_word):
+                    print("*Perfect!*\n")
+                response = multiple_choice(f"Congrats! You guessed {game_word} in {guesses} guesses. Try again?")
+                # Player plays again
+                if response == "y":
+                    clear_screen()
+                    same_words = multiple_choice("Would you like to use the same words/phrases?")
+                    clear_screen()
+                    if same_words == "n":
+                        words = None
+                    break
+                # Quit game
+                if response == "n":
+                    return 'Word Guess', active_user, None
 
 if __name__ == "__main__":
     response = main()
