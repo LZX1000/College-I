@@ -6,24 +6,6 @@ def main():
     pygame.init()
     clock = pygame.time.Clock()
 
-    # Display
-    ## Resolutions
-    internal_width = 640
-    internal_height = 360
-    screen_size = (1920, 1080)
-    pixelation_factor = 2
-    ## Surfaces
-    internal_surface = pygame.Surface((internal_width, internal_height)) # For rendering
-    screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
-    ## Background
-    background = pygame.image.load(f"assets/SnakeBackground1.png")
-    background = pygame.transform.scale(background, (internal_width, internal_height))
-
-    # Player Settings
-    movement_speed = 120
-    normal_movement_speed = movement_speed
-    player_pos = pygame.Vector2(internal_width // 2, internal_width // 2)
-
     pygame.display.set_caption("Snake")
 
     class GamePlayer(pygame.sprite.Sprite):
@@ -44,6 +26,43 @@ def main():
         def update(self, display_surface, pos):
             display_surface.blit(self.image, self.rect.topleft)
             self.rect.center = pos
+
+    class GameBackground(pygame.sprite.Sprite):
+        def __init__(self, pos, size=None):
+            super().__init__()
+            self.source_image = pygame.image.load(f"assets/SnakeBackground1.png")
+
+            original_size = self.source_image.get_size()
+            if size is None:
+                size = (
+                    original_size[0] * pixelation_factor,
+                    original_size[1] * pixelation_factor
+                )
+            self.image = pygame.transform.scale(self.source_image, size)
+            self.rect = self.image.get_rect(center=pos)
+            self.size = size
+
+        def update(self, display_surface, pos):
+            display_surface.blit(self.image, self.rect.topleft)
+            self.rect.center = pos
+
+    # Display
+    ## Resolutions
+    internal_width = 640
+    internal_height = 360
+    screen_size = (1920, 1080)
+    pixelation_factor = 2
+    ## Surfaces
+    internal_surface = pygame.Surface((internal_width, internal_height)) # For rendering
+    screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
+    ## Background
+    background_pos = pygame.Vector2(internal_width // 2, internal_height // 2)
+    background = GameBackground(background_pos)
+
+    # Player Settings
+    movement_speed = 120
+    normal_movement_speed = movement_speed
+    player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
 
     player = GamePlayer(player_pos)
     running = True
@@ -93,7 +112,8 @@ def main():
         player_pos.y = max(0, min(internal_height, player_pos.y))
 
         # Render in 640x360
-        internal_surface.blit(background, (0, 0))
+        internal_surface.fill((0, 0, 0)) # Sub-background
+        background.update(internal_surface, background_pos)
         player.update(internal_surface, player_pos)
 
         # Upscale to 1920x1080
