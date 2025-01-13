@@ -8,6 +8,8 @@ from Extras import *
 from Start import main as start_main
 from typing import List, Tuple
 
+import pygame
+
 def sign_in(users: List[Player]) -> Tuple[Player, bool]:
     """
     Handles the sign-in or account creation process for users.
