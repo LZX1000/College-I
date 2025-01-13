@@ -37,7 +37,7 @@ def main():
                     original_size[0] * pixelation_factor,
                     original_size[1] * pixelation_factor
                 )
-            self.image = pygame.transform.scale(self.source_image, (size, size))
+            self.image = pygame.transform.scale(self.source_image, size)
             self.rect = self.image.get_rect(center=pos)
             self.size = size
 
