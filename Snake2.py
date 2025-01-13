@@ -1,5 +1,6 @@
 import pygame
 import math
+import ctypes
 
 def main():
     # Initialize
@@ -47,15 +48,16 @@ def main():
             self.rect.center = pos
 
     # Display
-    ## Resolutions
+    # # Resolutions
     internal_width = 640
     internal_height = 360
+    ctypes.windll.user32.SetProcessDPIAware()
     screen_size = (1920, 1080)
     pixelation_factor = 2
-    ## Surfaces
+    # # Surfaces
     internal_surface = pygame.Surface((internal_width, internal_height)) # For rendering
     screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
-    ## Background
+    # # Background
     background_pos = pygame.Vector2(internal_width // 2, internal_height // 2)
     background = GameBackground(background_pos)
 
@@ -76,14 +78,16 @@ def main():
 
         keys = pygame.key.get_pressed()
         # Misc inputs
+        if keys[pygame.K_ESCAPE]:
+            running = False
         if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
             movement_speed /= 2
             diagonal_speed = movement_speed / math.sqrt(2)
         else:
             movement_speed = normal_movement_speed
             diagonal_speed = movement_speed / math.sqrt(2)
-        if keys[pygame.K_ESCAPE]:
-            running = False
+        if keys[pygame.K_r]:
+            player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
         # Diagonal movement
         if keys[pygame.K_w] and keys[pygame.K_a] or keys[pygame.K_UP] and keys[pygame.K_LEFT]:
             player_pos.x -= diagonal_speed * dt
