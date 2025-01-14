@@ -21,31 +21,77 @@ def main():
                     original_size[1] * pixelation_factor
                 )
             self.image = pygame.transform.scale(self.source_image, size)
+            self.angle = 0
+
             self.rect = self.image.get_rect(center=pos)
-            self.size = size
+            self.collision_point = pygame.Vector2(self.rect.centerx, self.rect.top)
+
+        def update_collision_point(self):
+            offset_x = 0
+            offset_y = -self.rect.height / 2
+            radians = math.radians(self.angle)
+            rotated_x = offset_x * math.cos(radians) - offset_y * math.sin(radians)
+            rotated_y = offset_x * math.sin(radians) + offset_y * math.cos(radians)
+            self.collision_point.x = self.rect.centerx + rotated_x
+            self.collision_point.y = self.rect.centery + rotated_y
 
         def update(self, display_surface, pos):
-            display_surface.blit(self.image, self.rect.topleft)
+            # # Update positions
             self.rect.center = pos
+            self.update_collision_point()
+            rotated_image = pygame.transform.rotate(self.image, self.angle)
+            rotated_rect = rotated_image.get_rect(center=self.rect.center)
+            # # Render player
+            display_surface.blit(rotated_image, rotated_rect.topleft)
+            '''debug code'''
+            pygame.draw.circle(internal_surface, (255, 0, 0), (int(player.collision_point.x), int(player.collision_point.y)), 3)
 
-    class GameBackground(pygame.sprite.Sprite):
+    class GameBackground():
+        class Grass(pygame.sprite.Sprite):
+            def __init__(self, pos, size=None):
+                super().__init__()
+                self.source_image = pygame.image.load(f"assets/SnakeBackgroundGrass1.png")
+
+                original_size = self.source_image.get_size()
+                if size is None:
+                    size = (
+                        original_size[0] * pixelation_factor,
+                        original_size[1] * pixelation_factor
+                    )
+                self.image = pygame.transform.scale(self.source_image, size)
+                self.rect = self.image.get_rect(center=pos)
+
+            def update(self, display_surface, pos):
+                display_surface.blit(self.image, self.rect.topleft)
+                self.rect.center = pos
+
+        class Edge(pygame.sprite.Sprite):
+            def __init__(self, pos, size=None):
+                super().__init__()
+                self.source_image = pygame.image.load(f"assets/SnakeBackgroundEdge1.png")
+
+                original_size = self.source_image.get_size()
+                if size is None:
+                    size = (
+                        original_size[0] * pixelation_factor,
+                        original_size[1] * pixelation_factor
+                    )
+                self.image = pygame.transform.scale(self.source_image, size)
+                self.rect = self.image.get_rect(center=pos)
+
+            def update(self, display_surface, pos):
+                display_surface.blit(self.image, self.rect.topleft)
+                self.rect.center = pos
+
         def __init__(self, pos, size=None):
-            super().__init__()
-            self.source_image = pygame.image.load(f"assets/SnakeBackground1.png")
+            self.grass = self.Grass(pos, size)
+            self.edge = self.Edge(pos, size)
 
-            original_size = self.source_image.get_size()
-            if size is None:
-                size = (
-                    original_size[0] * pixelation_factor,
-                    original_size[1] * pixelation_factor
-                )
-            self.image = pygame.transform.scale(self.source_image, size)
-            self.rect = self.image.get_rect(center=pos)
-            self.size = size
+            self.grass_group = pygame.sprite.Group(self.grass)
 
         def update(self, display_surface, pos):
-            display_surface.blit(self.image, self.rect.topleft)
-            self.rect.center = pos
+            self.grass.update(display_surface, pos)
+            self.edge.update(display_surface, pos)
 
     # Display
     # # Resolutions
@@ -103,17 +149,21 @@ def main():
             player_pos.y += diagonal_speed * dt
         # Straight movement
         elif keys[pygame.K_w] or keys[pygame.K_UP]:
+            player.angle = 0
             player_pos.y -= movement_speed * dt
         elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            player.angle = 180
             player_pos.y += movement_speed * dt
         elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            player.angle = 90
             player_pos.x -= movement_speed * dt
         elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            player.angle = 270
             player_pos.x += movement_speed * dt
 
         # Player bounds
-        player_pos.x = max(0, min(internal_width, player_pos.x))
-        player_pos.y = max(0, min(internal_height, player_pos.y))
+        if not background.edge.rect.collidepoint(player.collision_point):
+            player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
 
         # Render in 640x360
         internal_surface.fill((0, 0, 0)) # Sub-background
