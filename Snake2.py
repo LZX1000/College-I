@@ -29,7 +29,7 @@ def main():
         def update_collision_point(self):
             offset_x = 0
             offset_y = -self.rect.height / 2
-            radians = math.radians(self.angle)
+            radians = math.radians(-self.angle)
             rotated_x = offset_x * math.cos(radians) - offset_y * math.sin(radians)
             rotated_y = offset_x * math.sin(radians) + offset_y * math.cos(radians)
             self.collision_point.x = self.rect.centerx + rotated_x
