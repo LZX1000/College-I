@@ -113,6 +113,7 @@ def main():
     player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
 
     player = GamePlayer(player_pos)
+    player_movement = (0, 0)
     running = True
     max_fps = 60
     dt = 0
@@ -134,32 +135,40 @@ def main():
             diagonal_speed = movement_speed / math.sqrt(2)
         if keys[pygame.K_r]:
             player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
-        # Diagonal movement
-        if keys[pygame.K_w] and keys[pygame.K_a] or keys[pygame.K_UP] and keys[pygame.K_LEFT]:
-            player_pos.x -= diagonal_speed * dt
-            player_pos.y -= diagonal_speed * dt
-        elif keys[pygame.K_w] and keys[pygame.K_d] or keys[pygame.K_UP] and keys[pygame.K_RIGHT]:
-            player_pos.x += diagonal_speed * dt
-            player_pos.y -= diagonal_speed * dt
-        elif keys[pygame.K_s] and keys[pygame.K_a] or keys[pygame.K_DOWN] and keys[pygame.K_LEFT]:
-            player_pos.x -= diagonal_speed * dt
-            player_pos.y += diagonal_speed * dt
-        elif keys[pygame.K_s] and keys[pygame.K_d] or keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]:
-            player_pos.x += diagonal_speed * dt
-            player_pos.y += diagonal_speed * dt
+        # # Diagonal movement
+        # if keys[pygame.K_w] and keys[pygame.K_a] or keys[pygame.K_UP] and keys[pygame.K_LEFT]:
+        #     player_pos.x -= diagonal_speed * dt
+        #     player_pos.y -= diagonal_speed * dt
+        # elif keys[pygame.K_w] and keys[pygame.K_d] or keys[pygame.K_UP] and keys[pygame.K_RIGHT]:
+        #     player_pos.x += diagonal_speed * dt
+        #     player_pos.y -= diagonal_speed * dt
+        # elif keys[pygame.K_s] and keys[pygame.K_a] or keys[pygame.K_DOWN] and keys[pygame.K_LEFT]:
+        #     player_pos.x -= diagonal_speed * dt
+        #     player_pos.y += diagonal_speed * dt
+        # elif keys[pygame.K_s] and keys[pygame.K_d] or keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]:
+        #     player_pos.x += diagonal_speed * dt
+        #     player_pos.y += diagonal_speed * dt
         # Straight movement
-        elif keys[pygame.K_w] or keys[pygame.K_UP]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             player.angle = 0
-            player_pos.y -= movement_speed * dt
+            player_movement = (0, -1)
+            # player_pos.y -= movement_speed * dt
         elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
             player.angle = 180
-            player_pos.y += movement_speed * dt
+            player_movement = (0, 1)
+            # player_pos.y += movement_speed * dt
         elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
             player.angle = 90
-            player_pos.x -= movement_speed * dt
+            player_movement = (-1, 0)
+            # player_pos.x -= movement_speed * dt
         elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             player.angle = 270
-            player_pos.x += movement_speed * dt
+            player_movement = (1, 0)
+            # player_pos.x += movement_speed * dt
+
+        # Player movement
+        player_pos.x += player_movement[0] * movement_speed * dt
+        player_pos.y += player_movement[1] * movement_speed * dt
 
         # Player bounds
         if not background.edge.rect.collidepoint(player.collision_point):
