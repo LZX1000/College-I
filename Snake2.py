@@ -59,7 +59,9 @@ def main():
                         original_size[1] * pixelation_factor
                     )
                 self.image = pygame.transform.scale(self.source_image, size)
+
                 self.rect = self.image.get_rect(center=pos)
+                self.movement_points = []
 
             def update(self, display_surface, pos):
                 display_surface.blit(self.image, self.rect.topleft)
@@ -129,10 +131,10 @@ def main():
             running = False
         if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
             movement_speed /= 2
-            diagonal_speed = movement_speed / math.sqrt(2)
+            # diagonal_speed = movement_speed / math.sqrt(2)
         else:
             movement_speed = normal_movement_speed
-            diagonal_speed = movement_speed / math.sqrt(2)
+            # diagonal_speed = movement_speed / math.sqrt(2)
         if keys[pygame.K_r]:
             player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
         # # Diagonal movement
