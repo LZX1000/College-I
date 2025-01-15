@@ -66,7 +66,7 @@ def main():
                 self.rect.center = pos
 
         class Grass(pygame.sprite.Sprite):
-            def __init__(self, pos, size=None):
+            def __init__(self, pos, size=None, width=11):
                 super().__init__()
                 self.source_image = pygame.image.load(f"assets/SnakeBackgroundGrass1.png")
 
@@ -78,12 +78,23 @@ def main():
                     )
                 self.image = pygame.transform.scale(self.source_image, size)
 
-                self.rect = self.image.get_rect(center=pos)
-                self.movement_points = []
+                self.rect = self.image.get_rect(center=pos) # Whole grass collision
+                self.block_width = self.image.get_width() / width
+                self.blocks_list = []
+                for i in range(width):
+                    block_height_pos = self.rect.topleft[1] + i * self.block_width + self.block_width / 2
+                    for i in range(width):
+                        block = pygame.Vector2(
+                            (self.rect.topleft[0] + i * self.block_width + self.block_width / 2),
+                            block_height_pos)
+                        self.blocks_list.append(block)
 
             def update(self, display_surface, pos):
                 display_surface.blit(self.image, self.rect.topleft)
                 self.rect.center = pos
+                '''debug code'''
+                for block in self.blocks_list:
+                    pygame.draw.circle(internal_surface, (0, 0, 255), block, 2)
 
         class Edge(pygame.sprite.Sprite):
             def __init__(self, pos, size=None):
@@ -126,7 +137,7 @@ def main():
     pixelation_factor = 2
     # # Surfaces
     internal_surface = pygame.Surface((internal_width, internal_height)) # For rendering
-    screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
+    screen = pygame.display.set_mode(screen_size) # pygame.FULLSCREEN
     # # Background
     background_pos = pygame.Vector2(internal_width // 2, internal_height // 2)
     background = Backgrounds(background_pos)
