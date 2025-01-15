@@ -46,7 +46,25 @@ def main():
             '''debug code'''
             pygame.draw.circle(internal_surface, (255, 0, 0), (int(player.collision_point.x), int(player.collision_point.y)), 3)
 
-    class GameBackground():
+    class Backgrounds():
+        class Menu(pygame.sprite.Sprite):
+            def __init__(self, pos, size=None):
+                super().__init__()
+                self.source_image = pygame.image.load(f"assets/SnakeBackgroundMenu1.png")
+
+                original_size = self.source_image.get_size()
+                if size is None:
+                    size = (
+                        original_size[0] * pixelation_factor,
+                        original_size[1] * pixelation_factor
+                    )
+                self.image = pygame.transform.scale(self.source_image, size)
+                self.rect = self.image.get_rect(center=pos)
+
+            def update(self, display_surface, pos):
+                display_surface.blit(self.image, self.rect.topleft)
+                self.rect.center = pos
+
         class Grass(pygame.sprite.Sprite):
             def __init__(self, pos, size=None):
                 super().__init__()
@@ -88,13 +106,17 @@ def main():
         def __init__(self, pos, size=None):
             self.grass = self.Grass(pos, size)
             self.edge = self.Edge(pos, size)
+            self.menu = self.Menu(pos, size)
 
             self.grass_group = pygame.sprite.Group(self.grass)
 
-        def update(self, display_surface, pos):
+        def game_update(self, display_surface, pos):
             self.grass.update(display_surface, pos)
             self.edge.update(display_surface, pos)
-
+        
+        def menu_update(self, display_surface, pos):
+            self.menu.update(display_surface, pos)
+    
     # Display
     # # Resolutions
     internal_width = 640
@@ -107,7 +129,7 @@ def main():
     screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
     # # Background
     background_pos = pygame.Vector2(internal_width // 2, internal_height // 2)
-    background = GameBackground(background_pos)
+    background = Backgrounds(background_pos)
 
     # Player Settings
     movement_speed = 120
@@ -117,77 +139,98 @@ def main():
     player = GamePlayer(player_pos)
     player_movement = (0, 0)
     running = True
+    gamestate = "game"
     max_fps = 60
     dt = 0
 
     while running:
+        alive = True
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
         keys = pygame.key.get_pressed()
-        # Misc inputs
-        if keys[pygame.K_ESCAPE]:
-            running = False
-        if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
-            movement_speed /= 2
-            # diagonal_speed = movement_speed / math.sqrt(2)
-        else:
-            movement_speed = normal_movement_speed
-            # diagonal_speed = movement_speed / math.sqrt(2)
-        if keys[pygame.K_r]:
-            player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
-        # # Diagonal movement
-        # if keys[pygame.K_w] and keys[pygame.K_a] or keys[pygame.K_UP] and keys[pygame.K_LEFT]:
-        #     player_pos.x -= diagonal_speed * dt
-        #     player_pos.y -= diagonal_speed * dt
-        # elif keys[pygame.K_w] and keys[pygame.K_d] or keys[pygame.K_UP] and keys[pygame.K_RIGHT]:
-        #     player_pos.x += diagonal_speed * dt
-        #     player_pos.y -= diagonal_speed * dt
-        # elif keys[pygame.K_s] and keys[pygame.K_a] or keys[pygame.K_DOWN] and keys[pygame.K_LEFT]:
-        #     player_pos.x -= diagonal_speed * dt
-        #     player_pos.y += diagonal_speed * dt
-        # elif keys[pygame.K_s] and keys[pygame.K_d] or keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]:
-        #     player_pos.x += diagonal_speed * dt
-        #     player_pos.y += diagonal_speed * dt
-        # Straight movement
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
-            player.angle = 0
-            player_movement = (0, -1)
-            # player_pos.y -= movement_speed * dt
-        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            player.angle = 180
-            player_movement = (0, 1)
-            # player_pos.y += movement_speed * dt
-        elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            player.angle = 90
-            player_movement = (-1, 0)
-            # player_pos.x -= movement_speed * dt
-        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            player.angle = 270
-            player_movement = (1, 0)
-            # player_pos.x += movement_speed * dt
 
-        # Player movement
-        player_pos.x += player_movement[0] * movement_speed * dt
-        player_pos.y += player_movement[1] * movement_speed * dt
+        if gamestate == "menu":
+            # Misc inputs
+            if keys[pygame.K_ESCAPE]:
+                running = False
+            elif keys[pygame.K_RETURN]:
+                gamestate = "game"
 
-        # Player bounds
-        if not background.edge.rect.collidepoint(player.collision_point):
-            player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+            # Render in 640x360
+            internal_surface.fill((0, 0, 0)) # Sub-background
+            background.menu_update(internal_surface, background_pos)
+            player.update(internal_surface, player_pos)
 
-        # Render in 640x360
-        internal_surface.fill((0, 0, 0)) # Sub-background
-        background.update(internal_surface, background_pos)
-        player.update(internal_surface, player_pos)
+            # Upscale to 1920x1080
+            scaled_surface = pygame.transform.scale(internal_surface, screen_size)
+            screen.blit(scaled_surface, (0, 0))
+        
+        elif gamestate == "game":
+            # Misc inputs
+            if keys[pygame.K_ESCAPE]:
+                gamestate = "menu"
+            if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+                movement_speed /= 2
+                # diagonal_speed = movement_speed / math.sqrt(2)
+            else:
+                movement_speed = normal_movement_speed
+                # diagonal_speed = movement_speed / math.sqrt(2)
+            if keys[pygame.K_r]:
+                player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+            # # Diagonal movement
+            # if keys[pygame.K_w] and keys[pygame.K_a] or keys[pygame.K_UP] and keys[pygame.K_LEFT]:
+            #     player_pos.x -= diagonal_speed * dt
+            #     player_pos.y -= diagonal_speed * dt
+            # elif keys[pygame.K_w] and keys[pygame.K_d] or keys[pygame.K_UP] and keys[pygame.K_RIGHT]:
+            #     player_pos.x += diagonal_speed * dt
+            #     player_pos.y -= diagonal_speed * dt
+            # elif keys[pygame.K_s] and keys[pygame.K_a] or keys[pygame.K_DOWN] and keys[pygame.K_LEFT]:
+            #     player_pos.x -= diagonal_speed * dt
+            #     player_pos.y += diagonal_speed * dt
+            # elif keys[pygame.K_s] and keys[pygame.K_d] or keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]:
+            #     player_pos.x += diagonal_speed * dt
+            #     player_pos.y += diagonal_speed * dt
+            # Straight movement
+            if keys[pygame.K_w] or keys[pygame.K_UP]:
+                player.angle = 0
+                player_movement = (0, -1)
+                # player_pos.y -= movement_speed * dt
+            elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                player.angle = 180
+                player_movement = (0, 1)
+                # player_pos.y += movement_speed * dt
+            elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                player.angle = 90
+                player_movement = (-1, 0)
+                # player_pos.x -= movement_speed * dt
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                player.angle = 270
+                player_movement = (1, 0)
+                # player_pos.x += movement_speed * dt
 
-        # Upscale to 1920x1080
-        scaled_surface = pygame.transform.scale(internal_surface, screen_size)
-        screen.blit(scaled_surface, (0, 0))
+            # Player movement
+            player_pos.x += player_movement[0] * movement_speed * dt
+            player_pos.y += player_movement[1] * movement_speed * dt
 
-        pygame.display.flip()
-        # Tick Speed
-        dt = clock.tick(max_fps) / 1000
+            # Player bounds
+            if not background.grass.rect.collidepoint(player.collision_point):
+                gamestate = "menu"
+
+            # Render in 640x360
+            internal_surface.fill((36, 201, 29)) # Sub-background
+            background.game_update(internal_surface, background_pos)
+            player.update(internal_surface, player_pos)
+
+            # Upscale to 1920x1080
+            scaled_surface = pygame.transform.scale(internal_surface, screen_size)
+            screen.blit(scaled_surface, (0, 0))
+
+            pygame.display.flip()
+            # Tick Speed
+            dt = clock.tick(max_fps) / 1000
     
 if __name__ == "__main__":
     main()
