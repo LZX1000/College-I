@@ -6,9 +6,18 @@ import ctypes
 def main():
     # Initialize
     pygame.init()
+    pygame.display.set_caption("Snake")
     clock = pygame.time.Clock()
 
-    pygame.display.set_caption("Snake")
+    def image_stuff(source_image, pos, pixelation_factor, size=None):
+        source_image = pygame.image.load(f"{source_image}")
+        original_size = source_image.get_size()
+        if size is None:
+            size = (original_size[0] * pixelation_factor,
+                    original_size[1] * pixelation_factor)
+        image = pygame.transform.scale(source_image, size)
+        rect = image.get_rect(center=pos)
+        return image, rect
 
     class GamePlayer(pygame.sprite.Sprite):
         class Nose(pygame.sprite.Sprite):
@@ -17,8 +26,7 @@ def main():
                 self.pos = pygame.Vector2(player.rect.centerx, player.rect.top)
                 self.rect = pygame.rect.Rect(self.pos[0], self.pos[1], 1, 1)
 
-            def update(self, pos):
-                offset_x = 0
+            def update(self, pos, offset_x=0):
                 offset_y = -player.rect.height / 2
                 radians = math.radians(-player.angle)
                 rotated_x = offset_x * math.cos(radians) - offset_y * math.sin(radians)
@@ -38,8 +46,7 @@ def main():
                 self.pos = pygame.Vector2(player.rect.centerx, player.rect.centery - player.rect.height / 4)
                 self.rect = pygame.rect.Rect(self.pos[0], self.pos[1], 1, 1)
 
-            def update(self, pos):
-                offset_x = 0
+            def update(self, pos, offset_x=0):
                 offset_y = -player.rect.height / 4
                 radians = math.radians(-player.angle)
                 rotated_x = offset_x * math.cos(radians) - offset_y * math.sin(radians)
@@ -53,20 +60,11 @@ def main():
                                    (int(player.movement_point.pos.x),
                                    int(player.movement_point.pos.y)), 3)
         class Tail(pygame.sprite.Sprite):
-            def __init__(self, pos, size=None):
+            def __init__(self, pos, angle=0, size=None):
                 super().__init__()
-                self.source_image = pygame.image.load(f"assets/GameCharacter.png")
 
-                original_size = self.source_image.get_size()
-                if size is None:
-                    size = (
-                        original_size[0] * pixelation_factor,
-                        original_size[1] * pixelation_factor
-                    )
-                self.image = pygame.transform.scale(self.source_image, size)
-                self.angle = 0
-
-                self.rect = self.image.get_rect(center=pos)
+                self.image, self.rect = image_stuff("assets/GameCharacter.png", pos, pixelation_factor, size)
+                self.angle = angle
         
             def update(self, display_surface, pos):
                 # # Update positions
@@ -79,20 +77,11 @@ def main():
             def debug(self, internal_surface):
                 pygame.draw.rect(internal_surface, (0, 255, 0), self.rect, 1)
 
-        def __init__(self, pos, size=None):
+        def __init__(self, pos, angle=0, size=None):
             super().__init__()
-            self.source_image = pygame.image.load(f"assets/GameCharacter.png")
 
-            original_size = self.source_image.get_size()
-            if size is None:
-                size = (
-                    original_size[0] * pixelation_factor,
-                    original_size[1] * pixelation_factor
-                )
-            self.image = pygame.transform.scale(self.source_image, size)
-            self.angle = 0
-
-            self.rect = self.image.get_rect(center=pos)
+            self.image, self.rect = image_stuff("assets/GameCharacter.png", pos, pixelation_factor, size)
+            self.angle = angle
             
             self.nose = self.Nose(self)
             self.movement_point = self.MovementPoint(self)
@@ -114,17 +103,8 @@ def main():
     class GameFood(pygame.sprite.Sprite):
         def __init__(self, pos, size=None):
             super().__init__()
-            self.source_image = pygame.image.load(f"assets/Point.png")
 
-            original_size = self.source_image.get_size()
-            if size is None:
-                size = (
-                    original_size[0] * pixelation_factor,
-                    original_size[1] * pixelation_factor
-                )
-            self.image = pygame.transform.scale(self.source_image, size)
-
-            self.rect = self.image.get_rect(center=pos)
+            self.image, self.rect = image_stuff("assets/Point.png", pos, pixelation_factor, size)
 
         def update(self, display_surface, pos):
             display_surface.blit(self.image, self.rect.topleft)
@@ -137,16 +117,8 @@ def main():
         class Menu(pygame.sprite.Sprite):
             def __init__(self, pos, size=None):
                 super().__init__()
-                self.source_image = pygame.image.load(f"assets/SnakeBackgroundMenu1.png")
 
-                original_size = self.source_image.get_size()
-                if size is None:
-                    size = (
-                        original_size[0] * pixelation_factor,
-                        original_size[1] * pixelation_factor
-                    )
-                self.image = pygame.transform.scale(self.source_image, size)
-                self.rect = self.image.get_rect(center=pos)
+                self.image, self.rect = image_stuff("assets/SnakeBackgroundMenu1.png", pos, pixelation_factor, size)
 
             def update(self, display_surface, pos):
                 display_surface.blit(self.image, self.rect.topleft)
@@ -163,17 +135,9 @@ def main():
         class Grass(pygame.sprite.Sprite):
             def __init__(self, pos, size=None, width=11):
                 super().__init__()
-                self.source_image = pygame.image.load(f"assets/SnakeBackgroundGrass1.png")
 
-                original_size = self.source_image.get_size()
-                if size is None:
-                    size = (
-                        original_size[0] * pixelation_factor,
-                        original_size[1] * pixelation_factor
-                    )
-                self.image = pygame.transform.scale(self.source_image, size)
+                self.image, self.rect = image_stuff("assets/SnakeBackgroundGrass1.png", pos, pixelation_factor, size)
 
-                self.rect = self.image.get_rect(center=pos) # Whole grass collision
                 self.block_width = self.image.get_width() / width
                 self.blocks_list = []
                 for i in range(width):
@@ -196,16 +160,8 @@ def main():
         class Edge(pygame.sprite.Sprite):
             def __init__(self, pos, size=None):
                 super().__init__()
-                self.source_image = pygame.image.load(f"assets/SnakeBackgroundEdge1.png")
 
-                original_size = self.source_image.get_size()
-                if size is None:
-                    size = (
-                        original_size[0] * pixelation_factor,
-                        original_size[1] * pixelation_factor
-                    )
-                self.image = pygame.transform.scale(self.source_image, size)
-                self.rect = self.image.get_rect(center=pos)
+                self.image, self.rect = image_stuff("assets/SnakeBackgroundEdge1.png", pos, pixelation_factor, size)
 
             def update(self, display_surface, pos):
                 display_surface.blit(self.image, self.rect.topleft)
