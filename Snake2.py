@@ -65,6 +65,13 @@ def main():
                 display_surface.blit(self.image, self.rect.topleft)
                 self.rect.center = pos
 
+        class GameBlock(pygame.sprite.Sprite):
+            def __init__(self, pos, block_width):
+                super().__init__()
+                self.collision_point = pygame.Vector2(pos)
+                self.rect = pygame.rect.Rect(pos[0] - block_width / 2, pos[1] - block_width / 2,
+                                             block_width, block_width)
+
         class Grass(pygame.sprite.Sprite):
             def __init__(self, pos, size=None, width=11):
                 super().__init__()
@@ -84,17 +91,19 @@ def main():
                 for i in range(width):
                     block_height_pos = self.rect.topleft[1] + i * self.block_width + self.block_width / 2
                     for i in range(width):
-                        block = pygame.Vector2(
-                            (self.rect.topleft[0] + i * self.block_width + self.block_width / 2),
-                            block_height_pos)
+                        block_pos = ((self.rect.topleft[0] + i * self.block_width + self.block_width / 2),
+                                     block_height_pos)
+                        block = Backgrounds.GameBlock(block_pos, self.block_width)
                         self.blocks_list.append(block)
-
+                self.blocks_group = pygame.sprite.Group(self.blocks_list)
+        
             def update(self, display_surface, pos):
                 display_surface.blit(self.image, self.rect.topleft)
-                self.rect.center = pos
-                '''debug code'''
+            
+            def debug(self, internal_surface):
                 for block in self.blocks_list:
-                    pygame.draw.circle(internal_surface, (0, 0, 255), block, 2)
+                    pygame.draw.circle(internal_surface, (0, 0, 255), block.collision_point, 2)
+                    pygame.draw.rect(internal_surface, (0, 255, 255), block.rect, 1)
 
         class Edge(pygame.sprite.Sprite):
             def __init__(self, pos, size=None):
@@ -143,20 +152,19 @@ def main():
     background = Backgrounds(background_pos)
 
     # Player Settings
-    movement_speed = 120
+    movement_speed = 60
     normal_movement_speed = movement_speed
     player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
 
     player = GamePlayer(player_pos)
     player_movement = (0, 0)
     running = True
+    requested_movement = False
     gamestate = "game"
     max_fps = 60
     dt = 0
 
     while running:
-        alive = True
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -207,24 +215,39 @@ def main():
             # Straight movement
             if keys[pygame.K_w] or keys[pygame.K_UP]:
                 player.angle = 0
-                player_movement = (0, -1)
+                requested_direction = (0, -1)
+                requested_movement = True
                 # player_pos.y -= movement_speed * dt
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 player.angle = 180
-                player_movement = (0, 1)
+                requested_direction = (0, 1)
+                requested_movement = True
                 # player_pos.y += movement_speed * dt
             elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 player.angle = 90
-                player_movement = (-1, 0)
+                requested_direction = (-1, 0)
+                requested_movement = True
                 # player_pos.x -= movement_speed * dt
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 player.angle = 270
-                player_movement = (1, 0)
+                requested_direction = (1, 0)
+                requested_movement = True
                 # player_pos.x += movement_speed * dt
 
             # Player movement
-            player_pos.x += player_movement[0] * movement_speed * dt
-            player_pos.y += player_movement[1] * movement_speed * dt
+            if background.grass.rect.collidepoint(player.collision_point):
+                if requested_movement and requested_direction != player_movement:
+                    movement_point = pygame.sprite.spritecollide(player, background.grass.blocks_group, False)
+                    if movement_point:
+                        requested_movement = False
+                        player_movement = requested_direction
+                        player_pos = movement_point.collision_point
+                
+                player_pos.x += player_movement[0] * movement_speed * dt
+                player_pos.y += player_movement[1] * movement_speed * dt
+            else:
+                requested_movement = False
+                gamestate = "menu"
 
             # Player bounds
             if not background.grass.rect.collidepoint(player.collision_point):
@@ -233,6 +256,7 @@ def main():
             # Render in 640x360
             internal_surface.fill((36, 201, 29)) # Sub-background
             background.game_update(internal_surface, background_pos)
+            background.grass.debug(internal_surface)
             player.update(internal_surface, player_pos)
 
             # Upscale to 1920x1080
@@ -242,6 +266,6 @@ def main():
             pygame.display.flip()
             # Tick Speed
             dt = clock.tick(max_fps) / 1000
-    
+
 if __name__ == "__main__":
     main()
