@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 import ctypes
 
 def main():
@@ -83,6 +84,28 @@ def main():
         def debug(self, internal_surface):
             self.nose.debug(internal_surface)
             self.movement_point.debug(internal_surface)
+
+    class GameFood(pygame.sprite.Sprite):
+        def __init__(self, pos, size=None):
+            super().__init__()
+            self.source_image = pygame.image.load(f"assets/Point.png")
+
+            original_size = self.source_image.get_size()
+            if size is None:
+                size = (
+                    original_size[0] * pixelation_factor,
+                    original_size[1] * pixelation_factor
+                )
+            self.image = pygame.transform.scale(self.source_image, size)
+
+            self.rect = self.image.get_rect(center=pos)
+
+        def update(self, display_surface, pos):
+            display_surface.blit(self.image, self.rect.topleft)
+            self.rect.center = pos
+
+        def debug(self, internal_surface):
+            pygame.draw.rect(internal_surface, (255, 0, 0), self.rect, 1)
 
     class Backgrounds():
         class Menu(pygame.sprite.Sprite):
@@ -175,6 +198,18 @@ def main():
         
         def menu_update(self, display_surface, pos):
             self.menu.update(display_surface, pos)
+
+    def spawn_food(max_food, food_list):
+        while len(food_list) < max_food:
+            food = GameFood(background.grass.blocks_list[random.randint(0, len(background.grass.blocks_list) - 1)].pos)
+            food_list.append(food)
+        return food_list
+    
+    def render_food(food_list, debug=False):
+        for food in food_list:
+            food.update(internal_surface, food.rect.center)
+            if debug:
+                food.debug(internal_surface)
     
     # Display
     # # Resolutions
@@ -189,10 +224,12 @@ def main():
     # # Background
     background_pos = pygame.Vector2(internal_width // 2, internal_height // 2)
     background = Backgrounds(background_pos)
-
     # Player Settings
     movement_speed = 120
     player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+    # # Food Settings
+    max_food = 3
+    food_list = []
 
     player = GamePlayer(player_pos)
     player_movement = (0, 0)
@@ -256,6 +293,11 @@ def main():
 
             # Player movement
             if background.grass.rect.collidepoint(player.nose.pos):
+                # Food collision
+                for food in food_list:
+                    if player.nose.rect.colliderect(food.rect):
+                        food_list.remove(food)
+                # Movement restriction
                 if requested_movement and requested_direction != player_movement and free:
                     movement_box = pygame.sprite.spritecollide(player.movement_point, background.grass.blocks_group, False)
                     # Keep player centered on blocks
@@ -286,6 +328,9 @@ def main():
             internal_surface.fill((36, 201, 29)) # Sub-background
             background.game_update(internal_surface, background_pos)
             background.grass.debug(internal_surface)
+            # Food
+            food_list = spawn_food(max_food, food_list)
+            render_food(food_list, debug=True)
             # Render Player
             player.update(internal_surface, player_pos)
             player.debug(internal_surface)
