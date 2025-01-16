@@ -52,6 +52,32 @@ def main():
                 pygame.draw.circle(internal_surface, (0, 255, 0),
                                    (int(player.movement_point.pos.x),
                                    int(player.movement_point.pos.y)), 3)
+        class Tail(pygame.sprite.Sprite):
+            def __init__(self, pos, size=None):
+                super().__init__()
+                self.source_image = pygame.image.load(f"assets/GameCharacter.png")
+
+                original_size = self.source_image.get_size()
+                if size is None:
+                    size = (
+                        original_size[0] * pixelation_factor,
+                        original_size[1] * pixelation_factor
+                    )
+                self.image = pygame.transform.scale(self.source_image, size)
+                self.angle = 0
+
+                self.rect = self.image.get_rect(center=pos)
+        
+            def update(self, display_surface, pos):
+                # # Update positions
+                self.rect.center = pos
+                rotated_image = pygame.transform.rotate(self.image, self.angle)
+                rotated_rect = rotated_image.get_rect(center=self.rect.center)
+                # # Render tail
+                display_surface.blit(rotated_image, rotated_rect.topleft)
+            
+            def debug(self, internal_surface):
+                pygame.draw.rect(internal_surface, (0, 255, 0), self.rect, 1)
 
         def __init__(self, pos, size=None):
             super().__init__()
@@ -226,6 +252,7 @@ def main():
     background = Backgrounds(background_pos)
     # Player Settings
     movement_speed = 120
+    tail_list = []
     player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
     # # Food Settings
     max_food = 3
@@ -297,6 +324,8 @@ def main():
                 for food in food_list:
                     if player.nose.rect.colliderect(food.rect):
                         food_list.remove(food)
+                        new_tail = player.Tail(player_pos)
+                        tail_list.append(new_tail)
                 # Movement restriction
                 if requested_movement and requested_direction != player_movement and free:
                     movement_box = pygame.sprite.spritecollide(player.movement_point, background.grass.blocks_group, False)
@@ -332,6 +361,9 @@ def main():
             food_list = spawn_food(max_food, food_list)
             render_food(food_list, debug=True)
             # Render Player
+            for tail in tail_list:
+                tail.update(internal_surface, player_pos)
+                tail.debug(internal_surface)
             player.update(internal_surface, player_pos)
             player.debug(internal_surface)
 
