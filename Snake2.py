@@ -206,19 +206,9 @@ def main():
     # # Background
     background_pos = pygame.Vector2(internal_width // 2, internal_height // 2)
     background = Backgrounds(background_pos)
-    # Player Settings
-    movement_speed = 120
-    tail_list = []
-    player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
-    # # Food Settings
-    max_food = 3
-    food_list = []
 
-    player = GamePlayer(player_pos)
-    player_movement = (0, 0)
     running = True
-    free = True
-    requested_movement = False
+    new = True
     gamestate = "game"
     max_fps = 60
     dt = 0
@@ -239,14 +229,27 @@ def main():
 
             # Render in 640x360
             internal_surface.fill((0, 0, 0)) # Sub-background
-            background.menu_update(internal_surface, background_pos)
-            player.update(internal_surface, player_pos)
+            background.menu.update(internal_surface, background_pos)
 
             # Upscale to 1920x1080
             scaled_surface = pygame.transform.scale(internal_surface, screen_size)
             screen.blit(scaled_surface, (0, 0))
         
         elif gamestate == "game":
+            if new:
+                # Player Settings
+                movement_speed = 120
+                tail_list = []
+                player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+                # # Food Settings
+                max_food = 3
+                food_list = []
+                # # General Initialization
+                player = GamePlayer(player_pos)
+                player_movement = (0, 0)
+                new = False
+                free = True
+                requested_movement = False
             # Misc inputs
             if keys[pygame.K_ESCAPE]:
                 gamestate = "menu"
@@ -302,11 +305,7 @@ def main():
                 player_pos.x += player_movement[0] * movement_speed * dt
                 player_pos.y += player_movement[1] * movement_speed * dt
             else:
-                requested_movement = False
-                gamestate = "menu"
-
-            # Player bounds
-            if not background.grass.rect.collidepoint(player.nose.pos):
+                new = True
                 gamestate = "menu"
 
             # Render in 640x360
@@ -327,9 +326,9 @@ def main():
             scaled_surface = pygame.transform.scale(internal_surface, screen_size)
             screen.blit(scaled_surface, (0, 0))
 
-            pygame.display.flip()
-            # Tick Speed
-            dt = clock.tick(max_fps) / 1000
+        pygame.display.flip()
+        # Tick Speed
+        dt = clock.tick(max_fps) / 1000
 
 if __name__ == "__main__":
     main()
