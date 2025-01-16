@@ -18,12 +18,12 @@ def main():
 
             def update(self, pos):
                 offset_x = 0
-                offset_y = -self.rect.height / 2
+                offset_y = -player.rect.height / 2
                 radians = math.radians(-player.angle)
                 rotated_x = offset_x * math.cos(radians) - offset_y * math.sin(radians)
                 rotated_y = offset_x * math.sin(radians) + offset_y * math.cos(radians)
-                self.pos.x = self.rect.centerx + rotated_x
-                self.pos.y = self.rect.centery + rotated_y
+                self.pos.x = player.rect.centerx + rotated_x
+                self.pos.y = player.rect.centery + rotated_y
                 self.rect.center = pos
 
             def debug(self, internal_surface):
@@ -191,7 +191,7 @@ def main():
     background = Backgrounds(background_pos)
 
     # Player Settings
-    movement_speed = 60
+    movement_speed = 120
     player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
 
     player = GamePlayer(player_pos)
@@ -258,6 +258,7 @@ def main():
             if background.grass.rect.collidepoint(player.nose.pos):
                 if requested_movement and requested_direction != player_movement and free:
                     movement_box = pygame.sprite.spritecollide(player.movement_point, background.grass.blocks_group, False)
+                    # Keep player centered on blocks
                     if movement_box:
                         old_movement_box = movement_box
                         requested_movement = False
@@ -266,11 +267,11 @@ def main():
                         player_pos.x = movement_box[0].pos[0]
                         player_pos.y = movement_box[0].pos[1]
                         movement_box = None
-
+                # Remove movement restriction
                 elif not free:
                     if not pygame.sprite.spritecollide(player.movement_point, old_movement_box, False):
                         free = True
-                        
+                # Move player
                 player_pos.x += player_movement[0] * movement_speed * dt
                 player_pos.y += player_movement[1] * movement_speed * dt
             else:
