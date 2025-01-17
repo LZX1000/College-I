@@ -64,6 +64,7 @@ def main():
                 super().__init__()
 
                 self.image, self.rect = image_stuff("assets/GameCharacter.png", pos, pixelation_factor, size)
+                self.old_pos = pos
                 self.angle = angle
         
             def update(self, display_surface, pos):
@@ -81,6 +82,8 @@ def main():
             super().__init__()
 
             self.image, self.rect = image_stuff("assets/GameCharacter.png", pos, pixelation_factor, size)
+            self.pos = pos
+            self.old_pos = pos
             self.angle = angle
             
             self.nose = self.Nose(self)
@@ -249,13 +252,13 @@ def main():
                 # Player Settings
                 movement_speed = 160
                 tail_list = []
-                player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
                 # # Food Settings
                 max_food = 3
                 food_list = []
                 food_ghost_list = []
                 # # General Initialization
-                player = GamePlayer(player_pos)
+                player_starting_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+                player = GamePlayer(player_starting_pos)
                 player_movement = (0, 0)
                 new = False
                 free = True
@@ -264,7 +267,7 @@ def main():
             if keys[pygame.K_ESCAPE]:
                 gamestate = "menu"
             if keys[pygame.K_r]:
-                player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+                player.pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
             # Movement detection
             if keys[pygame.K_w] or keys[pygame.K_UP]:
                 if player_movement != (0, 1):
@@ -287,6 +290,18 @@ def main():
                     requested_direction = (1, 0)
                     requested_movement = True
 
+            # Tail movement
+            for i in range(2):
+                if abs(player.rect.center[i] - player.old_pos[i]) >= player.rect.width:
+                    for i, tail in enumerate(tail_list):
+                        if i == 0:
+                            tail.rect.center = player.old_pos
+                        else:
+                            tail.rect.center = tail_list[i - 1].old_pos
+                            tail.old_pos = tail.rect.center
+                    player.rect.center = player.old_pos
+                    player.old_pos = player.rect.center
+
             # Player checks
             if background.grass.rect.collidepoint(player.nose.pos):
                 # Food ghost check
@@ -305,7 +320,7 @@ def main():
                         food_ghost = FoodGhost(food.rect)
                         food_ghost_list.append(food_ghost)
                         food_list.remove(food)
-                        new_tail = player.Tail(player_pos)
+                        new_tail = player.Tail(player.pos)
                         tail_list.append(new_tail)
                 # Movement restriction
                 if requested_movement and requested_direction != player_movement and free:
@@ -316,16 +331,16 @@ def main():
                         requested_movement = False
                         free = False
                         player_movement = requested_direction
-                        player_pos.x = movement_box[0].pos[0]
-                        player_pos.y = movement_box[0].pos[1]
+                        player.pos.x = movement_box[0].pos[0]
+                        player.pos.y = movement_box[0].pos[1]
                         movement_box = None
                 # Remove movement restriction
                 elif not free:
                     if not pygame.sprite.spritecollide(player.movement_point, old_movement_box, False):
                         free = True
                 # Move player
-                player_pos.x += player_movement[0] * movement_speed * dt
-                player_pos.y += player_movement[1] * movement_speed * dt
+                player.pos.x += player_movement[0] * movement_speed * dt
+                player.pos.y += player_movement[1] * movement_speed * dt
             # Out of bounds
             else:
                 new = True
@@ -342,7 +357,7 @@ def main():
             for tail in tail_list:
                 tail.update(internal_surface, tail.rect.center)
                 tail.debug(internal_surface)
-            player.update(internal_surface, player_pos)
+            player.update(internal_surface, player.pos)
             player.debug(internal_surface)
             # Food Ghost
             for food_ghost in food_ghost_list:
