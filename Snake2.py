@@ -75,7 +75,7 @@ def main():
                 display_surface.blit(rotated_image, rotated_rect.topleft)
             
             def debug(self, internal_surface):
-                pygame.draw.rect(internal_surface, (0, 255, 0), self.rect, 1)
+                pygame.draw.rect(internal_surface, (0, 0, 0), self.rect, 1)
 
         def __init__(self, pos, angle=0, size=None):
             super().__init__()
@@ -99,6 +99,15 @@ def main():
         def debug(self, internal_surface):
             self.nose.debug(internal_surface)
             self.movement_point.debug(internal_surface)
+
+    class FoodGhost(pygame.sprite.Sprite):
+        def __init__(self, food_rect):
+            super().__init__()
+
+            self.rect = food_rect
+
+        def debug(self, internal_surface):
+            pygame.draw.rect(internal_surface, (30, 30, 30), self.rect, 1)
 
     class GameFood(pygame.sprite.Sprite):
         def __init__(self, pos, size=None):
@@ -238,12 +247,13 @@ def main():
         elif gamestate == "game":
             if new:
                 # Player Settings
-                movement_speed = 120
+                movement_speed = 160
                 tail_list = []
                 player_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
                 # # Food Settings
                 max_food = 3
                 food_list = []
+                food_ghost_list = []
                 # # General Initialization
                 player = GamePlayer(player_pos)
                 player_movement = (0, 0)
@@ -277,11 +287,23 @@ def main():
                     requested_direction = (1, 0)
                     requested_movement = True
 
-            # Player movement
+            # Player checks
             if background.grass.rect.collidepoint(player.nose.pos):
+                # Food ghost check
+                for food_ghost in food_ghost_list:
+                    if not player.rect.colliderect(food_ghost.rect):
+                        food_ghost_list.remove(food_ghost)
+                # Tail collision
+                if len(food_ghost_list) == 0:
+                    for tail in tail_list:
+                        if player.nose.rect.colliderect(tail.rect):
+                            new = True
+                            gamestate = "menu"
                 # Food collision
                 for food in food_list:
                     if player.nose.rect.colliderect(food.rect):
+                        food_ghost = FoodGhost(food.rect)
+                        food_ghost_list.append(food_ghost)
                         food_list.remove(food)
                         new_tail = player.Tail(player_pos)
                         tail_list.append(new_tail)
@@ -304,6 +326,7 @@ def main():
                 # Move player
                 player_pos.x += player_movement[0] * movement_speed * dt
                 player_pos.y += player_movement[1] * movement_speed * dt
+            # Out of bounds
             else:
                 new = True
                 gamestate = "menu"
@@ -317,10 +340,13 @@ def main():
             render_food(food_list, debug=True)
             # Render Player
             for tail in tail_list:
-                tail.update(internal_surface, player_pos)
+                tail.update(internal_surface, tail.rect.center)
                 tail.debug(internal_surface)
             player.update(internal_surface, player_pos)
             player.debug(internal_surface)
+            # Food Ghost
+            for food_ghost in food_ghost_list:
+                food_ghost.debug(internal_surface)
 
             # Upscale to 1920x1080
             scaled_surface = pygame.transform.scale(internal_surface, screen_size)
