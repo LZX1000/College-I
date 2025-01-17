@@ -248,21 +248,28 @@ def main():
             screen.blit(scaled_surface, (0, 0))
         
         elif gamestate == "game":
+            # Game Initialization
             if new:
-                # Player Settings
+                # Player
+                player_movement = (0, 0)
                 movement_speed = 160
                 tail_list = []
-                # # Food Settings
+                player_starting_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+                player = GamePlayer(player_starting_pos)
+                # Food Settings
                 max_food = 3
                 food_list = []
                 food_ghost_list = []
-                # # General Initialization
-                player_starting_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
-                player = GamePlayer(player_starting_pos)
-                player_movement = (0, 0)
+                # General Initialization
+                points = 0
                 new = False
                 free = True
                 requested_movement = False
+                endgame = False
+            # Endgame
+            elif endgame:
+                new = True
+                gamestate = "menu"
             # Misc inputs
             if keys[pygame.K_ESCAPE]:
                 gamestate = "menu"
@@ -312,14 +319,16 @@ def main():
                 if len(food_ghost_list) == 0:
                     for tail in tail_list:
                         if player.nose.rect.colliderect(tail.rect):
-                            new = True
-                            gamestate = "menu"
+                            endgame = True
                 # Food collision
                 for food in food_list:
                     if player.nose.rect.colliderect(food.rect):
+                        points += 1
+                        # Food/Ghost
                         food_ghost = FoodGhost(food.rect)
                         food_ghost_list.append(food_ghost)
                         food_list.remove(food)
+                        # Tail
                         new_tail = player.Tail(player.pos)
                         tail_list.append(new_tail)
                 # Movement restriction
@@ -343,8 +352,7 @@ def main():
                 player.pos.y += player_movement[1] * movement_speed * dt
             # Out of bounds
             else:
-                new = True
-                gamestate = "menu"
+                endgame = True
 
             # Render in 640x360
             internal_surface.fill((36, 201, 29)) # Sub-background
