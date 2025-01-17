@@ -64,7 +64,7 @@ def main():
                 super().__init__()
 
                 self.image, self.rect = image_stuff("assets/GameCharacter.png", pos, pixelation_factor, size)
-                self.old_pos = pos
+                self.pos = pos
                 self.angle = angle
         
             def update(self, display_surface, pos):
@@ -83,7 +83,6 @@ def main():
 
             self.image, self.rect = image_stuff("assets/GameCharacter.png", pos, pixelation_factor, size)
             self.pos = pos
-            self.old_pos = pos
             self.angle = angle
             
             self.nose = self.Nose(self)
@@ -254,6 +253,7 @@ def main():
                 player_movement = (0, 0)
                 movement_speed = 160
                 tail_list = []
+                movement_box_list = []
                 player_starting_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
                 player = GamePlayer(player_starting_pos)
                 # Food Settings
@@ -263,6 +263,7 @@ def main():
                 # General Initialization
                 points = 0
                 new = False
+                in_use = False
                 free = True
                 requested_movement = False
                 endgame = False
@@ -277,37 +278,39 @@ def main():
                 player.pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
             # Movement detection
             if keys[pygame.K_w] or keys[pygame.K_UP]:
-                if player_movement != (0, 1):
+                if player_movement != (0, 1) and player_movement != (0, -1):
                     player.angle = 0
                     requested_direction = (0, -1)
                     requested_movement = True
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-                if player_movement != (0, -1):
+                if player_movement != (0, -1) and player_movement != (0, 1):
                     player.angle = 180
                     requested_direction = (0, 1)
                     requested_movement = True
             elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
-                if player_movement != (1, 0):
+                if player_movement != (1, 0) and player_movement != (-1, 0):
                     player.angle = 90
                     requested_direction = (-1, 0)
                     requested_movement = True
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-                if player_movement != (-1, 0):
+                if player_movement != (-1, 0) and player_movement != (1, 0):
                     player.angle = 270
                     requested_direction = (1, 0)
                     requested_movement = True
 
-            # Tail movement
-            for i in range(2):
-                if abs(player.rect.center[i] - player.old_pos[i]) >= player.rect.width:
-                    for i, tail in enumerate(tail_list):
-                        if i == 0:
-                            tail.rect.center = player.old_pos
-                        else:
-                            tail.rect.center = tail_list[i - 1].old_pos
-                            tail.old_pos = tail.rect.center
-                    player.rect.center = player.old_pos
-                    player.old_pos = player.rect.center
+            # Tail handling
+            # # Turn boxes
+            for turning_box in movement_box_list:
+                for tail in tail_list:
+                    if pygame.sprite.spritecollide(player.movement_point, turning_box, False):
+                        in_use = True
+                if not in_use:
+                    movement_box_list.remove(turning_box)
+                in_use = False
+            # # Tail movement
+            for tail in tail_list:
+                tail.pos.x += player_movement[0] * movement_speed * dt
+                tail.pos.y += player_movement[1] * movement_speed * dt
 
             # Player checks
             if background.grass.rect.collidepoint(player.nose.pos):
@@ -337,6 +340,7 @@ def main():
                     # Keep player centered on blocks
                     if movement_box:
                         old_movement_box = movement_box
+                        movement_box_list.append(old_movement_box)
                         requested_movement = False
                         free = False
                         player_movement = requested_direction
