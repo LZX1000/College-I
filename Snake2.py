@@ -147,7 +147,7 @@ def main():
             def __init__(self, pos, size=None, width=11):
                 super().__init__()
 
-                self.image, self.rect = image_stuff("assets/SnakeBackgroundGrass1.png", pos, pixelation_factor, size)
+                self.image, self.rect = image_stuff("assets/SnakeBackgroundGrass2.png", pos, pixelation_factor * 2, size)    #Fix pixelation factor
 
                 self.block_width = self.image.get_width() / width
                 self.blocks_list = []
