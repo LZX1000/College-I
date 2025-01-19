@@ -298,20 +298,6 @@ def main():
                     requested_direction = (1, 0)
                     requested_movement = True
 
-            # Tail handling
-            # # Turn boxes
-            for turning_box in movement_box_list:
-                for tail in tail_list:
-                    if pygame.sprite.spritecollide(player.movement_point, turning_box, False):
-                        in_use = True
-                if not in_use:
-                    movement_box_list.remove(turning_box)
-                in_use = False
-            # # Tail movement
-            for tail in tail_list:
-                tail.pos.x += player_movement[0] * movement_speed * dt
-                tail.pos.y += player_movement[1] * movement_speed * dt
-
             # Player checks
             if background.grass.rect.collidepoint(player.nose.pos):
                 # Food ghost check
@@ -354,6 +340,19 @@ def main():
                 # Move player
                 player.pos.x += player_movement[0] * movement_speed * dt
                 player.pos.y += player_movement[1] * movement_speed * dt
+                # Tail handling
+                # # Turn boxes
+                for turning_box in movement_box_list:
+                    for tail in tail_list:
+                        if pygame.sprite.spritecollide(player.movement_point, turning_box, False):
+                            in_use = True
+                    if not in_use:
+                        movement_box_list.remove(turning_box)
+                    in_use = False
+                # # Tail movement
+                for tail in tail_list:
+                    tail.pos.x += player_movement[0] * movement_speed * dt
+                    tail.pos.y += player_movement[1] * movement_speed * dt
             # Out of bounds
             else:
                 endgame = True
