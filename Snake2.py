@@ -253,8 +253,9 @@ def main():
                 player_movement = (0, 0)
                 movement_speed = 160
                 tail_list = []
-                movement_box_list = []
                 player_starting_pos = pygame.Vector2((internal_width // 2), (internal_height // 2))
+                player_path = [pygame.Vector2(player_starting_pos)]
+                max_path_length = len(background.grass.blocks_list)
                 player = GamePlayer(player_starting_pos)
                 # Food Settings
                 max_food = 3
@@ -326,7 +327,6 @@ def main():
                     # Keep player centered on blocks
                     if movement_box:
                         old_movement_box = movement_box
-                        movement_box_list.append(old_movement_box)
                         requested_movement = False
                         free = False
                         player_movement = requested_direction
@@ -340,19 +340,21 @@ def main():
                 # Move player
                 player.pos.x += player_movement[0] * movement_speed * dt
                 player.pos.y += player_movement[1] * movement_speed * dt
-                # Tail handling
-                # # Turn boxes
-                for turning_box in movement_box_list:
-                    for tail in tail_list:
-                        if pygame.sprite.spritecollide(player.movement_point, turning_box, False):
-                            in_use = True
-                    if not in_use:
-                        movement_box_list.remove(turning_box)
-                    in_use = False
-                # # Tail movement
+
+                player_path.insert(0, pygame.Vector2(player.pos))
+                if len(player_path) > max_path_length:
+                    endgame = True
+
+                for i, tail in enumerate(tail_list):
+                    if len(player_path) > i * player.rect.width:
+                        tail.pos = player_path[(i + 1) * player.rect.width]
+                    else:
+                        break
                 for tail in tail_list:
                     tail.pos.x += player_movement[0] * movement_speed * dt
                     tail.pos.y += player_movement[1] * movement_speed * dt
+                # Tail handling
+
             # Out of bounds
             else:
                 endgame = True
