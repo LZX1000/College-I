@@ -114,7 +114,7 @@ def main():
         legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_balls}", False, (0, 0, 0))
         if len(balls) > 0:
             most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
-            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (0, 0, 0))
+            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (255, 0, 0))
         # # Blit to Balls Menu
         balls_menu_surface.fill((255, 255, 255)) # Sub-background
         balls_menu_surface.blit(common_ball_count_text_surface, (0, 40))
