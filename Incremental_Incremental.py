@@ -74,7 +74,6 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     player_money += player_money_per_click
-
         # Handle keypresses
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
@@ -154,6 +153,9 @@ def main():
         pygame.display.flip()
         # Tick Speed
         dt = clock.tick(max_fps) / 1000
+
+    # Save
+    
 
 if __name__ == "__main__":
     main()
