@@ -9,15 +9,19 @@ def main():
             rarity = random.randint(1, 100)
             if rarity <= 50:
                 self.rarity = "Common"
+                self.color = (0, 0, 0)
                 self.money_value = 1
             elif rarity <= 80:
                 self.rarity = "Rare"
+                self.color = (0, 0, 255)
                 self.money_value = 5
             elif rarity <= 95:
                 self.rarity = "Epic"
+                self.color = (255, 0, 255)
                 self.money_value = 25
             else:
                 self.rarity = "Legendary"
+                self.color = (255, 0, 0)
                 self.money_value = 100
             
             self.time = time.monotonic()
@@ -49,6 +53,7 @@ def main():
 
     running = True
     new = True # Change when adding saving
+    enter_press_override = False
     max_fps = 60
     dt = 0
 
@@ -80,14 +85,23 @@ def main():
             running = False
     
         if keys[pygame.K_RETURN]:
-            if not enter_pressed:
+            if not enter_pressed or enter_press_override:
                 enter_pressed = True
+                enter_timer = time.monotonic()
                 if player_money >= new_ball_cost:
                     player_money -= new_ball_cost
                     new_ball_cost = (len(balls) ** 2) + 10
                     unresolved_balls.append(0)
+            else:
+                if time.monotonic() - enter_timer >= 0.25:
+                    enter_pressed = False
+                    enter_press_override = True
         else:
             enter_pressed = False
+            enter_press_override = False
+        
+        if keys[pygame.K_LCTRL] and keys[pygame.K_q]:
+            player_money += 100000
         
         if len(unresolved_balls) > 0:
             for _ in unresolved_balls:
@@ -119,17 +133,8 @@ def main():
         epic_ball_count_text_surface = font.render(f"Epic Balls : {epic_ball_count}", False, (0, 0, 0))
         legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_ball_count}", False, (0, 0, 0))
         if len(balls) > 0:
-            if balls[-1].rarity == "Common":
-                most_recent_ball_rarity_color = (0, 0, 0)
-            elif balls[-1].rarity == "Rare":
-                most_recent_ball_rarity_color = (0, 0, 255)
-            elif balls[-1].rarity == "Epic":
-                most_recent_ball_rarity_color = (255, 0, 255)
-            else:
-                most_recent_ball_rarity_color = (255, 255, 0)
-
             most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
-            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, most_recent_ball_rarity_color)
+            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (balls[-1].color))
         # # Blit to Balls Menu
         balls_menu_surface.fill((255, 255, 255)) # Sub-background
         balls_menu_surface.blit(common_ball_count_text_surface, (0, 40))
@@ -155,7 +160,7 @@ def main():
         dt = clock.tick(max_fps) / 1000
 
     # Save
-    
+
 
 if __name__ == "__main__":
     main()
