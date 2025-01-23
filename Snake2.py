@@ -9,14 +9,15 @@ def main():
     pygame.display.set_caption("Snake")
     clock = pygame.time.Clock()
 
-    def image_stuff(source_image, pos, pixelation_factor, size=None):
+    def image_stuff(source_image, pos, pixelation_factor, size=None, rect=True):
         source_image = pygame.image.load(f"{source_image}")
         original_size = source_image.get_size()
         if size is None:
             size = (original_size[0] * pixelation_factor,
                     original_size[1] * pixelation_factor)
         image = pygame.transform.scale(source_image, size)
-        rect = image.get_rect(center=pos)
+        if rect:
+            rect = image.get_rect(center=pos)
         return image, rect
 
     class GamePlayer(pygame.sprite.Sprite):
@@ -136,20 +137,22 @@ def main():
                 self.rect.center = pos
 
         class GameBlock(pygame.sprite.Sprite):
-            def __init__(self, pos, block_width):
+            def __init__(self, pos, block_type):
                 super().__init__()
                 self.pos = pos
                 self.collision_point = pygame.Vector2(self.pos)
-                self.rect = pygame.rect.Rect(pos[0] - block_width / 2, pos[1] - block_width / 2,
-                                             block_width, block_width)
+                if block_type // 2 == 0:
+                    self.image = image_stuff("assets/SnakeBackgroundGrass1.png", self.pos, pixelation_factor*2, rect=False)
+                else:
+                    self.image = image_stuff("assets/SnakeBackgroundGrass2.png", self.pos, pixelation_factor*2, rect=False)
+                self.block_width = self.image.get_width()
+                self.rect = pygame.rect.Rect(pos[0] - self.block_width / 2, pos[1] - self.block_width / 2,
+                                             self.block_width, self.block_width)
 
         class Grass(pygame.sprite.Sprite):
-            def __init__(self, pos, size=None, width=11):
+            def __init__(self, width=11):
                 super().__init__()
-
-                self.image, self.rect = image_stuff("assets/SnakeBackgroundGrass2.png", pos, pixelation_factor * 2, size)    #Fix pixelation factor
-
-                self.block_width = self.image.get_width() / width
+                self.block_width = 176 / width
                 self.blocks_list = []
                 for i in range(width):
                     block_height_pos = self.rect.topleft[1] + i * self.block_width + self.block_width / 2
@@ -160,8 +163,14 @@ def main():
                         self.blocks_list.append(block)
                 self.blocks_group = pygame.sprite.Group(self.blocks_list)
         
-            def update(self, display_surface, pos):
-                display_surface.blit(self.image, self.rect.topleft)
+            def update(self, display_surface):
+                block_type = 1
+                for block in self.blocks_list:
+                    if block_type // 2 == 0:
+                        display_surface.blit(self.image, block.rect.topleft)
+                    else:
+                        display_surface.blit(self.image, block.rect.topleft)
+                    block_type += 1
             
             def debug(self, internal_surface):
                 for block in self.blocks_list:
@@ -179,15 +188,15 @@ def main():
                 self.rect.center = pos
 
         def __init__(self, pos, size=None):
-            self.grass = self.Grass(pos, size)
-            self.edge = self.Edge(pos, size)
-            self.menu = self.Menu(pos, size)
+            self.grass = self.Grass(size)
+            self.edge = self.Edge(size)
+            self.menu = self.Menu(size)
 
             self.grass_group = pygame.sprite.Group(self.grass)
 
-        def game_update(self, display_surface, pos):
-            self.grass.update(display_surface, pos)
-            self.edge.update(display_surface, pos)
+        def game_update(self, display_surface):
+            self.grass.update(display_surface)
+            self.edge.update(display_surface)
         
         def menu_update(self, display_surface, pos):
             self.menu.update(display_surface, pos)
@@ -361,7 +370,7 @@ def main():
 
             # Render in 640x360
             internal_surface.fill((36, 201, 29)) # Sub-background
-            background.game_update(internal_surface, background_pos)
+            background.game_update(internal_surface)
             background.grass.debug(internal_surface)
             # Food
             food_list = spawn_food(max_food, food_list)
