@@ -53,51 +53,54 @@ def main():
     dt = 0
 
     while running:
+        # Reset
         if new:
             player_money = 100
             player_money_per_click = 1
             new_ball_cost = 10
             balls = []
             unresolved_balls = []
-            legendary_balls = 0
-            epic_balls = 0
-            rare_balls = 0
-            common_balls = 0
+            legendary_ball_count = 0
+            epic_ball_count = 0
+            rare_ball_count = 0
+            common_ball_count = 0
             new = False
-        # Exit game
+
+        # Event Handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            
+            # Handle mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     player_money += player_money_per_click
-                    
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-            
-                elif event.key == pygame.K_RETURN:
-                    if not enter_pressed:
-                        enter_pressed = True
-                        if player_money >= new_ball_cost:
-                            player_money -= new_ball_cost
-                            new_ball_cost = (len(balls) ** 2) + 10
-                            unresolved_balls.append(0)
-                else:
-                    enter_pressed = False
+
+        # Handle keypresses
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            running = False
+    
+        if keys[pygame.K_RETURN]:
+            if not enter_pressed:
+                enter_pressed = True
+                if player_money >= new_ball_cost:
+                    player_money -= new_ball_cost
+                    new_ball_cost = (len(balls) ** 2) + 10
+                    unresolved_balls.append(0)
+        else:
+            enter_pressed = False
         
         if len(unresolved_balls) > 0:
             for _ in unresolved_balls:
                 new_ball = Ball()
                 if new_ball.rarity == "Common":
-                    common_balls += 1
+                    common_ball_count += 1
                 elif new_ball.rarity == "Rare":
-                    rare_balls += 1
+                    rare_ball_count += 1
                 elif new_ball.rarity == "Epic":
-                    epic_balls += 1
+                    epic_ball_count += 1
                 else:
-                    legendary_balls += 1
+                    legendary_ball_count += 1
                 balls.append(new_ball)
                 unresolved_balls.remove(0)
 
@@ -112,13 +115,22 @@ def main():
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
         balls_menu_text_surface = font.render("Balls Menu", False, (0, 0, 0))
         # Balls Menu
-        common_ball_count_text_surface = font.render(f"Common Balls : {common_balls}", False, (0, 0, 0))
-        rare_ball_count_text_surface = font.render(f"Rare Balls : {rare_balls}", False, (0, 0, 0))
-        epic_ball_count_text_surface = font.render(f"Epic Balls : {epic_balls}", False, (0, 0, 0))
-        legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_balls}", False, (0, 0, 0))
+        common_ball_count_text_surface = font.render(f"Common Balls : {common_ball_count}", False, (0, 0, 0))
+        rare_ball_count_text_surface = font.render(f"Rare Balls : {rare_ball_count}", False, (0, 0, 0))
+        epic_ball_count_text_surface = font.render(f"Epic Balls : {epic_ball_count}", False, (0, 0, 0))
+        legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_ball_count}", False, (0, 0, 0))
         if len(balls) > 0:
+            if balls[-1].rarity == "Common":
+                most_recent_ball_rarity_color = (0, 0, 0)
+            elif balls[-1].rarity == "Rare":
+                most_recent_ball_rarity_color = (0, 0, 255)
+            elif balls[-1].rarity == "Epic":
+                most_recent_ball_rarity_color = (255, 0, 255)
+            else:
+                most_recent_ball_rarity_color = (255, 255, 0)
+
             most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
-            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (255, 0, 0))
+            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, most_recent_ball_rarity_color)
         # # Blit to Balls Menu
         balls_menu_surface.fill((255, 255, 255)) # Sub-background
         balls_menu_surface.blit(common_ball_count_text_surface, (0, 40))
