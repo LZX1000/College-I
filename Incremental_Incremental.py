@@ -53,6 +53,7 @@ def main():
 
     running = True
     new = True # Change when adding saving
+    menu_type = "Main"
     enter_press_override = False
     max_fps = 60
     dt = 0
@@ -79,6 +80,11 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     player_money += player_money_per_click
+                elif event.button == 3:
+                    if menu_type == "Main":
+                        menu_type = "Balls"
+                    elif menu_type == "Balls":
+                        menu_type = "Main"
         # Handle keypresses
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
@@ -135,28 +141,30 @@ def main():
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
         balls_menu_text_surface = font.render("Balls Menu", False, (0, 0, 0))
         # Balls Menu
-        common_ball_count_text_surface = font.render(f"Common Balls : {common_ball_count}", False, (0, 0, 0))
-        rare_ball_count_text_surface = font.render(f"Rare Balls : {rare_ball_count}", False, (0, 0, 0))
-        epic_ball_count_text_surface = font.render(f"Epic Balls : {epic_ball_count}", False, (0, 0, 0))
-        legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_ball_count}", False, (0, 0, 0))
-        if len(balls) > 0:
-            most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
-            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (balls[-1].color))
-        # # Blit to Balls Menu
-        balls_menu_surface.fill((255, 255, 255)) # Sub-background
-        balls_menu_surface.blit(common_ball_count_text_surface, (0, 40))
-        balls_menu_surface.blit(rare_ball_count_text_surface, (0, 60))
-        balls_menu_surface.blit(epic_ball_count_text_surface, (0, 80))
-        balls_menu_surface.blit(legendary_ball_count_text_surface, (0, 100))
-        if len(balls) > 0:
-            balls_menu_surface.blit(most_recent_ball_text_surface1, (0, 140))
-            balls_menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
-        internal_surface.blit(balls_menu_surface, ((internal_width / 3) * 2, 0))
+        if menu_type == "Balls":
+            common_ball_count_text_surface = font.render(f"Common Balls : {common_ball_count}", False, (0, 0, 0))
+            rare_ball_count_text_surface = font.render(f"Rare Balls : {rare_ball_count}", False, (0, 0, 0))
+            epic_ball_count_text_surface = font.render(f"Epic Balls : {epic_ball_count}", False, (0, 0, 0))
+            legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_ball_count}", False, (0, 0, 0))
+            if len(balls) > 0:
+                most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
+                most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (balls[-1].color))
+            # # Blit to Balls Menu
+            balls_menu_surface.fill((255, 255, 255)) # Sub-background
+            balls_menu_surface.blit(common_ball_count_text_surface, (0, 40))
+            balls_menu_surface.blit(rare_ball_count_text_surface, (0, 60))
+            balls_menu_surface.blit(epic_ball_count_text_surface, (0, 80))
+            balls_menu_surface.blit(legendary_ball_count_text_surface, (0, 100))
+            if len(balls) > 0:
+                balls_menu_surface.blit(most_recent_ball_text_surface1, (0, 140))
+                balls_menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
+            internal_surface.blit(balls_menu_surface, ((internal_width / 3) * 2, 0))
         # Blit to internal_surface
+        if menu_type == "Balls":
+            internal_surface.blit(balls_menu_text_surface, ((internal_width / 3) * 2, 0))
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
         internal_surface.blit(owned_balls_text_surface, (0, 40))
-        internal_surface.blit(balls_menu_text_surface, ((internal_width / 3) * 2, 0))
 
         # Upscale to 1920x1080
         scaled_surface = pygame.transform.scale(internal_surface, screen_size)
