@@ -60,7 +60,7 @@ def main():
         if new:
             player_money = 100
             player_money_per_click = 1
-            new_ball_cost = 0
+            new_ball_cost = 10
             balls = []
             unresolved_balls = []
             new = False
@@ -68,16 +68,21 @@ def main():
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             running = False
-        elif keys[pygame.K_RETURN]:
-            if player_money >= new_ball_cost:
-                player_money -= new_ball_cost
-                new_ball_cost = len(balls) ** 4 + 10
-                unresolved_balls.append(0)
+        if keys[pygame.K_RETURN]:
+            if not enter_pressed:
+                enter_pressed = True
+                if player_money >= new_ball_cost:
+                    player_money -= new_ball_cost
+                    new_ball_cost = (len(balls) ** 2) + 10
+                    unresolved_balls.append(0)
+        else:
+            enter_pressed = False
         
         if len(unresolved_balls) > 0:
             for _ in unresolved_balls:
                 new_ball = Ball()
                 balls.append(new_ball)
+                unresolved_balls.remove(0)
 
         for ball in balls:
             player_money += ball.check_for_payount()
@@ -87,8 +92,10 @@ def main():
         # background.game_update(internal_surface)
         money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0)) # For text
         ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0)) # For text
+        owned_balls_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0)) # For text
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
+        internal_surface.blit(owned_balls_surface, (0, 40))
 
         # Upscale to 1920x1080
         scaled_surface = pygame.transform.scale(internal_surface, screen_size)
