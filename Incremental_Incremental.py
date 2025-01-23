@@ -85,15 +85,22 @@ def main():
             running = False
     
         if keys[pygame.K_RETURN]:
-            if not enter_pressed or enter_press_override:
+            if not enter_pressed:
                 enter_pressed = True
                 enter_timer = time.monotonic()
                 if player_money >= new_ball_cost:
                     player_money -= new_ball_cost
                     new_ball_cost = (len(balls) ** 2) + 10
                     unresolved_balls.append(0)
+                    enter_interval_timer = time.monotonic()
+            elif not enter_press_override:
+                if player_money >= new_ball_cost and time.monotonic() - enter_interval_timer >= 0.1:
+                    player_money -= new_ball_cost
+                    new_ball_cost = (len(balls) ** 2) + 10
+                    unresolved_balls.append(0)
+                    enter_interval_timer = time.monotonic()
             else:
-                if time.monotonic() - enter_timer >= 0.25:
+                if time.monotonic() - enter_timer >= 0.5:
                     enter_pressed = False
                     enter_press_override = True
         else:
