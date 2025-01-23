@@ -44,6 +44,7 @@ def main():
     pixelation_factor = 2
     # # Surfaces
     internal_surface = pygame.Surface((internal_width, internal_height)) # For rendering
+    balls_menu_surface = pygame.Surface((internal_width / 3, internal_height)) # For rendering
     screen = pygame.display.set_mode(screen_size) # pygame.FULLSCREEN
 
     running = True
@@ -90,12 +91,18 @@ def main():
         # Render in 640x360
         internal_surface.fill((180, 180, 180)) # Sub-background
         # background.game_update(internal_surface)
-        money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0)) # For text
-        ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0)) # For text
-        owned_balls_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0)) # For text
+        money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0))
+        ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0))
+        owned_balls_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
+        balls_menu_surface_text = font.render("Balls Menu", False, (0, 0, 0))
+        # Balls Menu
+        balls_menu_surface.fill((255, 255, 255)) # Sub-background
+        internal_surface.blit(balls_menu_surface, ((internal_width / 3) * 2, 0))
+        # Blit to internal_surface
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
         internal_surface.blit(owned_balls_surface, (0, 40))
+        internal_surface.blit(balls_menu_surface_text, ((internal_width / 3) * 2, 0))
 
         # Upscale to 1920x1080
         scaled_surface = pygame.transform.scale(internal_surface, screen_size)
