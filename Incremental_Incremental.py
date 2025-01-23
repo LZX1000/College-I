@@ -53,11 +53,6 @@ def main():
     dt = 0
 
     while running:
-        # Exit game
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
         if new:
             player_money = 100
             player_money_per_click = 1
@@ -69,19 +64,28 @@ def main():
             rare_balls = 0
             common_balls = 0
             new = False
-        
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE]:
-            running = False
-        if keys[pygame.K_RETURN]:
-            if not enter_pressed:
-                enter_pressed = True
-                if player_money >= new_ball_cost:
-                    player_money -= new_ball_cost
-                    new_ball_cost = (len(balls) ** 2) + 10
-                    unresolved_balls.append(0)
-        else:
-            enter_pressed = False
+        # Exit game
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    player_money += player_money_per_click
+                    
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            
+                elif event.key == pygame.K_RETURN:
+                    if not enter_pressed:
+                        enter_pressed = True
+                        if player_money >= new_ball_cost:
+                            player_money -= new_ball_cost
+                            new_ball_cost = (len(balls) ** 2) + 10
+                            unresolved_balls.append(0)
+                else:
+                    enter_pressed = False
         
         if len(unresolved_balls) > 0:
             for _ in unresolved_balls:
