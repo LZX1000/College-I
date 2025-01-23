@@ -64,6 +64,10 @@ def main():
             new_ball_cost = 10
             balls = []
             unresolved_balls = []
+            legendary_balls = 0
+            epic_balls = 0
+            rare_balls = 0
+            common_balls = 0
             new = False
         
         keys = pygame.key.get_pressed()
@@ -82,6 +86,14 @@ def main():
         if len(unresolved_balls) > 0:
             for _ in unresolved_balls:
                 new_ball = Ball()
+                if new_ball.rarity == "Common":
+                    common_balls += 1
+                elif new_ball.rarity == "Rare":
+                    rare_balls += 1
+                elif new_ball.rarity == "Epic":
+                    epic_balls += 1
+                else:
+                    legendary_balls += 1
                 balls.append(new_ball)
                 unresolved_balls.remove(0)
 
@@ -93,16 +105,31 @@ def main():
         # background.game_update(internal_surface)
         money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0))
         ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0))
-        owned_balls_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
-        balls_menu_surface_text = font.render("Balls Menu", False, (0, 0, 0))
+        owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
+        balls_menu_text_surface = font.render("Balls Menu", False, (0, 0, 0))
         # Balls Menu
+        common_ball_count_text_surface = font.render(f"Common Balls : {common_balls}", False, (0, 0, 0))
+        rare_ball_count_text_surface = font.render(f"Rare Balls : {rare_balls}", False, (0, 0, 0))
+        epic_ball_count_text_surface = font.render(f"Epic Balls : {epic_balls}", False, (0, 0, 0))
+        legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_balls}", False, (0, 0, 0))
+        if len(balls) > 0:
+            most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
+            most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (0, 0, 0))
+        # # Blit to Balls Menu
         balls_menu_surface.fill((255, 255, 255)) # Sub-background
+        balls_menu_surface.blit(common_ball_count_text_surface, (0, 40))
+        balls_menu_surface.blit(rare_ball_count_text_surface, (0, 60))
+        balls_menu_surface.blit(epic_ball_count_text_surface, (0, 80))
+        balls_menu_surface.blit(legendary_ball_count_text_surface, (0, 100))
+        if len(balls) > 0:
+            balls_menu_surface.blit(most_recent_ball_text_surface1, (0, 140))
+            balls_menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
         internal_surface.blit(balls_menu_surface, ((internal_width / 3) * 2, 0))
         # Blit to internal_surface
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
-        internal_surface.blit(owned_balls_surface, (0, 40))
-        internal_surface.blit(balls_menu_surface_text, ((internal_width / 3) * 2, 0))
+        internal_surface.blit(owned_balls_text_surface, (0, 40))
+        internal_surface.blit(balls_menu_text_surface, ((internal_width / 3) * 2, 0))
 
         # Upscale to 1920x1080
         scaled_surface = pygame.transform.scale(internal_surface, screen_size)
