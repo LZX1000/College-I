@@ -7,15 +7,15 @@ def main():
     class Ball:
         def __init__(self):
             rarity = random.randint(1, 100)
-            if rarity <= 50:
+            if rarity <= 75:
                 self.rarity = "Common"
                 self.color = (0, 0, 0)
                 self.money_value = 1
-            elif rarity <= 80:
+            elif rarity <= 95:
                 self.rarity = "Rare"
                 self.color = (0, 0, 255)
                 self.money_value = 5
-            elif rarity <= 95:
+            elif rarity <= 99:
                 self.rarity = "Epic"
                 self.color = (255, 0, 255)
                 self.money_value = 25
@@ -140,13 +140,13 @@ def main():
                 enter_timer = time.monotonic()
                 if player_money >= new_ball_cost:
                     player_money -= new_ball_cost
-                    new_ball_cost = (len(balls) ** 2) + 10
+                    new_ball_cost = int(round(len(balls) ** 2) / 2 + 11)
                     unresolved_balls.append(0)
                     enter_interval_timer = time.monotonic()
             elif not enter_press_override:
                 if player_money >= new_ball_cost and time.monotonic() - enter_interval_timer >= 0.1:
                     player_money -= new_ball_cost
-                    new_ball_cost = (len(balls) ** 2) + 10
+                    new_ball_cost = int(round(len(balls) ** 2) / 2 + 11)
                     unresolved_balls.append(0)
                     enter_interval_timer = time.monotonic()
             else:
