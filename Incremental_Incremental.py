@@ -33,18 +33,34 @@ def main():
             return 0
         
     class BallsMenuButton(pygame.sprite.Sprite):
-        def __init__(self, menu_surface):
+        def __init__(self, menu_surface, menu_offset, x_offset=0, y_offset=0):
             super().__init__()
 
             self.text_surface = font.render("Balls", False, (0, 0, 0))
-            self.rect = pygame.Rect(0, 0, menu_surface.get_width() / 2, 20)
+            self.rect = pygame.Rect(
+                menu_offset[0] + x_offset,
+                menu_offset[1] + y_offset,
+                menu_surface.get_width() / 2,
+                30
+            )
+        
+        def debug(self, surface):
+            pygame.draw.rect(surface, (255, 0, 0), self.rect, 1)
 
     class UpgradesMenuButton(pygame.sprite.Sprite):
-        def __init__(self, menu_surface):
+        def __init__(self, menu_surface, menu_offset, x_offset=0, y_offset=0):
             super().__init__()
             
             self.text_surface = font.render("Upgrades", False, (0, 0, 0))
-            self.rect = pygame.Rect(menu_surface.get_width() / 2, 0, menu_surface.get_width() / 2, 20)
+            self.rect = pygame.Rect(
+                menu_offset[0] + x_offset + menu_surface.get_width() / 2,
+                menu_offset[1] + y_offset,
+                menu_surface.get_width() / 2,
+                30
+            )
+
+        def debug(self, surface):
+            pygame.draw.rect(surface, (0, 255, 0), self.rect, 1)
 
     # Initialize
     pygame.init()
@@ -67,10 +83,11 @@ def main():
 
     running = True
     new = True # Change when adding saving
+    debug_mode = False
     menu_type = "Balls"
-    balls_menu_button = BallsMenuButton(menu_surface)
-    upgrades_menu_button = UpgradesMenuButton(menu_surface)
-    enter_press_override = False
+    menu_offset = ((internal_width / 3) * 2, 0)
+    balls_menu_button = BallsMenuButton(menu_surface, menu_offset, 0, 0)
+    upgrades_menu_button = UpgradesMenuButton(menu_surface, menu_offset, 0, 0)
     max_fps = 60
     dt = 0
 
@@ -88,6 +105,13 @@ def main():
             common_ball_count = 0
             new = False
 
+        scaled_mouse_pos = pygame.mouse.get_pos()
+        mouse_pos = (
+            scaled_mouse_pos[0] * internal_width / screen_size[0],
+            scaled_mouse_pos[1] * internal_height / screen_size[1]
+            )
+        keys = pygame.key.get_pressed()
+
         # Event Handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -95,10 +119,10 @@ def main():
             # Handle mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    if balls_menu_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        pass
-                    elif upgrades_menu_button.rect.collidepoint(pygame.mouse.get_pos()):
-                        pass
+                    if balls_menu_button.rect.collidepoint(mouse_pos):
+                        menu_type = "Balls"
+                    elif upgrades_menu_button.rect.collidepoint(mouse_pos):
+                        menu_type = "Upgrades"
                     else:
                         player_money += player_money_per_click
                 elif event.button == 3:
@@ -107,7 +131,6 @@ def main():
                     elif menu_type == "Balls":
                         menu_type = "Upgrades"
         # Handle keypresses
-        keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             running = False
     
@@ -136,6 +159,16 @@ def main():
         
         if keys[pygame.K_LCTRL] and keys[pygame.K_q]:
             player_money += 100000
+
+        if keys[pygame.K_LCTRL] and keys[pygame.K_SPACE]:
+            if not space_pressed:
+                space_pressed = True
+                if debug_mode:
+                    debug_mode = False
+                else:
+                    debug_mode = True
+        else:
+            space_pressed = False
         
         if len(unresolved_balls) > 0:
             for _ in unresolved_balls:
@@ -180,13 +213,19 @@ def main():
                 menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
         elif menu_type == "Upgrades":
             menu_surface.fill((255, 255, 255)) # Sub-background
-        menu_surface.blit(balls_menu_button.text_surface, balls_menu_button.rect.topleft)
-        menu_surface.blit(upgrades_menu_button.text_surface, upgrades_menu_button.rect.topleft)
         # Blit to internal_surface
         internal_surface.blit(menu_surface, ((internal_width / 3) * 2, 0))
+        # # Text
+        internal_surface.blit(balls_menu_button.text_surface, balls_menu_button.rect.topleft)
+        internal_surface.blit(upgrades_menu_button.text_surface, upgrades_menu_button.rect.topleft)
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
         internal_surface.blit(owned_balls_text_surface, (0, 40))
+        # Debug
+        if debug_mode:
+            pygame.draw.circle(internal_surface, (0, 0, 0), mouse_pos, 2)
+            balls_menu_button.debug(internal_surface)
+            upgrades_menu_button.debug(internal_surface)
 
         # Upscale to 1920x1080
         scaled_surface = pygame.transform.scale(internal_surface, screen_size)
