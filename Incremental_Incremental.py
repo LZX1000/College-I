@@ -2,10 +2,20 @@ import pygame
 import random
 import time
 import ctypes
+from typing import List
 
 def main():
+    class Upgrade:
+        def __init__(self, name, type, cost, max_level, description, level=0) -> None:
+            self.name = name
+            self.type = type
+            self.cost = cost
+            self.level = level
+            self.max_level = max_level
+            self.description = description
+
     class Ball:
-        def __init__(self):
+        def __init__(self) -> None:
             rarity = random.randint(1, 100)
             if rarity <= 75:
                 self.rarity = "Common"
@@ -26,40 +36,48 @@ def main():
             
             self.time = time.monotonic()
         
-        def check_for_payount(self):
+        def check_for_payount(self) -> int:
             if time.monotonic() - self.time >= 5:
                 self.time = time.monotonic()
                 return self.money_value
             return 0
         
     class BallsMenuButton(pygame.sprite.Sprite):
-        def __init__(self, menu_surface, menu_offset, x_offset=0, y_offset=0):
+        def __init__(
+            self,
+            menu_surface: pygame.Surface,
+            menu_offset: List[int] | None = [0, 0]
+        ) -> None:
             super().__init__()
 
             self.text_surface = font.render("Balls", False, (0, 0, 0))
             self.rect = pygame.Rect(
-                menu_offset[0] + x_offset,
-                menu_offset[1] + y_offset,
+                menu_offset[0],
+                menu_offset[1],
                 menu_surface.get_width() / 2,
                 30
             )
         
-        def debug(self, surface):
+        def debug(self, surface: pygame.Surface) -> None:
             pygame.draw.rect(surface, (255, 0, 0), self.rect, 1)
 
     class UpgradesMenuButton(pygame.sprite.Sprite):
-        def __init__(self, menu_surface, menu_offset, x_offset=0, y_offset=0):
+        def __init__(
+            self,
+            surface: pygame.Surface,
+            offset: List[int] | None = [0, 0]
+        ) -> None:
             super().__init__()
             
             self.text_surface = font.render("Upgrades", False, (0, 0, 0))
             self.rect = pygame.Rect(
-                menu_offset[0] + x_offset + menu_surface.get_width() / 2,
-                menu_offset[1] + y_offset,
-                menu_surface.get_width() / 2,
+                offset[0] + surface.get_width() / 2,
+                offset[1],
+                surface.get_width() / 2,
                 30
             )
 
-        def debug(self, surface):
+        def debug(self, surface: pygame.Surface) -> None:
             pygame.draw.rect(surface, (0, 255, 0), self.rect, 1)
 
     # Initialize
@@ -75,7 +93,7 @@ def main():
     internal_height = 360
     ctypes.windll.user32.SetProcessDPIAware()
     screen_size = (1920, 1080)
-    pixelation_factor = 2
+    # pixelation_factor = 2
     # # Surfaces
     internal_surface = pygame.Surface((internal_width, internal_height)) # For rendering
     menu_surface = pygame.Surface((internal_width / 3, internal_height)) # For rendering
@@ -86,10 +104,23 @@ def main():
     debug_mode = False
     menu_type = "Balls"
     menu_offset = ((internal_width / 3) * 2, 0)
-    balls_menu_button = BallsMenuButton(menu_surface, menu_offset, 0, 0)
-    upgrades_menu_button = UpgradesMenuButton(menu_surface, menu_offset, 0, 0)
+    balls_menu_button = BallsMenuButton(menu_surface, menu_offset)
+    upgrades_menu_button = UpgradesMenuButton(menu_surface, menu_offset)
     max_fps = 60
     dt = 0
+
+    initialized_upgrades = []
+    '''********************Add this to a startup file later********************'''
+    upgrades = [
+        ("Money Per Click", "money", 10, 10, "Increase money per click by 1"),
+        ("Ball Value", "money", 10, 10, "Increase ball value by 1")
+    ]
+    '''************************************************************************'''
+
+    for upgrade in upgrades:
+        initialized_upgrades.append(Upgrade(upgrade[0], upgrade[1], upgrade[2], upgrade[3], upgrade[4]))
+
+    upgrades = initialized_upgrades
 
     while running:
         # Reset
@@ -212,20 +243,27 @@ def main():
                 menu_surface.blit(most_recent_ball_text_surface1, (0, 140))
                 menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
         elif menu_type == "Upgrades":
+            # upgrade_text_surfaces = []
+            # for i, upgrade in enumerate(upgrades):
+            #     upgrade_text_surface = font.render(f"{upgrade.name} : {upgrade.cost} : {upgrade.type}", False, (0, 0, 0))
+                
+            # # Blit to Upgrades Menu
             menu_surface.fill((255, 255, 255)) # Sub-background
+        menu_surface.blit(balls_menu_button.text_surface, (0, 0))
+        menu_surface.blit(upgrades_menu_button.text_surface, (menu_surface.get_width() / 2, 0))
         # Blit to internal_surface
         internal_surface.blit(menu_surface, ((internal_width / 3) * 2, 0))
         # # Text
-        internal_surface.blit(balls_menu_button.text_surface, balls_menu_button.rect.topleft)
-        internal_surface.blit(upgrades_menu_button.text_surface, upgrades_menu_button.rect.topleft)
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
         internal_surface.blit(owned_balls_text_surface, (0, 40))
         # Debug
         if debug_mode:
-            pygame.draw.circle(internal_surface, (0, 0, 0), mouse_pos, 2)
+            # Menu buttons
             balls_menu_button.debug(internal_surface)
             upgrades_menu_button.debug(internal_surface)
+            # Mouse
+            pygame.draw.circle(internal_surface, (0, 0, 0), mouse_pos, 2)
 
         # Upscale to 1920x1080
         scaled_surface = pygame.transform.scale(internal_surface, screen_size)
