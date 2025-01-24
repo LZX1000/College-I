@@ -32,6 +32,20 @@ def main():
                 return self.money_value
             return 0
         
+    class BallsMenuButton(pygame.sprite.Sprite):
+        def __init__(self, menu_surface):
+            super().__init__()
+
+            self.text_surface = font.render("Balls", False, (0, 0, 0))
+            self.rect = pygame.Rect(0, 0, menu_surface.get_width() / 2, 20)
+
+    class UpgradesMenuButton(pygame.sprite.Sprite):
+        def __init__(self, menu_surface):
+            super().__init__()
+            
+            self.text_surface = font.render("Upgrades", False, (0, 0, 0))
+            self.rect = pygame.Rect(menu_surface.get_width() / 2, 0, menu_surface.get_width() / 2, 20)
+
     # Initialize
     pygame.init()
     pygame.font.init()
@@ -48,12 +62,14 @@ def main():
     pixelation_factor = 2
     # # Surfaces
     internal_surface = pygame.Surface((internal_width, internal_height)) # For rendering
-    balls_menu_surface = pygame.Surface((internal_width / 3, internal_height)) # For rendering
+    menu_surface = pygame.Surface((internal_width / 3, internal_height)) # For rendering
     screen = pygame.display.set_mode(screen_size) # pygame.FULLSCREEN
 
     running = True
     new = True # Change when adding saving
-    menu_type = "Main"
+    menu_type = "Balls"
+    balls_menu_button = BallsMenuButton(menu_surface)
+    upgrades_menu_button = UpgradesMenuButton(menu_surface)
     enter_press_override = False
     max_fps = 60
     dt = 0
@@ -79,12 +95,17 @@ def main():
             # Handle mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    player_money += player_money_per_click
+                    if balls_menu_button.rect.collidepoint(pygame.mouse.get_pos()):
+                        pass
+                    elif upgrades_menu_button.rect.collidepoint(pygame.mouse.get_pos()):
+                        pass
+                    else:
+                        player_money += player_money_per_click
                 elif event.button == 3:
-                    if menu_type == "Main":
+                    if menu_type == "Upgrades":
                         menu_type = "Balls"
                     elif menu_type == "Balls":
-                        menu_type = "Main"
+                        menu_type = "Upgrades"
         # Handle keypresses
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
@@ -139,7 +160,6 @@ def main():
         money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0))
         ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0))
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
-        balls_menu_text_surface = font.render("Balls Menu", False, (0, 0, 0))
         # Balls Menu
         if menu_type == "Balls":
             common_ball_count_text_surface = font.render(f"Common Balls : {common_ball_count}", False, (0, 0, 0))
@@ -150,18 +170,20 @@ def main():
                 most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
                 most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (balls[-1].color))
             # # Blit to Balls Menu
-            balls_menu_surface.fill((255, 255, 255)) # Sub-background
-            balls_menu_surface.blit(common_ball_count_text_surface, (0, 40))
-            balls_menu_surface.blit(rare_ball_count_text_surface, (0, 60))
-            balls_menu_surface.blit(epic_ball_count_text_surface, (0, 80))
-            balls_menu_surface.blit(legendary_ball_count_text_surface, (0, 100))
+            menu_surface.fill((255, 255, 255)) # Sub-background
+            menu_surface.blit(common_ball_count_text_surface, (0, 40))
+            menu_surface.blit(rare_ball_count_text_surface, (0, 60))
+            menu_surface.blit(epic_ball_count_text_surface, (0, 80))
+            menu_surface.blit(legendary_ball_count_text_surface, (0, 100))
             if len(balls) > 0:
-                balls_menu_surface.blit(most_recent_ball_text_surface1, (0, 140))
-                balls_menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
-            internal_surface.blit(balls_menu_surface, ((internal_width / 3) * 2, 0))
+                menu_surface.blit(most_recent_ball_text_surface1, (0, 140))
+                menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
+        elif menu_type == "Upgrades":
+            menu_surface.fill((255, 255, 255)) # Sub-background
+        menu_surface.blit(balls_menu_button.text_surface, balls_menu_button.rect.topleft)
+        menu_surface.blit(upgrades_menu_button.text_surface, upgrades_menu_button.rect.topleft)
         # Blit to internal_surface
-        if menu_type == "Balls":
-            internal_surface.blit(balls_menu_text_surface, ((internal_width / 3) * 2, 0))
+        internal_surface.blit(menu_surface, ((internal_width / 3) * 2, 0))
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
         internal_surface.blit(owned_balls_text_surface, (0, 40))
