@@ -41,6 +41,19 @@ def main():
                 self.time = time.monotonic()
                 return self.money_value
             return 0
+
+    class CombinedBall:
+        def __init__(self, rarity, money_value) -> None:
+            self.money_value = money_value
+            self.rarity = rarity
+            self.count = 2
+            self.time = time.monotonic()
+        
+        def check_for_payount(self) -> int:
+            if time.monotonic() - self.time >= 5:
+                self.time = time.monotonic()
+                return self.money_value * self.count
+            return 0
         
     class Button(pygame.sprite.Sprite):
         def __init__(
@@ -62,6 +75,7 @@ def main():
                 offsets = [list(offset) for offset in offsets]
 
             self.text_surface = font.render(text, False, text_color)
+            self.text_color = text_color
             self.debug_color = debug_color
 
             total_offset_x = sum(offset[0] for offset in offsets)
@@ -76,44 +90,6 @@ def main():
         
         def debug(self, surface: pygame.Surface) -> None:
             pygame.draw.rect(surface, self.debug_color, self.rect, 1)
-
-    # class BallsMenuButton(pygame.sprite.Sprite):
-    #     def __init__(
-    #         self,
-    #         menu_surface: pygame.Surface,
-    #         menu_offset: List[int] | None = [0, 0]
-    #     ) -> None:
-    #         super().__init__()
-
-    #         self.text_surface = font.render("Balls", False, (0, 0, 0))
-    #         self.rect = pygame.Rect(
-    #             menu_offset[0],
-    #             menu_offset[1],
-    #             menu_surface.get_width() / 2,
-    #             30
-    #         )
-        
-    #     def debug(self, surface: pygame.Surface) -> None:
-    #         pygame.draw.rect(surface, (255, 0, 0), self.rect, 1)
-
-    # class UpgradesMenuButton(pygame.sprite.Sprite):
-    #     def __init__(
-    #         self,
-    #         surface: pygame.Surface,
-    #         offset: List[int] | None = [0, 0]
-    #     ) -> None:
-    #         super().__init__()
-            
-    #         self.text_surface = font.render("Upgrades", False, (0, 0, 0))
-    #         self.rect = pygame.Rect(
-    #             offset[0] + surface.get_width() / 2,
-    #             offset[1],
-    #             surface.get_width() / 2,
-    #             30
-    #         )
-
-    #     def debug(self, surface: pygame.Surface) -> None:
-    #         pygame.draw.rect(surface, (0, 255, 0), self.rect, 1)
 
     # Initialize
     pygame.init()
@@ -173,6 +149,7 @@ def main():
             new_ball_cost = 10
             balls = []
             unresolved_balls = []
+            combined_balls = []
             available_upgrades = all_upgrades
             legendary_ball_count = 0
             epic_ball_count = 0
@@ -246,8 +223,11 @@ def main():
             space_pressed = False
         
         if len(unresolved_balls) > 0:
-            for _ in unresolved_balls:
+            while unresolved_balls:
                 new_ball = Ball()
+                resolved = False
+                recent_ball_rarity = new_ball.rarity
+                recent_ball_color = new_ball.color
                 if new_ball.rarity == "Common":
                     common_ball_count += 1
                 elif new_ball.rarity == "Rare":
@@ -256,10 +236,26 @@ def main():
                     epic_ball_count += 1
                 else:
                     legendary_ball_count += 1
-                balls.append(new_ball)
-                unresolved_balls.remove(0)
+                while not resolved:
+                    for ball in combined_balls:
+                        if ball.rarity == new_ball.rarity and ball.time % 5 == new_ball.time % 5:
+                            ball.count += 1
+                            resolved = True
+                            combined_balls.append(new_ball)
+                            break
+                    for ball in balls:
+                        if ball.rarity == new_ball.rarity and ball.time % 5 == new_ball.time % 5:
+                            new_ball = CombinedBall(new_ball.rarity, new_ball.money_value)
+                            resolved = True
+                            balls.remove(ball)
+                            combined_balls.append(new_ball)
+                            break
+                    balls.append(new_ball)
+                unresolved_balls.pop(0)
 
         for ball in balls:
+            player_money += ball.check_for_payount()
+        for ball in combined_balls:
             player_money += ball.check_for_payount()
 
         # Render in 640x360
@@ -276,7 +272,7 @@ def main():
             legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_ball_count}", False, (0, 0, 0))
             if len(balls) > 0:
                 most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
-                most_recent_ball_text_surface2 = font.render(f"        {balls[-1].rarity} Ball", False, (balls[-1].color))
+                most_recent_ball_text_surface2 = font.render(f"        {recent_ball_rarity} Ball", False, (recent_ball_color))
             # # Blit to Balls Menu
             menu_surface.fill((255, 255, 255)) # Sub-background
             menu_surface.blit(common_ball_count_text_surface, (0, 40))
