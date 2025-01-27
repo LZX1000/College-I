@@ -5,15 +5,6 @@ import ctypes
 from typing import List, Tuple
 
 def main():
-    class Upgrade:
-        def __init__(self, name, type, cost, max_level, description, level=0) -> None:
-            self.name = name
-            self.type = type
-            self.cost = cost
-            self.level = level
-            self.max_level = max_level
-            self.description = description
-
     class Ball:
         def __init__(self) -> None:
             rarity = random.randint(1, 100)
@@ -56,40 +47,105 @@ def main():
             return 0
         
     class Button(pygame.sprite.Sprite):
+        '''
+        Creates a button object, contains a text surface and a rect object.
+        '''
         def __init__(
             self,
             surface: pygame.Surface,
-            text: str | None = None, /,
-            offset: List[List[int]] |
-                    List[Tuple] |
-                    List[int] |
-                    None = [[0, 0]],
-            text_color: List[int] | None = [0, 0, 0],
-            debug_color: List[int] | None = [255, 0, 0]
+            text: str |
+                  List[str] |
+                  List[Tuple[str, Tuple[int, int, int]]] |
+                  None = None,
+                  /,
+            offset: List[Tuple[int, int]] |
+                    Tuple[int, int] |
+                    None = [(0, 0)],
+            text_color: Tuple[int, int, int] | None = (0, 0, 0),
+            spacing: int | None = 20,
+            type: str = "Upgrade",
+            debug_color: Tuple[int, int, int] | None = (255, 0, 0)
         ) -> None:
             super().__init__()
-            offsets = offset
-            if isinstance(offset[0], int) or isinstance(offset[0], float):
-                offsets = [offsets]
+            # Prepare text
+            texts = []
+            text_surfaces = []
+            self.spacing = spacing
+            if isinstance(text, str):
+                texts = [(text, text_color)]
+            elif isinstance(text, list):
+                for t in text:
+                    if isinstance(t, tuple):
+                        texts.append(t)
+                    else:
+                        texts.append((t, text_color))
+            else:
+                texts = [("", text_color)]
+            
+            for (text, color) in texts:
+                text_surface = font.render(text, False, color)
+                text_surfaces.append(text_surface)
+            # Prepare offsets
             if isinstance(offset[0], tuple):
-                offsets = [list(offset) for offset in offsets]
-
-            self.text_surface = font.render(text, False, text_color)
-            self.text_color = text_color
-            self.debug_color = debug_color
+                offsets = offset
+            elif isinstance(offset[0], int) or isinstance(offset[0], float):
+                offsets = [offset]
 
             total_offset_x = sum(offset[0] for offset in offsets)
             total_offset_y = sum(offset[1] for offset in offsets)
 
+            self.text_surfaces = text_surfaces
+            self.debug_color = debug_color
+
             self.rect = pygame.Rect(
                 total_offset_x,
                 total_offset_y,
-                surface.get_width() / 2,
+                surface.get_width() / 2 if type.lower() == "menu" else surface.get_width(),
                 30
             )
         
+        def update(
+            self,
+            surface: pygame.Surface,
+            pos: Tuple[int, int] | None = None
+        ) -> None:
+            '''
+            Updates the given surface by blitting text surfaces at the specified position.
+            '''
+            if pos is None:
+                pos = self.rect.topleft
+            for i, text_surface in enumerate(self.text_surfaces):
+                surface.blit(text_surface, (pos[0], pos[1] + (i * self.spacing)))
+
         def debug(self, surface: pygame.Surface) -> None:
+            '''
+            Draws a debug rectangle on the given surface.
+            '''
             pygame.draw.rect(surface, self.debug_color, self.rect, 1)
+
+    class Upgrade:
+        def __init__(
+            self,
+            surface: pygame.Surface,
+            name: str | None = "",
+            type: str | None = "money",
+            cost: int | None = 0,
+            max_level: int | None = 999,
+            description: str | None = "",
+            level: int | None = 0
+        ) -> None:
+            self.name = name
+            self.type = type
+            self.cost = cost
+            self.level = level
+            self.max_level = max_level
+            self.description = description
+            self.button = Button(
+                surface,
+                [self.name, self.description],
+                offset=[(menu_surface.get_width() / 2, 0), ((internal_width / 3) * 2, 0)],
+                debug_color=(255, 0, 0)
+            )
 
     # Initialize
     pygame.init()
@@ -114,11 +170,14 @@ def main():
     balls_menu_button = Button(
         menu_surface,
         "Balls",
-        offset=((internal_width / 3) * 2, 0)
+        type="Menu",
+        offset=((internal_width / 3) * 2, 0),
+        debug_color=[0, 0, 255]
     )
     upgrades_menu_button = Button(
         menu_surface,
         "Upgrades",
+        type="Menu",
         offset=[(menu_surface.get_width() / 2, 0), ((internal_width / 3) * 2, 0)],
         debug_color=[0, 255, 0]
     )
@@ -139,7 +198,7 @@ def main():
     '''************************************************************************'''
 
     for upgrade in raw_upgrades:
-        all_upgrades.append(Upgrade(upgrade[0], upgrade[1], upgrade[2], upgrade[3], upgrade[4]))
+        all_upgrades.append(Upgrade(menu_surface, upgrade[0], upgrade[1], upgrade[2], upgrade[3], upgrade[4]))
 
     while running:
         # Reset
@@ -284,6 +343,7 @@ def main():
                 menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
         elif menu_type == "Upgrades":
             available_upgrade_text_surfaces = []
+            available_upgrade_buttons = []
             for upgrade in available_upgrades:
                 available_upgrade_name_text_surface = font.render(f"{upgrade.name} :", False, (0, 0, 0))
                 available_upgrade_price_text_surface = font.render(f"   {upgrade.cost} {upgrade.type}", False, (0, 0, 0))
@@ -293,8 +353,8 @@ def main():
             for i, upgrade_text_surface in enumerate(available_upgrade_text_surfaces):
                 menu_surface.blit(upgrade_text_surface[0], (0, i * 40 + 40))
                 menu_surface.blit(upgrade_text_surface[1], (0, i * 40 + 60))
-        menu_surface.blit(balls_menu_button.text_surface, (0, 0))
-        menu_surface.blit(upgrades_menu_button.text_surface, (menu_surface.get_width() / 2, 0))
+        balls_menu_button.update(menu_surface, (0, 0))
+        upgrades_menu_button.update(menu_surface, (menu_surface.get_width() / 2, 0))
         # Blit to internal_surface
         internal_surface.blit(menu_surface, ((internal_width / 3) * 2, 0))
         # # Text
@@ -318,7 +378,6 @@ def main():
         dt = clock.tick(max_fps) / 1000
 
     # Save
-
 
 if __name__ == "__main__":
     main()
