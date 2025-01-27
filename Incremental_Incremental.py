@@ -10,6 +10,7 @@ def main():
             self,
             money: int | None = 100,
             money_per_click: int | None = 1,
+            clicks: int | None = 0,
             new_ball_cost: int | None = 10,
             common_ball_value: int | None = 1,
             rare_ball_value: int | None = 5,
@@ -22,6 +23,7 @@ def main():
         ) -> None:
             self.money = money
             self.money_per_click = money_per_click
+            self.clicks = clicks
             self.new_ball_cost = new_ball_cost
             # Values
             self.common_ball_value = common_ball_value
@@ -311,6 +313,7 @@ def main():
                     elif menu_type == "Balls":
                         pass
                     if not other_clicked:
+                        player.clicks += 1
                         player.money += player.money_per_click
                 elif event.button == 3:
                     if menu_type == "Upgrades":
@@ -406,6 +409,8 @@ def main():
         money_text_surface = font.render(f"Money :  {player.money}", False, (0, 0, 0))
         ball_cost_text_surface = font.render(f"Ball Cost : {player.new_ball_cost}", False, (0, 0, 0))
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
+        total_clicks_text_surface = font.render(f"Total Clicks : {player.clicks}", False, (0, 0, 0))
+        money_per_click_surface = font.render(f"Money Per Click : {player.money_per_click}", False, (0, 0, 0))
         money_per_second_surface = font.render(f"Money Per Second : {round(money_per_second, 2)}", False, (0, 0, 0))
         common_ball_surface = font.render(f"Common", False, (0, 0, 0))
         common_ball_value_surface = font.render(f": {player.common_ball_value}", False, (0, 0, 0))
@@ -454,6 +459,8 @@ def main():
         internal_surface.blit(epic_ball_value_surface, (100, 170))
         internal_surface.blit(legendary_ball_surface, (0, 190))
         internal_surface.blit(legendary_ball_value_surface, (100, 190))
+        internal_surface.blit(total_clicks_text_surface, (0, 300))
+        internal_surface.blit(money_per_click_surface, (0, 320))
         internal_surface.blit(money_per_second_surface, (0, 340))
         # Debug
         if debug_mode:
