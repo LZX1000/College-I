@@ -63,6 +63,7 @@ def main():
                     None = [(0, 0)],
             text_color: Tuple[int, int, int] | None = (0, 0, 0),
             spacing: int | None = 20,
+            rect_height: int | None = None,
             type: str = "Upgrade",
             debug_color: Tuple[int, int, int] | None = (255, 0, 0)
         ) -> None:
@@ -90,6 +91,9 @@ def main():
                 offsets = offset
             elif isinstance(offset[0], int) or isinstance(offset[0], float):
                 offsets = [offset]
+            # Prepare rect height
+            if rect_height is None:
+                rect_height = sum(spacing for _ in text_surfaces)
 
             total_offset_x = sum(offset[0] for offset in offsets)
             total_offset_y = sum(offset[1] for offset in offsets)
@@ -101,7 +105,7 @@ def main():
                 total_offset_x,
                 total_offset_y,
                 surface.get_width() / 2 if type.lower() == "menu" else surface.get_width(),
-                30
+                rect_height
             )
         
         def update(
@@ -142,10 +146,13 @@ def main():
             self.description = description
             self.button = Button(
                 surface,
-                [self.name, self.description],
-                offset=[(menu_surface.get_width() / 2, 0), ((internal_width / 3) * 2, 0)],
-                debug_color=(255, 0, 0)
+                [f"{self.name} :", f"   {self.cost} {self.type}"],
+                offset=[((internal_width / 3) * 2, 0), (0, 40)],
+                debug_color=(255, 255, 0)
             )
+
+            # available_upgrade_name_text_surface = font.render(f"{upgrade.name} :", False, (0, 0, 0))
+            # available_upgrade_price_text_surface = font.render(f"   {upgrade.cost} {upgrade.type}", False, (0, 0, 0))
 
     # Initialize
     pygame.init()
@@ -350,17 +357,10 @@ def main():
                 menu_surface.blit(most_recent_ball_text_surface1, (0, 140))
                 menu_surface.blit(most_recent_ball_text_surface2, (0, 160))
         elif menu_type == "Upgrades":
-            available_upgrade_text_surfaces = []
-            available_upgrade_buttons = []
-            for upgrade in available_upgrades:
-                available_upgrade_name_text_surface = font.render(f"{upgrade.name} :", False, (0, 0, 0))
-                available_upgrade_price_text_surface = font.render(f"   {upgrade.cost} {upgrade.type}", False, (0, 0, 0))
-                available_upgrade_text_surfaces.append((available_upgrade_name_text_surface, available_upgrade_price_text_surface))
             # # Blit to Upgrades Menu
             menu_surface.fill((255, 255, 255)) # Sub-background
-            for i, upgrade_text_surface in enumerate(available_upgrade_text_surfaces):
-                menu_surface.blit(upgrade_text_surface[0], (0, i * 40 + 40))
-                menu_surface.blit(upgrade_text_surface[1], (0, i * 40 + 60))
+            for i, upgrade in enumerate(available_upgrades):
+                upgrade.button.update(menu_surface, (0, i * 40 + 40))
         balls_menu_button.update(menu_surface, (0, 0))
         upgrades_menu_button.update(menu_surface, (menu_surface.get_width() / 2, 0))
         # Blit to internal_surface
@@ -375,6 +375,9 @@ def main():
             # Menu buttons
             balls_menu_button.debug(internal_surface)
             upgrades_menu_button.debug(internal_surface)
+            # Upgrades
+            for upgrade in available_upgrades:
+                upgrade.button.debug(internal_surface)
             # Mouse
             pygame.draw.circle(internal_surface, (0, 0, 0), mouse_pos, 2)
 
