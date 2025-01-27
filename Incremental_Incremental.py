@@ -290,16 +290,16 @@ def main():
                 recent_ball_color = new_ball.color
                 if new_ball.rarity == "Common":
                     common_ball_count += 1
-                    money_per_second += 1
+                    money_per_second_add = 1
                 elif new_ball.rarity == "Rare":
                     rare_ball_count += 1
-                    money_per_second += 5
+                    money_per_second_add = 5
                 elif new_ball.rarity == "Epic":
                     epic_ball_count += 1
-                    money_per_second += 25
+                    money_per_second_add = 25
                 else:
                     legendary_ball_count += 1
-                    money_per_second += 100
+                    money_per_second_add = 100
                 while not resolved:
                     for ball in combined_balls:
                         if ball.rarity == new_ball.rarity and ball.time % 5 == new_ball.time % 5:
@@ -317,6 +317,8 @@ def main():
                     balls.append(new_ball)
                 unresolved_balls.pop(0)
 
+                money_per_second += money_per_second_add / 5
+
         for ball in balls:
             player_money += ball.check_for_payount()
         for ball in combined_balls:
@@ -328,7 +330,7 @@ def main():
         money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0))
         ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0))
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
-        money_per_second_surface = font.render(f"Money Per Second : {money_per_second}", False, (0, 0, 0))
+        money_per_second_surface = font.render(f"Money Per Second : {round(money_per_second, 2)}", False, (0, 0, 0))
         # Balls Menu
         if menu_type == "Balls":
             common_ball_count_text_surface = font.render(f"Common Balls : {common_ball_count}", False, (0, 0, 0))
