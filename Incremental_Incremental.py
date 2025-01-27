@@ -5,26 +5,53 @@ import ctypes
 from typing import List, Tuple
 
 def main():
-    # Add player class to store all player data to be accessed in upgrade
+    class Player:
+        def __init__(
+            self,
+            money: int | None = 100,
+            money_per_click: int | None = 1,
+            new_ball_cost: int | None = 10,
+            common_ball_value: int | None = 1,
+            rare_ball_value: int | None = 5,
+            epic_ball_value: int | None = 25,
+            legendary_ball_value: int | None = 100,
+            common_ball_count: int | None = 0,
+            rare_ball_count: int | None = 0,
+            epic_ball_count: int | None = 0,
+            legendary_ball_count: int | None = 0
+        ) -> None:
+            self.money = money
+            self.money_per_click = money_per_click
+            self.new_ball_cost = new_ball_cost
+            # Values
+            self.common_ball_value = common_ball_value
+            self.rare_ball_value = rare_ball_value
+            self.epic_ball_value = epic_ball_value
+            self.legendary_ball_value = legendary_ball_value
+            # Counts
+            self.common_ball_count = common_ball_count
+            self.rare_ball_count = rare_ball_count
+            self.epic_ball_count = epic_ball_count
+            self.legendary_ball_count = legendary_ball_count
     class Ball:
         def __init__(self) -> None:
             rarity = random.randint(1, 100)
             if rarity <= 75:
                 self.rarity = "Common"
                 self.color = (0, 0, 0)
-                self.money_value = common_ball_value
+                self.money_value = player.common_ball_value
             elif rarity <= 95:
                 self.rarity = "Rare"
                 self.color = (0, 0, 255)
-                self.money_value = rare_ball_value
+                self.money_value = player.rare_ball_value
             elif rarity <= 99:
                 self.rarity = "Epic"
                 self.color = (255, 0, 255)
-                self.money_value = epic_ball_value
+                self.money_value = player.epic_ball_value
             else:
                 self.rarity = "Legendary"
                 self.color = (255, 0, 0)
-                self.money_value = legendary_ball_value
+                self.money_value = player.legendary_ball_value
             
             self.time = time.monotonic()
         
@@ -65,7 +92,7 @@ def main():
             text_color: Tuple[int, int, int] | None = (0, 0, 0),
             spacing: int | None = 20,
             rect_height: int | None = None,
-            type: str = "Upgrade",
+            type: str = "upgrade",
             debug_color: Tuple[int, int, int] | None = (255, 0, 0)
         ) -> None:
             super().__init__()
@@ -106,7 +133,7 @@ def main():
                 total_offset_x,
                 total_offset_y,
                 surface.get_width() / 2 if type.lower() == "menu" else surface.get_width(),
-                rect_height
+                30 if type.lower() == "menu" else rect_height
             )
         
         def update(
@@ -156,10 +183,10 @@ def main():
                 debug_color=(255, 255, 0)
             )
         
-        def check(self, surface: pygame.Surface, player_money: int) -> bool:
+        def check(self, surface: pygame.Surface) -> bool:
             if self.type == "money":
-                if player_money >= self.cost:
-                    player_money -= self.cost
+                if player.money >= self.cost:
+                    player.money -= self.cost
                     self.level += 1
                     self.cost += 10
                     self.button = Button(
@@ -235,22 +262,12 @@ def main():
     while running:
         # Reset
         if new:
-            player_money = 100
-            player_money_per_click = 1
-            new_ball_cost = 10
+            player = Player()
+            money_per_second = 0
             balls = []
             unresolved_balls = []
             combined_balls = []
             available_upgrades = all_upgrades
-            legendary_ball_count = 0
-            legendary_ball_value = 100
-            epic_ball_count = 0
-            epic_ball_value = 25
-            rare_ball_count = 0
-            rare_ball_value = 5
-            common_ball_count = 0
-            common_ball_value = 1
-            money_per_second = 0
             new = False
 
         scaled_mouse_pos = pygame.mouse.get_pos()
@@ -278,16 +295,23 @@ def main():
                         for upgrade in available_upgrades:
                             if upgrade.button.rect.collidepoint(mouse_pos):
                                 other_clicked = True
-                                if upgrade.check(internal_surface, player_money):
+                                if upgrade.check(internal_surface):
                                     if upgrade.name == "Money Per Click":
-                                        player_money_per_click += 1
+                                        player.money_per_click += 1
                                     elif upgrade.name == "Ball Value":
-                                        common_ball_value += 1
+                                        player.common_ball_value += 1
+                                        player.rare_ball_value += 1
+                                        player.epic_ball_value += 1
+                                        player.legendary_ball_value += 1
+                                        money_per_second = (player.common_ball_value * player.common_ball_count +
+                                                            player.rare_ball_value * player.rare_ball_count +
+                                                            player.epic_ball_value * player.epic_ball_count +
+                                                            player.legendary_ball_value * player.legendary_ball_count) / 5
                                     break
                     elif menu_type == "Balls":
                         pass
                     if not other_clicked:
-                        player_money += player_money_per_click
+                        player.money += player.money_per_click
                 elif event.button == 3:
                     if menu_type == "Upgrades":
                         menu_type = "Balls"
@@ -301,15 +325,15 @@ def main():
             if not enter_pressed:
                 enter_pressed = True
                 enter_timer = time.monotonic()
-                if player_money >= new_ball_cost:
-                    player_money -= new_ball_cost
-                    new_ball_cost = int(round(len(balls) ** 2) / 2 + 11)
+                if player.money >= player.new_ball_cost:
+                    player.money -= player.new_ball_cost
+                    player.new_ball_cost = int(round(len(balls) ** 2) / 2 + 11)
                     unresolved_balls.append(0)
                     enter_interval_timer = time.monotonic()
             elif not enter_press_override:
-                if player_money >= new_ball_cost and time.monotonic() - enter_interval_timer >= 0.1:
-                    player_money -= new_ball_cost
-                    new_ball_cost = int(round(len(balls) ** 2) / 2 + 11)
+                if player.money >= player.new_ball_cost and time.monotonic() - enter_interval_timer >= 0.1:
+                    player.money -= player.new_ball_cost
+                    player.new_ball_cost = int(round(len(balls) ** 2) / 2 + 11)
                     unresolved_balls.append(0)
                     enter_interval_timer = time.monotonic()
             else:
@@ -321,7 +345,7 @@ def main():
             enter_press_override = False
         
         if keys[pygame.K_LCTRL] and keys[pygame.K_q]:
-            player_money += 100000
+            player.money += 100000
 
         if keys[pygame.K_LCTRL] and keys[pygame.K_SPACE]:
             if not space_pressed:
@@ -340,16 +364,16 @@ def main():
                 recent_ball_rarity = new_ball.rarity
                 recent_ball_color = new_ball.color
                 if new_ball.rarity == "Common":
-                    common_ball_count += 1
+                    player.common_ball_count += 1
                     money_per_second_add = 1
                 elif new_ball.rarity == "Rare":
-                    rare_ball_count += 1
+                    player.rare_ball_count += 1
                     money_per_second_add = 5
                 elif new_ball.rarity == "Epic":
-                    epic_ball_count += 1
+                    player.epic_ball_count += 1
                     money_per_second_add = 25
                 else:
-                    legendary_ball_count += 1
+                    player.legendary_ball_count += 1
                     money_per_second_add = 100
                 while not resolved:
                     for ball in combined_balls:
@@ -372,31 +396,31 @@ def main():
                 money_per_second += money_per_second_add / 5
 
         for ball in balls:
-            player_money += ball.check_for_payount()
+            player.money += ball.check_for_payount()
         for ball in combined_balls:
-            player_money += ball.check_for_payount()
+            player.money += ball.check_for_payount()
 
         # Render in 640x360
         internal_surface.fill((180, 180, 180)) # Sub-background
         # background.game_update(internal_surface)
-        money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0))
-        ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0))
+        money_text_surface = font.render(f"Money :  {player.money}", False, (0, 0, 0))
+        ball_cost_text_surface = font.render(f"Ball Cost : {player.new_ball_cost}", False, (0, 0, 0))
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
         money_per_second_surface = font.render(f"Money Per Second : {round(money_per_second, 2)}", False, (0, 0, 0))
         common_ball_surface = font.render(f"Common", False, (0, 0, 0))
-        common_ball_value_surface = font.render(f": {common_ball_value}", False, (0, 0, 0))
+        common_ball_value_surface = font.render(f": {player.common_ball_value}", False, (0, 0, 0))
         rare_ball_surface = font.render(f"Rare", False, (0, 0, 0))
-        rare_ball_value_surface = font.render(f": {rare_ball_value}", False, (0, 0, 0))
+        rare_ball_value_surface = font.render(f": {player.rare_ball_value}", False, (0, 0, 0))
         epic_ball_surface = font.render(f"Epic", False, (0, 0, 0))
-        epic_ball_value_surface = font.render(f": {epic_ball_value}", False, (0, 0, 0))
+        epic_ball_value_surface = font.render(f": {player.epic_ball_value}", False, (0, 0, 0))
         legendary_ball_surface = font.render(f"Legendary", False, (0, 0, 0))
-        legendary_ball_value_surface = font.render(f": {legendary_ball_value}", False, (0, 0, 0))
+        legendary_ball_value_surface = font.render(f": {player.legendary_ball_value}", False, (0, 0, 0))
         # Balls Menu
         if menu_type == "Balls":
-            common_ball_count_text_surface = font.render(f"Common : {common_ball_count}", False, (0, 0, 0))
-            rare_ball_count_text_surface = font.render(f"Rare : {rare_ball_count}", False, (0, 0, 0))
-            epic_ball_count_text_surface = font.render(f"Epic : {epic_ball_count}", False, (0, 0, 0))
-            legendary_ball_count_text_surface = font.render(f"Legendary : {legendary_ball_count}", False, (0, 0, 0))
+            common_ball_count_text_surface = font.render(f"Common : {player.common_ball_count}", False, (0, 0, 0))
+            rare_ball_count_text_surface = font.render(f"Rare : {player.rare_ball_count}", False, (0, 0, 0))
+            epic_ball_count_text_surface = font.render(f"Epic : {player.epic_ball_count}", False, (0, 0, 0))
+            legendary_ball_count_text_surface = font.render(f"Legendary : {player.legendary_ball_count}", False, (0, 0, 0))
             if len(balls) > 0:
                 most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
                 most_recent_ball_text_surface2 = font.render(f"        {recent_ball_rarity} Ball", False, (recent_ball_color))
