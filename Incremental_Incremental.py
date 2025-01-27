@@ -5,25 +5,26 @@ import ctypes
 from typing import List, Tuple
 
 def main():
+    # Add player class to store all player data to be accessed in upgrade
     class Ball:
         def __init__(self) -> None:
             rarity = random.randint(1, 100)
             if rarity <= 75:
                 self.rarity = "Common"
                 self.color = (0, 0, 0)
-                self.money_value = 1
+                self.money_value = common_ball_value
             elif rarity <= 95:
                 self.rarity = "Rare"
                 self.color = (0, 0, 255)
-                self.money_value = 5
+                self.money_value = rare_ball_value
             elif rarity <= 99:
                 self.rarity = "Epic"
                 self.color = (255, 0, 255)
-                self.money_value = 25
+                self.money_value = epic_ball_value
             else:
                 self.rarity = "Legendary"
                 self.color = (255, 0, 0)
-                self.money_value = 100
+                self.money_value = legendary_ball_value
             
             self.time = time.monotonic()
         
@@ -136,6 +137,9 @@ def main():
             cost: int | None = 0,
             max_level: int | None = 999,
             description: str | None = "",
+            offset: List[Tuple[int, int]] |
+                    Tuple[int, int] |
+                    None = [(0, 0)],
             level: int | None = 0
         ) -> None:
             self.name = name
@@ -144,15 +148,28 @@ def main():
             self.level = level
             self.max_level = max_level
             self.description = description
+            self.offset = offset + [((internal_width / 3) * 2, 0)]
             self.button = Button(
                 surface,
-                [f"{self.name} :", f"   {self.cost} {self.type}"],
-                offset=[((internal_width / 3) * 2, 0), (0, 40)],
+                [f"lv {self.level} - {self.name} :", f"        {self.cost} {self.type}"],
+                offset=self.offset,
                 debug_color=(255, 255, 0)
             )
+        
+        def check(self, surface: pygame.Surface, player_money: int) -> bool:
+            if self.type == "money":
+                if player_money >= self.cost:
+                    player_money -= self.cost
+                    self.level += 1
+                    self.cost += 10
+                    self.button = Button(
+                        surface,
+                        [f"lv {self.level} - {self.name} :", f"        {self.cost} {self.type}"],
+                        offset=self.offset,
+                        debug_color=(255, 255, 0)
+                    )
 
-            # available_upgrade_name_text_surface = font.render(f"{upgrade.name} :", False, (0, 0, 0))
-            # available_upgrade_price_text_surface = font.render(f"   {upgrade.cost} {upgrade.type}", False, (0, 0, 0))
+                    return True
 
     # Initialize
     pygame.init()
@@ -204,8 +221,16 @@ def main():
     ]
     '''************************************************************************'''
 
-    for upgrade in raw_upgrades:
-        all_upgrades.append(Upgrade(menu_surface, upgrade[0], upgrade[1], upgrade[2], upgrade[3], upgrade[4]))
+    for i, upgrade in enumerate(raw_upgrades):
+        all_upgrades.append(Upgrade(
+                menu_surface,
+                upgrade[0],
+                upgrade[1],
+                upgrade[2],
+                upgrade[3],
+                upgrade[4],
+                offset=[(0, i * 50 + 40)]
+            ))
 
     while running:
         # Reset
@@ -218,9 +243,13 @@ def main():
             combined_balls = []
             available_upgrades = all_upgrades
             legendary_ball_count = 0
+            legendary_ball_value = 100
             epic_ball_count = 0
+            epic_ball_value = 25
             rare_ball_count = 0
+            rare_ball_value = 5
             common_ball_count = 0
+            common_ball_value = 1
             money_per_second = 0
             new = False
 
@@ -238,11 +267,26 @@ def main():
             # Handle mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    other_clicked = False
                     if balls_menu_button.rect.collidepoint(mouse_pos):
+                        other_clicked = True
                         menu_type = "Balls"
                     elif upgrades_menu_button.rect.collidepoint(mouse_pos):
+                        other_clicked = True
                         menu_type = "Upgrades"
-                    else:
+                    elif menu_type == "Upgrades":
+                        for upgrade in available_upgrades:
+                            if upgrade.button.rect.collidepoint(mouse_pos):
+                                other_clicked = True
+                                if upgrade.check(internal_surface, player_money):
+                                    if upgrade.name == "Money Per Click":
+                                        player_money_per_click += 1
+                                    elif upgrade.name == "Ball Value":
+                                        common_ball_value += 1
+                                    break
+                    elif menu_type == "Balls":
+                        pass
+                    if not other_clicked:
                         player_money += player_money_per_click
                 elif event.button == 3:
                     if menu_type == "Upgrades":
@@ -321,7 +365,8 @@ def main():
                             balls.remove(ball)
                             combined_balls.append(new_ball)
                             break
-                    balls.append(new_ball)
+                    break
+                balls.append(new_ball)
                 unresolved_balls.pop(0)
 
                 money_per_second += money_per_second_add / 5
@@ -338,12 +383,20 @@ def main():
         ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0))
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
         money_per_second_surface = font.render(f"Money Per Second : {round(money_per_second, 2)}", False, (0, 0, 0))
+        common_ball_surface = font.render(f"Common", False, (0, 0, 0))
+        common_ball_value_surface = font.render(f": {common_ball_value}", False, (0, 0, 0))
+        rare_ball_surface = font.render(f"Rare", False, (0, 0, 0))
+        rare_ball_value_surface = font.render(f": {rare_ball_value}", False, (0, 0, 0))
+        epic_ball_surface = font.render(f"Epic", False, (0, 0, 0))
+        epic_ball_value_surface = font.render(f": {epic_ball_value}", False, (0, 0, 0))
+        legendary_ball_surface = font.render(f"Legendary", False, (0, 0, 0))
+        legendary_ball_value_surface = font.render(f": {legendary_ball_value}", False, (0, 0, 0))
         # Balls Menu
         if menu_type == "Balls":
-            common_ball_count_text_surface = font.render(f"Common Balls : {common_ball_count}", False, (0, 0, 0))
-            rare_ball_count_text_surface = font.render(f"Rare Balls : {rare_ball_count}", False, (0, 0, 0))
-            epic_ball_count_text_surface = font.render(f"Epic Balls : {epic_ball_count}", False, (0, 0, 0))
-            legendary_ball_count_text_surface = font.render(f"Legendary Balls : {legendary_ball_count}", False, (0, 0, 0))
+            common_ball_count_text_surface = font.render(f"Common : {common_ball_count}", False, (0, 0, 0))
+            rare_ball_count_text_surface = font.render(f"Rare : {rare_ball_count}", False, (0, 0, 0))
+            epic_ball_count_text_surface = font.render(f"Epic : {epic_ball_count}", False, (0, 0, 0))
+            legendary_ball_count_text_surface = font.render(f"Legendary : {legendary_ball_count}", False, (0, 0, 0))
             if len(balls) > 0:
                 most_recent_ball_text_surface1 = font.render(f"Most Recent Ball :", False, (0, 0, 0))
                 most_recent_ball_text_surface2 = font.render(f"        {recent_ball_rarity} Ball", False, (recent_ball_color))
@@ -360,7 +413,7 @@ def main():
             # # Blit to Upgrades Menu
             menu_surface.fill((255, 255, 255)) # Sub-background
             for i, upgrade in enumerate(available_upgrades):
-                upgrade.button.update(menu_surface, (0, i * 40 + 40))
+                upgrade.button.update(menu_surface, (0, i * 50 + 40))
         balls_menu_button.update(menu_surface, (0, 0))
         upgrades_menu_button.update(menu_surface, (menu_surface.get_width() / 2, 0))
         # Blit to internal_surface
@@ -369,6 +422,14 @@ def main():
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
         internal_surface.blit(owned_balls_text_surface, (0, 40))
+        internal_surface.blit(common_ball_surface, (0, 130))
+        internal_surface.blit(common_ball_value_surface, (100, 130))
+        internal_surface.blit(rare_ball_surface, (0, 150))
+        internal_surface.blit(rare_ball_value_surface, (100, 150))
+        internal_surface.blit(epic_ball_surface, (0, 170))
+        internal_surface.blit(epic_ball_value_surface, (100, 170))
+        internal_surface.blit(legendary_ball_surface, (0, 190))
+        internal_surface.blit(legendary_ball_value_surface, (100, 190))
         internal_surface.blit(money_per_second_surface, (0, 340))
         # Debug
         if debug_mode:
@@ -376,8 +437,9 @@ def main():
             balls_menu_button.debug(internal_surface)
             upgrades_menu_button.debug(internal_surface)
             # Upgrades
-            for upgrade in available_upgrades:
-                upgrade.button.debug(internal_surface)
+            if menu_type == "Upgrades":
+                for upgrade in available_upgrades:
+                    upgrade.button.debug(internal_surface)
             # Mouse
             pygame.draw.circle(internal_surface, (0, 0, 0), mouse_pos, 2)
 
