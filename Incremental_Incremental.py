@@ -214,6 +214,7 @@ def main():
             epic_ball_count = 0
             rare_ball_count = 0
             common_ball_count = 0
+            money_per_second = 0
             new = False
 
         scaled_mouse_pos = pygame.mouse.get_pos()
@@ -289,12 +290,16 @@ def main():
                 recent_ball_color = new_ball.color
                 if new_ball.rarity == "Common":
                     common_ball_count += 1
+                    money_per_second += 1
                 elif new_ball.rarity == "Rare":
                     rare_ball_count += 1
+                    money_per_second += 5
                 elif new_ball.rarity == "Epic":
                     epic_ball_count += 1
+                    money_per_second += 25
                 else:
                     legendary_ball_count += 1
+                    money_per_second += 100
                 while not resolved:
                     for ball in combined_balls:
                         if ball.rarity == new_ball.rarity and ball.time % 5 == new_ball.time % 5:
@@ -323,6 +328,7 @@ def main():
         money_text_surface = font.render(f"Money :  {player_money}", False, (0, 0, 0))
         ball_cost_text_surface = font.render(f"Ball Cost : {new_ball_cost}", False, (0, 0, 0))
         owned_balls_text_surface = font.render(f"Owned Balls : {len(balls)}", False, (0, 0, 0))
+        money_per_second_surface = font.render(f"Money Per Second : {money_per_second}", False, (0, 0, 0))
         # Balls Menu
         if menu_type == "Balls":
             common_ball_count_text_surface = font.render(f"Common Balls : {common_ball_count}", False, (0, 0, 0))
@@ -361,6 +367,7 @@ def main():
         internal_surface.blit(money_text_surface, (0, 0))
         internal_surface.blit(ball_cost_text_surface, (0, 20))
         internal_surface.blit(owned_balls_text_surface, (0, 40))
+        internal_surface.blit(money_per_second_surface, (0, 340))
         # Debug
         if debug_mode:
             # Menu buttons
